@@ -8,7 +8,7 @@
 
 ### The quick way
 
-Double-click **`Creer.html`**. It is a self-contained build of the whole studio: all of the code, fonts and artwork are inside one file. No install, no server.
+[**Download Creer.html**](https://github.com/ahpah-dev/creer/releases/latest/download/Creer.html) from the latest release and double-click it. It is a self-contained build of the whole studio: all of the code, fonts and artwork are inside one file. No install, no server.
 
 > Your projects are stored in the browser's local storage for that file. Use **Project menu → Save a copy** to keep a `.creer.json` backup.
 
@@ -120,5 +120,7 @@ Incoming notes play through the **armed** track, falling back to the selected tr
 ## License
 
 **Unlicense** — this is free and unencumbered software released into the public domain. See [LICENSE](LICENSE).
+
+Source: [github.com/ahpah-dev/creer](https://github.com/ahpah-dev/creer)
 
 Made for making something.
