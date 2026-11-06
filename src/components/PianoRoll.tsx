@@ -16,7 +16,7 @@ import { useSessionStore } from '../store/session'
 import { engine } from '../audio/engine'
 import { addClipOnTrack } from '../lib/clips'
 import { quantizeNotes } from '../lib/clips'
-import { DRUM_NOTE_MAP, DRUM_NOTES, INSTRUMENT_MAP } from '../data/instruments'
+import { DRUM_NOTE_MAP, DRUM_NOTES, INSTRUMENT_MAP, isDrumInstrument } from '../data/instruments'
 import {
   clamp,
   formatBeatPosition,
@@ -39,7 +39,7 @@ interface Row {
 }
 
 const buildRows = (track: Track, clip: Clip): Row[] => {
-  if (track.instrument === 'drums') {
+  if (isDrumInstrument(track.instrument)) {
     const extra = clip.notes
       .map((note) => note.pitch)
       .filter((pitch) => !DRUM_NOTES.some((drum) => drum.pitch === pitch))
@@ -96,6 +96,13 @@ export function PianoRoll() {
   const gridRef = useRef<HTMLDivElement>(null)
   const velocityScrollRef = useRef<HTMLDivElement>(null)
   const playheadRef = useRef<HTMLDivElement>(null)
+  const auditionRef = useRef<{
+    pitch: number
+    key: string | null
+    cancelled: boolean
+    autoTimer: number | null
+    releaseTimer: number | null
+  } | null>(null)
 
   const track = selected?.track ?? project.tracks.find((item) => item.id === selectedTrackId) ?? null
   const clip = selected?.clip ?? null
@@ -115,12 +122,74 @@ export function PianoRoll() {
     return notes
   }, [clip, previewNote, draft])
 
+  const finishAudition = (entry: {
+    key: string | null
+    cancelled: boolean
+    autoTimer: number | null
+    releaseTimer: number | null
+  }) => {
+    if (entry.cancelled) return
+    entry.cancelled = true
+    if (entry.autoTimer !== null) window.clearTimeout(entry.autoTimer)
+    if (entry.releaseTimer !== null) window.clearTimeout(entry.releaseTimer)
+    if (entry.key) engine.noteOff(entry.key)
+    if (auditionRef.current === entry) auditionRef.current = null
+  }
+
+  const stopAudition = (delay = 80) => {
+    const entry = auditionRef.current
+    if (!entry) return
+    if (entry.releaseTimer !== null) window.clearTimeout(entry.releaseTimer)
+    if (delay <= 0) {
+      finishAudition(entry)
+      return
+    }
+    entry.releaseTimer = window.setTimeout(() => finishAudition(entry), delay)
+  }
+
+  const playAudition = (currentTrack: Track, pitch: number, velocity = 0.75, hold = 700) => {
+    const previous = auditionRef.current
+    if (previous) {
+      if (previous.pitch === pitch && !previous.cancelled) {
+        if (previous.releaseTimer !== null) {
+          window.clearTimeout(previous.releaseTimer)
+          previous.releaseTimer = null
+        }
+        return
+      }
+      finishAudition(previous)
+    }
+    const entry = {
+      pitch,
+      key: null as string | null,
+      cancelled: false,
+      autoTimer: null as number | null,
+      releaseTimer: null as number | null,
+    }
+    auditionRef.current = entry
+    void engine.noteOn(currentTrack.instrument, currentTrack.id, pitch, velocity).then((key) => {
+      if (!key) return
+      if (entry.cancelled) engine.noteOff(key)
+      else entry.key = key
+    })
+    entry.autoTimer = window.setTimeout(() => finishAudition(entry), hold)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (auditionRef.current) finishAudition(auditionRef.current)
+    }
+    // The audition manager only touches refs and the audio engine.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useEffect(() => {
     if (!clip) return
     setSelectedNoteIds([])
     setPreviewNote(null)
     setDraft(null)
     setVelocityPreview(null)
+    if (auditionRef.current) finishAudition(auditionRef.current)
     const id = window.setTimeout(() => {
       const scroller = scrollRef.current
       if (!scroller) return
@@ -183,12 +252,6 @@ export function PianoRoll() {
     return () => window.cancelAnimationFrame(frame)
   }, [clip, isPlaying, pausedBeat, ppb, track])
 
-  const previewPitch = (currentTrack: Track, pitch: number, velocity = 0.75) => {
-    void engine
-      .noteOn(currentTrack.instrument, currentTrack.id, pitch, velocity)
-      .then((key) => window.setTimeout(() => engine.noteOff(key), 260))
-  }
-
   const pitchFromY = (y: number) => {
     const index = clamp(Math.floor(y / ROW_HEIGHT), 0, rows.length - 1)
     return rows[index]?.pitch ?? 60
@@ -217,7 +280,7 @@ export function PianoRoll() {
     }
     setDraft(initial)
     setSelectedNoteIds([])
-    previewPitch(track, pitch)
+    playAudition(track, pitch, 0.78)
     let latest = initial
     const move = (moveEvent: PointerEvent) => {
       const pointerX = moveEvent.clientX - rect.left
@@ -236,6 +299,7 @@ export function PianoRoll() {
       window.removeEventListener('pointerup', up)
       window.removeEventListener('pointercancel', cancel)
       setDraft(null)
+      stopAudition(140)
     }
     const up = () => {
       cleanup()
@@ -255,11 +319,12 @@ export function PianoRoll() {
     event.preventDefault()
     event.stopPropagation()
     setSelectedNoteIds([note.id])
-    previewPitch(track, note.pitch, note.velocity)
+    playAudition(track, note.pitch, note.velocity)
     const originX = event.clientX
     const originY = event.clientY
     const startIndex = rows.findIndex((row) => row.pitch === note.pitch)
     let latest = note
+    let lastPlayedPitch = note.pitch
     setPreviewNote(note)
     const move = (moveEvent: PointerEvent) => {
       const dx = moveEvent.clientX - originX
@@ -284,6 +349,10 @@ export function PianoRoll() {
           : Math.max(snap, snapBeat(rawDuration, snap))
         latest = { ...note, duration: clamp(duration, snap, clip.length - note.start) }
       }
+      if (latest.pitch !== lastPlayedPitch) {
+        lastPlayedPitch = latest.pitch
+        playAudition(track, latest.pitch, latest.velocity)
+      }
       setPreviewNote(latest)
     }
     const cleanup = () => {
@@ -292,6 +361,7 @@ export function PianoRoll() {
       window.removeEventListener('pointercancel', cancel)
       setPreviewNote(null)
       document.body.classList.remove('is-note-dragging')
+      stopAudition(130)
     }
     const up = () => {
       const previous = clip.notes
@@ -322,7 +392,7 @@ export function PianoRoll() {
       clamp(1 - (clientY - rect.top - 4) / Math.max(1, rect.height - 8), 0.08, 1)
     let latest = getValue(event.clientY)
     setVelocityPreview({ noteId: note.id, value: latest })
-    previewPitch(track, note.pitch, latest)
+    playAudition(track, note.pitch, latest, 500)
     const move = (moveEvent: PointerEvent) => {
       latest = getValue(moveEvent.clientY)
       setVelocityPreview({ noteId: note.id, value: latest })
@@ -332,6 +402,7 @@ export function PianoRoll() {
       window.removeEventListener('pointerup', up)
       window.removeEventListener('pointercancel', cancel)
       setVelocityPreview(null)
+      stopAudition(100)
     }
     const up = () => {
       cleanup()
@@ -372,16 +443,15 @@ export function PianoRoll() {
   }
 
   const transpose = (semitones: number) => {
-    if (!clip || !track || track.instrument === 'drums') return
+    if (!clip || !track || isDrumInstrument(track.instrument)) return
     const targetIds = selectedNoteIds.length ? selectedNoteIds : clip.notes.map((note) => note.id)
     const target = new Set(targetIds)
-    updateNotes(
-      track.id,
-      clip.id,
-      clip.notes.map((note) =>
-        target.has(note.id) ? { ...note, pitch: clamp(note.pitch + semitones, 24, 96) } : note,
-      ),
+    const notes = clip.notes.map((note) =>
+      target.has(note.id) ? { ...note, pitch: clamp(note.pitch + semitones, 24, 96) } : note,
     )
+    updateNotes(track.id, clip.id, notes)
+    const moved = notes.find((note) => target.has(note.id))
+    if (moved) playAudition(track, moved.pitch, moved.velocity, 320)
   }
 
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
@@ -426,7 +496,7 @@ export function PianoRoll() {
   }
 
   const selectedNoteName = selectedNote
-    ? track.instrument === 'drums'
+    ? isDrumInstrument(track.instrument)
       ? DRUM_NOTE_MAP[selectedNote.pitch]?.name ?? midiToName(selectedNote.pitch)
       : midiToName(selectedNote.pitch, true)
     : null
@@ -475,7 +545,7 @@ export function PianoRoll() {
             <button
               className="editor-tool icon-only"
               onClick={() => transpose(-1)}
-              disabled={track.instrument === 'drums'}
+              disabled={isDrumInstrument(track.instrument)}
               title="Transpose down one semitone"
               aria-label="Transpose down one semitone"
             >
@@ -485,7 +555,7 @@ export function PianoRoll() {
             <button
               className="editor-tool icon-only"
               onClick={() => transpose(1)}
-              disabled={track.instrument === 'drums'}
+              disabled={isDrumInstrument(track.instrument)}
               title="Transpose up one semitone"
               aria-label="Transpose up one semitone"
             >
@@ -547,7 +617,7 @@ export function PianoRoll() {
                     key={row.pitch}
                     className={`pr-label ${row.black ? 'is-black' : ''} ${row.cRow ? 'is-c' : ''}`}
                     style={{ height: ROW_HEIGHT }}
-                    onClick={() => previewPitch(track, row.pitch)}
+                    onClick={() => playAudition(track, row.pitch, 0.8, 340)}
                   >
                     <span>{row.name}</span>
                   </div>
@@ -608,7 +678,7 @@ export function PianoRoll() {
                     >
                       {width > 36 && (
                         <span className="pr-note-label">
-                          {track.instrument === 'drums'
+                          {isDrumInstrument(track.instrument)
                             ? DRUM_NOTE_MAP[note.pitch]?.short ?? ''
                             : midiToName(note.pitch, true)}
                         </span>

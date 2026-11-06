@@ -8,7 +8,19 @@ export type InstrumentId =
   | 'strings'
   | 'organ'
   | 'marimba'
+  | 'harp'
+  | 'wurlitzer'
+  | 'toy'
+  | 'musicbox'
+  | 'sub'
+  | 'fretless'
+  | 'aurora'
+  | 'choir'
+  | 'neon'
+  | 'kalimba'
   | 'drums'
+  | 'lofi'
+  | 'hand'
 
 export type InstrumentCategory = 'Keys' | 'Bass' | 'Pads' | 'Leads' | 'Drums'
 
@@ -63,6 +75,7 @@ export interface Section {
   name: string
   start: number
   length: number
+  color?: string
 }
 
 export interface LoopSettings {

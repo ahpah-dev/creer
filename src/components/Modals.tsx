@@ -12,11 +12,14 @@ import {
   Loader2,
   Play,
   Plus,
+  Search,
   Sparkles,
+  Square,
   X,
 } from 'lucide-react'
-import type { InstrumentId, Note } from '../types'
+import type { InstrumentId } from '../types'
 import { INSTRUMENT_MAP, INSTRUMENTS } from '../data/instruments'
+import { getAuditionNotes } from '../lib/auditions'
 import { useProjectStore, projectStats } from '../store/project'
 import { useSessionStore } from '../store/session'
 import { engine } from '../audio/engine'
@@ -149,7 +152,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
             </div>
             <div>
               <span className="step-number">03</span>
-              <p><strong>Borrow a loop.</strong> Everything in the library is built to sit in the same pocket.</p>
+              <p><strong>Browse the library.</strong> Twenty-two synthesized instruments are waiting in Sounds &amp; Keys, each with a one-click audition.</p>
             </div>
             <div>
               <span className="step-number">04</span>
@@ -177,6 +180,13 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           </div>
           <div className="help-tip">
             <Info size={14} />
+            <p>
+              Drag a note up or down to hear each pitch as it moves. Hover a song section
+              and use the pencil to rename or recolor it; the plus adds a new section.
+            </p>
+          </div>
+          <div className="help-tip">
+            <Info size={14} />
             <p>Double-click a song section in the ruler to loop it. Drag the loop edges to choose your own range.</p>
           </div>
           <div className="help-tip midi-help-tip">
@@ -186,7 +196,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           <div className="help-signature">
             <span>CREER</span>
             <i />
-            <span>v1.0</span>
+            <span>v1.1</span>
             <em>made for making</em>
           </div>
         </div>
@@ -368,77 +378,6 @@ function ExportModal({ onClose }: { onClose: () => void }) {
   )
 }
 
-const DEMO_NOTES: Record<Exclude<InstrumentId, 'drums'>, Omit<Note, 'id'>[]> = {
-  piano: [
-    { pitch: 57, start: 0, duration: 1.8, velocity: 0.7 },
-    { pitch: 60, start: 0, duration: 1.8, velocity: 0.68 },
-    { pitch: 64, start: 0, duration: 1.8, velocity: 0.65 },
-    { pitch: 67, start: 0, duration: 1.8, velocity: 0.62 },
-    { pitch: 55, start: 2, duration: 1.8, velocity: 0.6 },
-    { pitch: 59, start: 2, duration: 1.8, velocity: 0.58 },
-    { pitch: 62, start: 2, duration: 1.8, velocity: 0.56 },
-    { pitch: 67, start: 2, duration: 1.8, velocity: 0.52 },
-  ],
-  electric: [
-    { pitch: 57, start: 0.25, duration: 1.3, velocity: 0.66 },
-    { pitch: 60, start: 0.25, duration: 1.3, velocity: 0.62 },
-    { pitch: 64, start: 0.25, duration: 1.3, velocity: 0.58 },
-    { pitch: 67, start: 1.75, duration: 0.7, velocity: 0.55 },
-    { pitch: 55, start: 2.25, duration: 1.5, velocity: 0.62 },
-    { pitch: 59, start: 2.25, duration: 1.5, velocity: 0.58 },
-    { pitch: 62, start: 2.25, duration: 1.5, velocity: 0.56 },
-    { pitch: 67, start: 2.25, duration: 1.5, velocity: 0.5 },
-  ],
-  pad: [
-    { pitch: 45, start: 0, duration: 3.8, velocity: 0.5 },
-    { pitch: 52, start: 0, duration: 3.8, velocity: 0.46 },
-    { pitch: 57, start: 0, duration: 3.8, velocity: 0.45 },
-    { pitch: 60, start: 0, duration: 3.8, velocity: 0.4 },
-    { pitch: 64, start: 0, duration: 3.8, velocity: 0.36 },
-  ],
-  bass: [
-    { pitch: 45, start: 0, duration: 0.8, velocity: 0.9 },
-    { pitch: 45, start: 1.5, duration: 0.35, velocity: 0.6 },
-    { pitch: 52, start: 2, duration: 0.7, velocity: 0.8 },
-    { pitch: 45, start: 3.25, duration: 0.45, velocity: 0.55 },
-  ],
-  pluck: [
-    { pitch: 76, start: 0, duration: 0.7, velocity: 0.6 },
-    { pitch: 72, start: 0.75, duration: 0.4, velocity: 0.52 },
-    { pitch: 74, start: 1.5, duration: 0.7, velocity: 0.55 },
-    { pitch: 76, start: 2.25, duration: 1.1, velocity: 0.6 },
-    { pitch: 79, start: 3.5, duration: 0.4, velocity: 0.48 },
-  ],
-  bell: [
-    { pitch: 81, start: 0.5, duration: 0.6, velocity: 0.35 },
-    { pitch: 84, start: 1.5, duration: 0.6, velocity: 0.3 },
-    { pitch: 79, start: 2.5, duration: 0.6, velocity: 0.33 },
-    { pitch: 76, start: 3.5, duration: 0.6, velocity: 0.28 },
-  ],
-  strings: [
-    { pitch: 57, start: 0, duration: 3.8, velocity: 0.45 },
-    { pitch: 60, start: 0, duration: 3.8, velocity: 0.42 },
-    { pitch: 64, start: 0, duration: 3.8, velocity: 0.4 },
-    { pitch: 67, start: 0, duration: 3.8, velocity: 0.38 },
-  ],
-  organ: [
-    { pitch: 57, start: 0, duration: 1.5, velocity: 0.55 },
-    { pitch: 60, start: 0, duration: 1.5, velocity: 0.52 },
-    { pitch: 64, start: 0, duration: 1.5, velocity: 0.5 },
-    { pitch: 57, start: 2, duration: 1.7, velocity: 0.5 },
-    { pitch: 60, start: 2, duration: 1.7, velocity: 0.48 },
-    { pitch: 67, start: 2, duration: 1.7, velocity: 0.44 },
-  ],
-  marimba: [
-    { pitch: 69, start: 0, duration: 0.45, velocity: 0.55 },
-    { pitch: 72, start: 0.5, duration: 0.45, velocity: 0.5 },
-    { pitch: 76, start: 1, duration: 0.6, velocity: 0.55 },
-    { pitch: 74, start: 2, duration: 0.45, velocity: 0.48 },
-    { pitch: 72, start: 2.5, duration: 0.45, velocity: 0.5 },
-    { pitch: 69, start: 3, duration: 0.8, velocity: 0.52 },
-  ],
-}
-
 function AddTrackModal({ onClose }: { onClose: () => void }) {
   const [instrument, setInstrument] = useState<InstrumentId>('piano')
   const [name, setName] = useState('')
@@ -456,18 +395,7 @@ function AddTrackModal({ onClose }: { onClose: () => void }) {
       setPreviewing(false)
       return
     }
-    const notes =
-      instrument === 'drums'
-        ? [
-            { pitch: 36, start: 0, duration: 0.2, velocity: 0.9 },
-            { pitch: 42, start: 0.5, duration: 0.1, velocity: 0.45 },
-            { pitch: 38, start: 1, duration: 0.2, velocity: 0.8 },
-            { pitch: 42, start: 1.5, duration: 0.1, velocity: 0.4 },
-            { pitch: 36, start: 2, duration: 0.2, velocity: 0.85 },
-            { pitch: 42, start: 2.5, duration: 0.1, velocity: 0.45 },
-            { pitch: 38, start: 3, duration: 0.2, velocity: 0.82 },
-          ]
-        : DEMO_NOTES[instrument]
+    const notes = getAuditionNotes(instrument)
     setPreviewing(true)
     await engine.previewNotes(instrument, notes, 96, 4, () => setPreviewing(false))
   }
@@ -559,6 +487,165 @@ function AddTrackModal({ onClose }: { onClose: () => void }) {
   )
 }
 
+const SOUND_CATEGORIES = ['All', 'Keys', 'Bass', 'Pads', 'Leads', 'Drums'] as const
+
+function SoundLibraryModal({ onClose }: { onClose: () => void }) {
+  const project = useProjectStore((state) => state.project)
+  const selectedTrackId = useProjectStore((state) => state.selectedTrackId)
+  const updateTrack = useProjectStore((state) => state.updateTrack)
+  const track = project.tracks.find((item) => item.id === selectedTrackId) ?? project.tracks[0]
+  const [category, setCategory] = useState<(typeof SOUND_CATEGORIES)[number]>('All')
+  const [search, setSearch] = useState('')
+  const [previewing, setPreviewing] = useState<InstrumentId | null>(null)
+
+  useEffect(() => {
+    return () => engine.stopPreview()
+  }, [])
+
+  if (!track) return null
+  const current = INSTRUMENT_MAP[track.instrument]
+  const query = search.trim().toLowerCase()
+  const sounds = INSTRUMENTS.filter((instrument) => {
+    if (category !== 'All' && instrument.category !== category) return false
+    if (!query) return true
+    return `${instrument.name} ${instrument.category} ${instrument.description}`
+      .toLowerCase()
+      .includes(query)
+  })
+
+  const previewSound = (instrument: InstrumentId) => {
+    if (previewing === instrument) {
+      engine.stopPreview()
+      setPreviewing(null)
+      return
+    }
+    engine.stopPreview()
+    setPreviewing(instrument)
+    void engine.previewNotes(instrument, getAuditionNotes(instrument), 96, 4, () => {
+      setPreviewing((existing) => (existing === instrument ? null : existing))
+    })
+  }
+
+  const apply = (instrument: InstrumentId) => {
+    if (previewing && previewing !== instrument) {
+      engine.stopPreview()
+      setPreviewing(null)
+    }
+    updateTrack(track.id, { instrument })
+  }
+
+  const createTrack = () => {
+    engine.stopPreview()
+    addTrackWithStarterClip(track.instrument)
+    onClose()
+  }
+
+  return (
+    <ModalShell
+      eyebrow="INSTRUMENT LIBRARY"
+      title="Find your next sound."
+      subtitle={`${INSTRUMENTS.length} instruments, all synthesized in your browser. Choose one to load it on the current track.`}
+      onClose={onClose}
+      size="wide"
+      footer={
+        <>
+          <span className="modal-footer-note">
+            Loaded on <strong>{track.name}</strong>
+            {track.name !== current.name ? ` · ${current.name}` : ''}
+          </span>
+          <div className="modal-actions">
+            <button className="button button-secondary" onClick={createTrack}>
+              <Plus size={14} /> New track with {current.shortName}
+            </button>
+            <button className="button button-primary" onClick={onClose}>
+              Done
+            </button>
+          </div>
+        </>
+      }
+    >
+      <div className="sound-library-toolbar">
+        <div className="sound-library-categories">
+          {SOUND_CATEGORIES.map((item) => (
+            <button
+              key={item}
+              className={`filter-chip ${category === item ? 'is-active' : ''}`}
+              onClick={() => setCategory(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+        <label className="sound-library-search">
+          <Search size={13} />
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search the library"
+            aria-label="Search the instrument library"
+          />
+          <span>{sounds.length}</span>
+        </label>
+      </div>
+
+      <div className="sound-library-grid">
+        {sounds.map((instrument) => {
+          const selected = track.instrument === instrument.id
+          const playing = previewing === instrument.id
+          return (
+            <div
+              key={instrument.id}
+              className={`library-sound-card ${selected ? 'is-selected' : ''} ${playing ? 'is-previewing' : ''}`}
+            >
+              <button className="library-sound-main" onClick={() => apply(instrument.id)} aria-pressed={selected}>
+                <span
+                  className="library-sound-icon"
+                  style={{ '--instrument-color': instrument.color } as CSSProperties}
+                >
+                  <TrackIcon instrument={instrument.id} size={16} />
+                </span>
+                <span className="library-sound-copy">
+                  <span className="library-sound-category">{instrument.category}</span>
+                  <strong>{instrument.name}</strong>
+                  <em>{instrument.description}</em>
+                </span>
+                {selected && (
+                  <span className="library-sound-loaded" title="Loaded on this track">
+                    <Check size={9} />
+                  </span>
+                )}
+              </button>
+              <button
+                className={`library-sound-preview ${playing ? 'is-playing' : ''}`}
+                onClick={() => previewSound(instrument.id)}
+                aria-label={playing ? `Stop preview of ${instrument.name}` : `Preview ${instrument.name}`}
+                title={playing ? 'Stop preview' : 'Preview sound'}
+              >
+                {playing ? <Square size={8} fill="currentColor" /> : <Play size={10} fill="currentColor" />}
+              </button>
+            </div>
+          )
+        })}
+        {!sounds.length && (
+          <div className="sound-library-empty">
+            <span>No instruments found</span>
+            <p>Try another search or category.</p>
+            <button
+              className="button button-secondary"
+              onClick={() => {
+                setSearch('')
+                setCategory('All')
+              }}
+            >
+              Show all sounds
+            </button>
+          </div>
+        )}
+      </div>
+    </ModalShell>
+  )
+}
+
 export function ModalRoot() {
   const modal = useSessionStore((state) => state.modal)
   const setModal = useSessionStore((state) => state.setModal)
@@ -568,6 +655,7 @@ export function ModalRoot() {
   if (modal === 'new') return <NewProjectModal onClose={close} />
   if (modal === 'export') return <ExportModal onClose={close} />
   if (modal === 'addTrack') return <AddTrackModal onClose={close} />
+  if (modal === 'sounds') return <SoundLibraryModal onClose={close} />
   return null
 }
 

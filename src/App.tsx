@@ -189,6 +189,12 @@ export default function App() {
             )
           }
           projectStore.updateNotes(track.id, clip.id, notes, { coalesce: `nudge-notes:${clip.id}` })
+          const moved = notes.find((note) => ids.has(note.id))
+          if (moved) {
+            void engine
+              .noteOn(track.instrument, track.id, moved.pitch, moved.velocity)
+              .then((key) => window.setTimeout(() => engine.noteOff(key), 300))
+          }
         }
         return
       }

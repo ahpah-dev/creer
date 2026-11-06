@@ -1,5 +1,5 @@
 import type { InstrumentId, LoopDef, Track } from '../types'
-import { INSTRUMENT_MAP } from '../data/instruments'
+import { INSTRUMENT_MAP, isDrumInstrument } from '../data/instruments'
 import { useProjectStore } from '../store/project'
 import { useSessionStore } from '../store/session'
 import { getCurrentBeat } from './transport'
@@ -16,7 +16,19 @@ const defaults: Record<InstrumentId, { volume: number; reverb: number; delay: nu
   strings: { volume: 0.52, reverb: 0.38, delay: 0.05 },
   organ: { volume: 0.6, reverb: 0.2, delay: 0.04 },
   marimba: { volume: 0.62, reverb: 0.22, delay: 0.08 },
+  harp: { volume: 0.62, reverb: 0.3, delay: 0.08 },
+  wurlitzer: { volume: 0.66, reverb: 0.18, delay: 0.1 },
+  toy: { volume: 0.58, reverb: 0.2, delay: 0.06 },
+  musicbox: { volume: 0.46, reverb: 0.4, delay: 0.1 },
+  sub: { volume: 0.8, reverb: 0.02, delay: 0.02 },
+  fretless: { volume: 0.74, reverb: 0.1, delay: 0.04 },
+  aurora: { volume: 0.48, reverb: 0.48, delay: 0.08 },
+  choir: { volume: 0.46, reverb: 0.42, delay: 0.06 },
+  neon: { volume: 0.54, reverb: 0.18, delay: 0.24 },
+  kalimba: { volume: 0.58, reverb: 0.26, delay: 0.08 },
   drums: { volume: 0.84, reverb: 0.08, delay: 0.03 },
+  lofi: { volume: 0.8, reverb: 0.12, delay: 0.04 },
+  hand: { volume: 0.72, reverb: 0.14, delay: 0.04 },
 }
 
 export const createTrack = (
@@ -38,9 +50,14 @@ export const createTrack = (
     id: uid('t'),
     name: baseName,
     instrument,
-    color: options.color ?? (instrument === 'drums' ? '#dd876f' : palette.value),
+    color: options.color ?? (isDrumInstrument(instrument) ? '#dd876f' : palette.value),
     volume: settings.volume,
-    pan: instrument === 'pad' ? 0.12 : instrument === 'pluck' ? -0.16 : 0,
+    pan:
+      instrument === 'pad' || instrument === 'aurora' || instrument === 'choir'
+        ? 0.12
+        : instrument === 'pluck' || instrument === 'neon'
+          ? -0.16
+          : 0,
     mute: false,
     solo: false,
     armed: options.arm ?? false,
@@ -97,10 +114,9 @@ export const addLoopToProject = (loop: LoopDef) => {
     })
     store.addTrack(target)
   }
-  const notes =
-    loop.instrument === 'drums'
-      ? loop.notes
-      : transposeNotesToKey(loop.notes, 'A', project.key ?? KEY_REF)
+  const notes = isDrumInstrument(loop.instrument)
+    ? loop.notes
+    : transposeNotesToKey(loop.notes, 'A', project.key ?? KEY_REF)
   const clip = makeClip(loop.name, snapped, loop.lengthBeats)
   clip.notes = notes.map((note) => ({ ...note, id: uid('n') }))
   clip.name = loop.name

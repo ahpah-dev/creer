@@ -1,20 +1,22 @@
-import { AudioWaveform, Drum, Guitar, Piano, Sparkles, Waves } from 'lucide-react'
+import { Drum, Guitar, Music2, Piano, Sparkles, Waves } from 'lucide-react'
 import type { InstrumentId } from '../types'
+import { isDrumInstrument } from '../data/instruments'
 
-const iconFor: Record<InstrumentId, typeof Piano> = {
-  drums: Drum,
-  bass: Guitar,
-  pad: Waves,
-  strings: Waves,
-  pluck: Sparkles,
-  bell: Sparkles,
-  piano: Piano,
-  electric: Piano,
-  organ: Piano,
-  marimba: Piano,
-}
+const sparkleIds: InstrumentId[] = ['pluck', 'bell', 'musicbox', 'neon', 'kalimba']
+const waveIds: InstrumentId[] = ['pad', 'strings', 'aurora', 'choir']
 
 export function TrackIcon({ instrument, size = 14 }: { instrument: InstrumentId; size?: number }) {
-  const Icon = iconFor[instrument] ?? AudioWaveform
+  const Icon =
+    instrument === 'musicbox'
+      ? Music2
+      : isDrumInstrument(instrument)
+        ? Drum
+        : instrument === 'bass' || instrument === 'sub' || instrument === 'fretless'
+          ? Guitar
+          : waveIds.includes(instrument)
+            ? Waves
+            : sparkleIds.includes(instrument)
+              ? Sparkles
+              : Piano
   return <Icon size={size} strokeWidth={1.8} aria-hidden="true" />
 }

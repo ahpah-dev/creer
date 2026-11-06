@@ -40,19 +40,28 @@ That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub P
 ## What is inside
 
 - **Six-track demo song, “Golden Hour”** — play it immediately, solo parts, or pull it apart to learn how it was built.
-- **Piano-roll editor** — draw, drag, resize and nudge notes, change velocity, quantize, transpose, split clips, and edit drum patterns by drum name.
-- **Playable instruments** — Velvet Piano, Moonlight Keys, Soft Focus pads, Round Bass, Paper Pluck, Glass Bell, Slow Strings, Sunday Organ, Wood & Mallet and a synthesized Studio Kit.
+- **Piano-roll editor** — draw, drag, resize and nudge notes, change velocity, quantize, transpose, split clips, and edit drum patterns by drum name. Drag a note up or down and you hear each new pitch as it moves.
+- **Instrument library** — 22 synthesized sounds across Keys, Bass, Pads, Leads and Drums. Search or filter the collection, audition any sound, load it onto the current track with one click, or grow a new track from it.
+- **The sounds** — from Velvet Piano, Gilded Harp and Red Room Wurli to Deep End, Fretless, Aurora, Dust Choir, Neon Lead, Kalimba and the dust-edged Lo-Fi Kit. Every one is built from oscillators, filters, FM and noise.
 - **Live MIDI-style recording** — arm a track, hit record and play the keys or pads. Captured takes land in the arrangement.
 - **MIDI keyboard input** — connect a hardware keyboard through the MIDI button in the top bar. Note on/off, velocity, sustain and hot-plugging are supported, and incoming MIDI is captured while recording.
 - **Loop library** — ten curated, tempo-aware parts that preview and drop into the song.
 - **Mixer** — per-track faders, pans, reverb/delay sends, mute/solo and meters, plus a master strip with its own effects and limiter.
-- **Arrangement tools** — drag clips across tracks, resize them, loop sections, scrub the timeline, zoom, snap, duplicate, split and undo.
+- **Arrangement tools** — drag clips across tracks, resize them, loop sections, scrub the timeline, zoom, snap, duplicate, split and undo. Song sections are yours: rename and recolor them from the pencil, add new ones with **+**, or delete them.
 - **WAV export** — offline-rendered stereo 44.1 kHz / 16-bit master, with all effects and the reverb tail.
 - **Local-first workflow** — autosaves to the browser, exports/imports project files, and makes a copy with one click.
 
 The audio is synthesised live with Web Audio. There are no samples or external audio assets.
 
+> **New in 1.1** — the 22-sound instrument library with search and auditions, live pitch feedback while dragging notes, and song sections you can rename, recolor, add and remove.
+
 ## A look inside
+
+### Instrument library
+![Creer instrument library](screenshots/library.png)
+
+### Song sections
+![Creer section editor](screenshots/section-editor.png)
 
 ### Mixer
 ![Creer mixer](screenshots/mixer.png)
@@ -68,8 +77,9 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 | Area | What to do |
 | --- | --- |
 | Transport | `Space` plays and pauses. `L` toggles the loop. `R` starts/stops a take. |
-| Arrangement | Double-click an empty lane for a new clip. Double-click a clip to open its editor. Double-click a section in the ruler to loop it. |
-| Piano roll | Click to draw, drag to move, use the right handle to resize. The lower lane edits velocity. |
+| Arrangement | Double-click an empty lane for a new clip. Double-click a clip to open its editor. Hover a section and use the pencil to rename, recolor, loop or delete it; **+** adds a section. |
+| Piano roll | Click to draw, drag to move, use the right handle to resize. Moving a note up or down auditions the new pitch. The lower lane edits velocity. |
+| Instrument library | Open **Sounds & Keys** and click the sound name (or **Browse**). Search, audition, then click a card to load it on the current track. |
 | Recording | Arm a track with the dot in its header, press record, then play the on-screen keys or pads. |
 | Loops | Open the **Loops** tab, preview with the play button, add with **Add**. |
 | Mixer | Faders, pan, reverb/delay sends and master effects. Double-click a knob to reset it to its natural centre. |

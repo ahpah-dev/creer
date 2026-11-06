@@ -5,7 +5,7 @@ import { engine } from '../audio/engine'
 import { useProjectStore } from '../store/project'
 import { useSessionStore } from '../store/session'
 import { addLoopToProject } from '../lib/tracks'
-import { INSTRUMENT_MAP } from '../data/instruments'
+import { INSTRUMENT_MAP, isDrumInstrument } from '../data/instruments'
 import { transposeNotesToKey } from '../lib/utils'
 import type { LoopDef } from '../types'
 
@@ -40,7 +40,7 @@ function LoopCard({ loop, projectKey, bpm }: { loop: LoopDef; projectKey: string
   const isPreviewing = previewingLoop === loop.id
   const info = INSTRUMENT_MAP[loop.instrument]
   const previewNotes = useMemo(
-    () => (loop.instrument === 'drums' ? loop.notes : transposeNotesToKey(loop.notes, 'A', projectKey)),
+    () => (isDrumInstrument(loop.instrument) ? loop.notes : transposeNotesToKey(loop.notes, 'A', projectKey)),
     [loop, projectKey],
   )
 

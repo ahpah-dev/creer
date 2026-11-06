@@ -1,6 +1,6 @@
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 import type { Clip, Track } from '../types'
-import { INSTRUMENT_MAP } from '../data/instruments'
+import { INSTRUMENT_MAP, isDrumInstrument } from '../data/instruments'
 import { clipNoteRange } from '../lib/utils'
 
 interface ClipViewProps {
@@ -23,7 +23,7 @@ export function ClipView({
   onDoubleClick,
 }: ClipViewProps) {
   const info = INSTRUMENT_MAP[track.instrument]
-  const range = track.instrument === 'drums' ? { min: 34, max: 54 } : clipNoteRange(clip)
+  const range = isDrumInstrument(track.instrument) ? { min: 34, max: 54 } : clipNoteRange(clip)
   const span = Math.max(12, range.max - range.min + 1)
   const notes = clip.notes
     .filter((note) => note.start < clip.length - 0.001)

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
-import { Cable, ChevronDown, Minus, Plus } from 'lucide-react'
-import { DRUM_NOTES, INSTRUMENTS } from '../data/instruments'
+import { Cable, LayoutGrid, Minus, Plus } from 'lucide-react'
+import { DRUM_NOTES, INSTRUMENT_MAP, isDrumInstrument } from '../data/instruments'
 import { engine } from '../audio/engine'
 import { useProjectStore } from '../store/project'
 import { useSessionStore } from '../store/session'
@@ -64,11 +64,11 @@ interface ActiveEntry {
 export function KeyboardPanel() {
   const project = useProjectStore((state) => state.project)
   const selectedTrackId = useProjectStore((state) => state.selectedTrackId)
-  const updateTrack = useProjectStore((state) => state.updateTrack)
   const track = project.tracks.find((item) => item.id === selectedTrackId) ?? project.tracks[0]
   const octave = useSessionStore((state) => state.keyboardOctave)
   const setOctave = useSessionStore((state) => state.setKeyboardOctave)
   const isRecording = useSessionStore((state) => state.isRecording)
+  const setModal = useSessionStore((state) => state.setModal)
   const midiStatus = useMidiStore((state) => state.status)
   const midiDevices = useMidiStore((state) => state.devices)
   const midiActiveNotes = useMidiStore((state) => state.activeNotes)
@@ -77,7 +77,7 @@ export function KeyboardPanel() {
   const [activePitches, setActivePitches] = useState<Set<number>>(new Set())
   const [activePad, setActivePad] = useState<number | null>(null)
   const padTimers = useRef<number[]>([])
-  const isDrums = track?.instrument === 'drums'
+  const isDrums = Boolean(track && isDrumInstrument(track.instrument))
   const basePitch = (octave + 1) * 12
   const visiblePitches = Array.from({ length: 25 }, (_, index) => basePitch + index)
   const whitePitches = visiblePitches.filter((pitch) => !isBlackKey(pitch))
@@ -154,7 +154,7 @@ export function KeyboardPanel() {
     const timer = window.setTimeout(() => setActivePad(null), 150)
     padTimers.current.push(timer)
     const recordToken = captureNoteStart(pitch, 0.85)
-    void engine.noteOn('drums', track.id, pitch, 0.85).then((key) => {
+    void engine.noteOn(track.instrument, track.id, pitch, 0.85).then((key) => {
       window.setTimeout(() => engine.noteOff(key), 500)
       if (recordToken) window.setTimeout(() => captureNoteEnd(recordToken), 130)
     })
@@ -218,32 +218,36 @@ export function KeyboardPanel() {
   return (
     <div className={`keyboard-panel ${isDrums ? 'is-drum-panel' : ''}`} style={{ '--track-color': track.color } as CSSProperties}>
       <div className="keyboard-toolbar">
-        <div className="keyboard-sound-select">
+        <button
+          className="sound-browser-button"
+          onClick={() => setModal('sounds')}
+          aria-label="Browse instrument library"
+          data-tip="Browse the instrument library"
+        >
           <span className="keyboard-sound-icon">
             <TrackIcon instrument={track.instrument} size={15} />
           </span>
-          <div>
+          <span className="sound-browser-copy">
             <span className="eyebrow">SOUND</span>
-            <label className="sound-select">
-              <select
-                value={track.instrument}
-                onChange={(event) => updateTrack(track.id, { instrument: event.target.value as typeof track.instrument })}
-                aria-label="Track instrument"
-              >
-                {INSTRUMENTS.map((instrument) => (
-                  <option key={instrument.id} value={instrument.id}>
-                    {instrument.name}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown size={11} />
-            </label>
-          </div>
-        </div>
+            <strong>{INSTRUMENT_MAP[track.instrument].name}</strong>
+          </span>
+          <span className="sound-browser-action">
+            <LayoutGrid size={10} />
+            Browse
+          </span>
+        </button>
         <div className="keyboard-track-meta">
-          <span>{track.name}</span>
-          <span className="keyboard-meta-divider" />
-          <span>{isDrums ? 'Studio Kit · 12 pads' : `Live keys · ${midiToName(basePitch)} – ${midiToName(basePitch + 24)}`}</span>
+          {track.name !== INSTRUMENT_MAP[track.instrument].name && (
+            <>
+              <span>{track.name}</span>
+              <span className="keyboard-meta-divider" />
+            </>
+          )}
+          <span>
+            {isDrums
+              ? '12 pads'
+              : `Live keys · ${midiToName(basePitch)} – ${midiToName(basePitch + 24)}`}
+          </span>
         </div>
         {!isDrums && (
           <div className="octave-control">
@@ -294,66 +298,71 @@ export function KeyboardPanel() {
         )}
       </div>
 
-      {isDrums ? (
-        <div className="drum-pads">
-          {DRUM_NOTES.map((drum, index) => (
-            <button
-              key={drum.pitch}
-              className={`drum-pad ${activePad === drum.pitch || midiNotes.has(drum.pitch) ? 'is-hit' : ''}`}
-              onPointerDown={(event) => {
-                event.preventDefault()
-                hitPad(drum.pitch)
-              }}
-              aria-label={`Play ${drum.name}`}
-            >
-              <span className="pad-shortcut">{PAD_KEYS[index] ?? ''}</span>
-              <span className="pad-name">{drum.name}</span>
-              <span className="pad-glow" aria-hidden="true" />
-            </button>
-          ))}
-        </div>
-      ) : (
-        <div className="keyboard-stage">
-          <div className="piano-keyboard" role="group" aria-label="Playable piano keyboard">
-            <div className="white-keys">
-              {whitePitches.map((pitch) => {
-                const offset = pitch - basePitch
-                const label = KEY_LABELS[offset]
-                return (
-                  <button
-                    key={pitch}
-                    className={`piano-key white ${activePitches.has(pitch) || midiNotes.has(pitch) ? 'is-active' : ''}`}
-                    onPointerDown={(event) => triggerPointer(event, pitch)}
-                    aria-label={`Play ${midiToName(pitch)}`}
-                    tabIndex={-1}
-                  >
-                    <span className="white-key-label">
-                      {pitch % 12 === 0 ? <em>{midiToName(pitch)}</em> : null}
-                      {label && <kbd>{label}</kbd>}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-            {blackKeys.map(({ pitch, left, width }) => {
-              const offset = pitch - basePitch
-              const label = KEY_LABELS[offset]
-              return (
+      <div className="keyboard-body">
+
+        <div className="keyboard-performance">
+          {isDrums ? (
+            <div className="drum-pads">
+              {DRUM_NOTES.map((drum, index) => (
                 <button
-                  key={pitch}
-                  className={`piano-key black ${activePitches.has(pitch) || midiNotes.has(pitch) ? 'is-active' : ''}`}
-                  style={{ left: `${left}%`, width: `${width}%` }}
-                  onPointerDown={(event) => triggerPointer(event, pitch)}
-                  aria-label={`Play ${midiToName(pitch)}`}
-                  tabIndex={-1}
+                  key={drum.pitch}
+                  className={`drum-pad ${activePad === drum.pitch || midiNotes.has(drum.pitch) ? 'is-hit' : ''}`}
+                  onPointerDown={(event) => {
+                    event.preventDefault()
+                    hitPad(drum.pitch)
+                  }}
+                  aria-label={`Play ${drum.name}`}
                 >
-                  <span className="black-key-label">{label}</span>
+                  <span className="pad-shortcut">{PAD_KEYS[index] ?? ''}</span>
+                  <span className="pad-name">{drum.name}</span>
+                  <span className="pad-glow" aria-hidden="true" />
                 </button>
-              )
-            })}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="keyboard-stage">
+              <div className="piano-keyboard" role="group" aria-label="Playable piano keyboard">
+                <div className="white-keys">
+                  {whitePitches.map((pitch) => {
+                    const offset = pitch - basePitch
+                    const label = KEY_LABELS[offset]
+                    return (
+                      <button
+                        key={pitch}
+                        className={`piano-key white ${activePitches.has(pitch) || midiNotes.has(pitch) ? 'is-active' : ''}`}
+                        onPointerDown={(event) => triggerPointer(event, pitch)}
+                        aria-label={`Play ${midiToName(pitch)}`}
+                        tabIndex={-1}
+                      >
+                        <span className="white-key-label">
+                          {pitch % 12 === 0 ? <em>{midiToName(pitch)}</em> : null}
+                          {label && <kbd>{label}</kbd>}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+                {blackKeys.map(({ pitch, left, width }) => {
+                  const offset = pitch - basePitch
+                  const label = KEY_LABELS[offset]
+                  return (
+                    <button
+                      key={pitch}
+                      className={`piano-key black ${activePitches.has(pitch) || midiNotes.has(pitch) ? 'is-active' : ''}`}
+                      style={{ left: `${left}%`, width: `${width}%` }}
+                      onPointerDown={(event) => triggerPointer(event, pitch)}
+                      aria-label={`Play ${midiToName(pitch)}`}
+                      tabIndex={-1}
+                    >
+                      <span className="black-key-label">{label}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   )
 }

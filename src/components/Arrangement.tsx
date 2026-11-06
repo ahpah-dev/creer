@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from 'react'
-import { Plus } from 'lucide-react'
+import { Pencil, Plus } from 'lucide-react'
 import type { Clip, DragState, LoopSettings, Track } from '../types'
 import { useProjectStore } from '../store/project'
 import { useSessionStore } from '../store/session'
@@ -8,14 +8,15 @@ import { engine } from '../audio/engine'
 import { getCurrentBeat, seekTo } from '../lib/transport'
 import { addClipOnTrack } from '../lib/clips'
 import { moveClipBetweenTracks } from '../lib/tracks'
-import { clamp, projectEnd, snapBeat } from '../lib/utils'
+import { clamp, projectEnd, snapBeat, uid } from '../lib/utils'
+import { SECTION_COLORS, nextSectionName, sectionColor } from '../data/sections'
 import { ClipView } from './ClipView'
 import { TrackHeader } from './TrackHeader'
+import { SectionEditor } from './SectionEditor'
 
 const TRACK_HEIGHT = 68
 const RULER_HEIGHT = 44
 const TRACK_GAP = 6
-const SECTION_COLORS = ['#e8a071', '#9cac8f', '#9996d6', '#7fb2ae', '#d8a0b1', '#c8b285']
 
 const getNearestClip = (track: Track, beat: number, currentId: string | null) => {
   const existing = track.clips.find((clip) => clip.id === currentId)
@@ -62,6 +63,11 @@ export function Arrangement() {
   const loopPreviewRef = useRef<LoopSettings | null>(null)
   const [drag, setDrag] = useState<DragState | null>(null)
   const [loopPreview, setLoopPreview] = useState<LoopSettings | null>(null)
+  const [sectionEditor, setSectionEditor] = useState<{
+    sectionId: string
+    x: number
+    y: number
+  } | null>(null)
 
   const contentBeats = Math.max(64, Math.ceil((projectEnd(project) + 8) / project.timeSig) * project.timeSig)
   const contentWidth = contentBeats * zoom
@@ -70,6 +76,10 @@ export function Arrangement() {
   const barStep = barWidth < 38 ? 4 : barWidth < 62 ? 2 : 1
   const displayLoop = loopPreview ?? project.loop
   const hasSolo = project.tracks.some((track) => track.solo)
+  const lastSectionEnd = project.sections.reduce(
+    (max, section) => Math.max(max, section.start + section.length),
+    0,
+  )
 
   useEffect(() => {
     const handleMove = (event: PointerEvent) => {
@@ -166,7 +176,13 @@ export function Arrangement() {
   const handleRulerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return
     const target = event.target as HTMLElement
-    if (target.closest('.section-chip') || target.closest('.loop-handle')) return
+    if (
+      target.closest('.section-chip') ||
+      target.closest('.section-add-button') ||
+      target.closest('.loop-handle')
+    ) {
+      return
+    }
     scrubRef.current = true
     event.currentTarget.setPointerCapture(event.pointerId)
     seekTo(beatFromClientX(event.clientX, event.altKey))
@@ -342,6 +358,47 @@ export function Arrangement() {
     toast('Section looping', 'The playhead will repeat this part. Press L to turn the loop off.')
   }
 
+  const sectionAnchor = (element: HTMLElement) => {
+    const rect = element.getBoundingClientRect()
+    return {
+      x: Math.max(8, Math.min(rect.left - 36, window.innerWidth - 300)),
+      y: Math.min(rect.bottom + 7, window.innerHeight - 288),
+    }
+  }
+
+  const openSectionEditor = (sectionId: string, event: ReactMouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    const position = sectionAnchor(event.currentTarget)
+    setSectionEditor({ sectionId, ...position })
+  }
+
+  const addSection = (event: ReactMouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    const project = useProjectStore.getState().project
+    const end = project.sections.reduce(
+      (max, section) => Math.max(max, section.start + section.length),
+      0,
+    )
+    const start = Math.ceil(end / project.timeSig) * project.timeSig
+    const section = {
+      id: uid('s'),
+      name: nextSectionName(project.sections),
+      start,
+      length: project.timeSig * 4,
+      color: SECTION_COLORS[project.sections.length % SECTION_COLORS.length],
+    }
+    updateProject({
+      sections: [...project.sections, section],
+      lengthBeats: Math.max(project.lengthBeats, start + section.length),
+    })
+    const position = sectionAnchor(event.currentTarget)
+    setSectionEditor({ sectionId: section.id, ...position })
+    window.setTimeout(() => {
+      timelineRef.current?.scrollTo({ left: Math.max(0, start * zoom - 80), behavior: 'smooth' })
+    }, 30)
+    toast('Section added', `"${section.name}" starts at bar ${Math.floor(start / project.timeSig) + 1}.`, 'success')
+  }
+
   const nudgeLoopEdge = (edge: 'start' | 'end', direction: number) => {
     const step = project.timeSig
     const limit = Math.max(project.timeSig * 2, Math.ceil(project.lengthBeats / project.timeSig) * project.timeSig)
@@ -408,27 +465,50 @@ export function Arrangement() {
           <div className="ruler" ref={rulerRef} onPointerDown={handleRulerDown}>
             <div className="ruler-section-lane" aria-label="Song sections">
               {project.sections.map((section, index) => (
-                <button
+                <div
                   key={section.id}
                   className="section-chip"
                   style={{
                     left: section.start * zoom,
-                    width: Math.max(12, section.length * zoom - 2),
-                    ['--section-color' as string]: SECTION_COLORS[index % SECTION_COLORS.length],
+                    width: Math.max(20, section.length * zoom - 2),
+                    ['--section-color' as string]: sectionColor(section, index),
                   }}
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    seekTo(section.start)
-                  }}
-                  onDoubleClick={(event) => {
-                    event.stopPropagation()
-                    loopSection(section.start, section.length)
-                  }}
-                  title={`${section.name} — double-click to loop this section`}
                 >
-                  <span>{section.name}</span>
-                </button>
+                  <button
+                    className="section-seek"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      seekTo(section.start)
+                    }}
+                    onDoubleClick={(event) => {
+                      event.stopPropagation()
+                      loopSection(section.start, section.length)
+                    }}
+                    title={`${section.name} — double-click to loop this section`}
+                  >
+                    {section.name}
+                  </button>
+                  <button
+                    className="section-edit-button"
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onClick={(event) => openSectionEditor(section.id, event)}
+                    aria-label={`Edit ${section.name}`}
+                    title="Edit section"
+                  >
+                    <Pencil size={9} />
+                  </button>
+                </div>
               ))}
+              <button
+                className="section-add-button"
+                style={{ left: Math.max(0, lastSectionEnd * zoom + 7) }}
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={addSection}
+                aria-label="Add section"
+                title="Add a section"
+              >
+                <Plus size={10} />
+              </button>
             </div>
             <div className="ruler-bars">
               {Array.from({ length: barCount }, (_, index) => (
@@ -501,7 +581,7 @@ export function Arrangement() {
                 style={{
                   left: section.start * zoom,
                   width: Math.max(2, section.length * zoom),
-                  ['--section-color' as string]: SECTION_COLORS[index % SECTION_COLORS.length],
+                  ['--section-color' as string]: sectionColor(section, index),
                 }}
               />
             ))}
@@ -581,6 +661,15 @@ export function Arrangement() {
           <div className="timeline-corner-shade" aria-hidden="true" />
         </div>
       </div>
+
+      {sectionEditor && (
+        <SectionEditor
+          sectionId={sectionEditor.sectionId}
+          x={sectionEditor.x}
+          y={sectionEditor.y}
+          onClose={() => setSectionEditor(null)}
+        />
+      )}
     </section>
   )
 }
