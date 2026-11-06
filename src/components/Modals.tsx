@@ -186,7 +186,8 @@ function HelpModal({ onClose }: { onClose: () => void }) {
               with − / + or Ctrl/⌘ + scroll. Drag the grip above the editor tabs to make
               the piano roll taller; double-click it to reset. Drag across empty timeline
               space to box-select clips, or use Draw/Select in the piano roll. Copy, cut
-              and paste work in both. Hover a song section and use the pencil to rename
+              and paste work in both, and dragging any selected note moves the whole
+              selection together. Hover a song section and use the pencil to rename
               or recolor it; the plus adds a new section. Open the SWING pill in the top
               bar to add 8th- or 16th-note swing to playback and exports. The Effects tab
               builds an insert chain on any track or the master.
@@ -203,7 +204,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           <div className="help-signature">
             <span>CREER</span>
             <i />
-            <span>v1.7</span>
+            <span>v1.7.1</span>
             <em>made for making</em>
           </div>
         </div>

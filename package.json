@@ -1,7 +1,7 @@
 {
   "name": "creer",
   "private": true,
-  "version": "1.7.0",
+  "version": "1.7.1",
   "license": "Unlicense",
   "type": "module",
   "scripts": {

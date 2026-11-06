@@ -106,7 +106,7 @@ export function PianoRoll() {
   const pausedBeat = useSessionStore((state) => state.pausedBeat)
 
   const [availableWidth, setAvailableWidth] = useState(900)
-  const [previewNote, setPreviewNote] = useState<Note | null>(null)
+  const [previewNotes, setPreviewNotes] = useState<Note[] | null>(null)
   const [draft, setDraft] = useState<Note | null>(null)
   const [velocityPreview, setVelocityPreview] = useState<{ noteId: string; value: number } | null>(null)
   const [noteMarquee, setNoteMarquee] = useState<{
@@ -143,10 +143,13 @@ export function PianoRoll() {
   const displayNotes = useMemo(() => {
     if (!clip) return []
     let notes = clip.notes
-    if (previewNote) notes = notes.map((note) => (note.id === previewNote.id ? previewNote : note))
+    if (previewNotes?.length) {
+      const preview = new Map(previewNotes.map((note) => [note.id, note]))
+      notes = notes.map((note) => preview.get(note.id) ?? note)
+    }
     if (draft) notes = [...notes, draft]
     return notes
-  }, [clip, previewNote, draft])
+  }, [clip, previewNotes, draft])
 
   const finishAudition = (entry: {
     key: string | null
@@ -277,7 +280,7 @@ export function PianoRoll() {
   useEffect(() => {
     if (!clip) return
     setSelectedNoteIds([])
-    setPreviewNote(null)
+    setPreviewNotes(null)
     setDraft(null)
     setVelocityPreview(null)
     if (auditionRef.current) finishAudition(auditionRef.current)
@@ -492,14 +495,38 @@ export function PianoRoll() {
     if (!clip || !track || event.button !== 0) return
     event.preventDefault()
     event.stopPropagation()
-    setSelectedNoteIds([note.id])
+    const additive = event.shiftKey || event.metaKey || event.ctrlKey
+    const noteWasSelected = selectedNoteIds.includes(note.id)
+    if (mode === 'resize') {
+      setSelectedNoteIds([note.id])
+    } else if (!noteWasSelected) {
+      setSelectedNoteIds(additive ? [...selectedNoteIds, note.id] : [note.id])
+    }
+    const groupIds =
+      mode === 'move'
+        ? noteWasSelected
+          ? selectedNoteIds
+          : additive
+            ? [...selectedNoteIds, note.id]
+            : [note.id]
+        : [note.id]
+    const originNotes = clip.notes.filter((item) => groupIds.includes(item.id))
+    if (!originNotes.some((item) => item.id === note.id)) originNotes.push(note)
+    const minStart = Math.min(...originNotes.map((item) => item.start))
+    const maxEnd = Math.max(...originNotes.map((item) => item.start + item.duration))
+    const minPitch = Math.min(...originNotes.map((item) => item.pitch))
+    const maxPitch = Math.max(...originNotes.map((item) => item.pitch))
+    const rowPitches = rows.map((row) => row.pitch)
+    const minRowPitch = rowPitches.length ? Math.min(...rowPitches) : 24
+    const maxRowPitch = rowPitches.length ? Math.max(...rowPitches) : 96
     playAudition(track, note.pitch, note.velocity)
     const originX = event.clientX
     const originY = event.clientY
     const startIndex = rows.findIndex((row) => row.pitch === note.pitch)
     let latest = note
+    let latestNotes = originNotes
     let lastPlayedPitch = note.pitch
-    setPreviewNote(note)
+    setPreviewNotes(originNotes)
     const move = (moveEvent: PointerEvent) => {
       const dx = moveEvent.clientX - originX
       const dy = moveEvent.clientY - originY
@@ -508,45 +535,72 @@ export function PianoRoll() {
         const start = moveEvent.altKey
           ? Math.max(0, rawStart)
           : Math.max(0, snapBeat(rawStart, snap))
+        const deltaStart = clamp(start - note.start, -minStart, Math.max(-minStart, clip.length - maxEnd))
         const rowDelta = Math.round(dy / ROW_HEIGHT)
         const targetIndex = clamp((startIndex < 0 ? 0 : startIndex) + rowDelta, 0, rows.length - 1)
-        const pitch = rows[targetIndex]?.pitch ?? note.pitch
-        latest = {
-          ...note,
-          start: clamp(start, 0, Math.max(0, clip.length - note.duration)),
-          pitch,
-        }
+        const targetPitch = rows[targetIndex]?.pitch ?? note.pitch
+        const pitchDelta = clamp(
+          targetPitch - note.pitch,
+          minRowPitch - minPitch,
+          maxRowPitch - maxPitch,
+        )
+        latestNotes = originNotes.map((item) => ({
+          ...item,
+          start: clamp(item.start + deltaStart, 0, Math.max(0, clip.length - item.duration)),
+          pitch: item.pitch + pitchDelta,
+        }))
+        latest = latestNotes.find((item) => item.id === note.id) ?? note
       } else {
         const rawDuration = note.duration + dx / ppb
         const duration = moveEvent.altKey
           ? Math.max(0.08, rawDuration)
           : Math.max(snap, snapBeat(rawDuration, snap))
         latest = { ...note, duration: clamp(duration, snap, clip.length - note.start) }
+        latestNotes = [latest]
       }
       if (latest.pitch !== lastPlayedPitch) {
         lastPlayedPitch = latest.pitch
         playAudition(track, latest.pitch, latest.velocity)
       }
-      setPreviewNote(latest)
+      setPreviewNotes(latestNotes)
     }
     const cleanup = () => {
       window.removeEventListener('pointermove', move)
       window.removeEventListener('pointerup', up)
       window.removeEventListener('pointercancel', cancel)
-      setPreviewNote(null)
+      setPreviewNotes(null)
       document.body.classList.remove('is-note-dragging')
       stopAudition(130)
     }
     const up = () => {
       const previous = clip.notes
       cleanup()
-      if (latest.start === note.start && latest.pitch === note.pitch && latest.duration === note.duration) return
-      updateNotes(
-        track.id,
-        clip.id,
-        previous.map((item) => (item.id === note.id ? latest : item)),
-      )
-      setSelectedNoteIds([note.id])
+      const changed =
+        mode === 'move'
+          ? latestNotes.some((item) => {
+              const original = originNotes.find((candidate) => candidate.id === item.id)
+              return Boolean(original && (original.start !== item.start || original.pitch !== item.pitch))
+            })
+          : latest.start !== note.start ||
+            latest.pitch !== note.pitch ||
+            latest.duration !== note.duration
+      if (!changed) return
+      if (mode === 'move') {
+        const moved = new Map(latestNotes.map((item) => [item.id, item]))
+        updateNotes(
+          track.id,
+          clip.id,
+          previous.map((item) => moved.get(item.id) ?? item),
+        )
+        setSelectedNoteIds(groupIds)
+      } else {
+        updateNotes(
+          track.id,
+          clip.id,
+          previous.map((item) => (item.id === note.id ? latest : item)),
+        )
+        setSelectedNoteIds([note.id])
+      }
     }
     const cancel = () => cleanup()
     document.body.classList.add('is-note-dragging')
@@ -884,6 +938,7 @@ export function PianoRoll() {
                   return (
                     <div
                       key={note.id}
+                      data-note-id={note.id}
                       className={`pr-note ${isSelected ? 'is-selected' : ''} ${isDraft ? 'is-draft' : ''}`}
                       style={{
                         left,
