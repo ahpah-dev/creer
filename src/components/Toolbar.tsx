@@ -1,13 +1,26 @@
-import { ChevronDown, Copy, Minus, Plus, Scissors, Trash2, ZoomIn, ZoomOut } from 'lucide-react'
+import {
+  ChevronDown,
+  ClipboardPaste,
+  Copy,
+  CopyPlus,
+  Minus,
+  Plus,
+  Scissors,
+  Trash2,
+  ZoomIn,
+  ZoomOut,
+} from 'lucide-react'
 import { useProjectStore, getSelectedClip } from '../store/project'
 import { useSessionStore } from '../store/session'
 import { MOD_LABEL, SNAP_OPTIONS, projectEnd } from '../lib/utils'
 import { duplicateSelectedClip, splitSelectedClip } from '../lib/clips'
+import { copySelectedClips, pasteClipboard } from '../lib/clipboard'
 
 export function Toolbar() {
   const project = useProjectStore((state) => state.project)
   const selectedClipId = useProjectStore((state) => state.selectedClipId)
-  const deleteClip = useProjectStore((state) => state.deleteClip)
+  const selectedClipIds = useProjectStore((state) => state.selectedClipIds)
+  const deleteClips = useProjectStore((state) => state.deleteClips)
   const selected = getSelectedClip(project, selectedClipId)
   const zoom = useSessionStore((state) => state.zoom)
   const setZoom = useSessionStore((state) => state.setZoom)
@@ -60,22 +73,49 @@ export function Toolbar() {
             className="text-button"
             onClick={duplicateSelectedClip}
             disabled={!selected}
-            data-tip={`Duplicate selected clip  ${MOD_LABEL}D`}
+            data-tip={`Duplicate selected clip  ${MOD_LABEL}+D`}
             aria-label="Duplicate selected clip"
           >
-            <Copy size={14} />
+            <CopyPlus size={14} />
             <span>Duplicate</span>
+          </button>
+          <button
+            className="text-button"
+            onClick={() => copySelectedClips()}
+            disabled={!selectedClipIds.length && !selected}
+            data-tip={`Copy selected clips  ${MOD_LABEL}+C`}
+            aria-label="Copy selected clips"
+          >
+            <Copy size={14} />
+            <span>Copy</span>
+          </button>
+          <button
+            className="text-button"
+            onClick={() => pasteClipboard('clips')}
+            data-tip={`Paste clips at the playhead  ${MOD_LABEL}+V`}
+            aria-label="Paste clips at the playhead"
+          >
+            <ClipboardPaste size={14} />
+            <span>Paste</span>
           </button>
           <button
             className="icon-button compact"
             onClick={() => {
-              if (!selected) return
-              deleteClip(selected.track.id, selected.clip.id)
-              toast('Clip deleted', `${MOD_LABEL}Z brings it back.`)
+              const ids = selectedClipIds.length
+                ? selectedClipIds
+                : selected
+                  ? [selected.clip.id]
+                  : []
+              if (!ids.length) return
+              deleteClips(ids)
+              toast(
+                `${ids.length} clip${ids.length === 1 ? '' : 's'} deleted`,
+                `${MOD_LABEL}Z brings ${ids.length === 1 ? 'it' : 'them'} back.`,
+              )
             }}
-            disabled={!selected}
-            aria-label="Delete selected clip"
-            data-tip="Delete clip  ⌫"
+            disabled={!selectedClipIds.length && !selected}
+            aria-label="Delete selected clips"
+            data-tip="Delete selected clips  ⌫"
           >
             <Trash2 size={14} />
           </button>

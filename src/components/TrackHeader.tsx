@@ -97,7 +97,7 @@ export function TrackHeader({ track, index, selected, dimmed, onSelect }: TrackH
   const clear = () => {
     updateTrack(track.id, { clips: [] })
     if (useProjectStore.getState().selectedTrackId === track.id) {
-      useProjectStore.setState({ selectedClipId: null })
+      useProjectStore.setState({ selectedClipId: null, selectedClipIds: [] })
       useSessionStore.getState().setSelectedNoteIds([])
     }
     toast('Track cleared', `All clips were removed from "${track.name}".`)

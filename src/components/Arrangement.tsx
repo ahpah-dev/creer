@@ -37,7 +37,7 @@ const getNearestClip = (track: Track, beat: number, currentId: string | null) =>
 export function Arrangement() {
   const project = useProjectStore((state) => state.project)
   const selectedTrackId = useProjectStore((state) => state.selectedTrackId)
-  const selectedClipId = useProjectStore((state) => state.selectedClipId)
+  const selectedClipIds = useProjectStore((state) => state.selectedClipIds)
   const updateClip = useProjectStore((state) => state.updateClip)
   const updateProject = useProjectStore((state) => state.updateProject)
   const selectClip = useProjectStore((state) => state.selectClip)
@@ -63,6 +63,12 @@ export function Arrangement() {
   const loopPreviewRef = useRef<LoopSettings | null>(null)
   const [drag, setDrag] = useState<DragState | null>(null)
   const [loopPreview, setLoopPreview] = useState<LoopSettings | null>(null)
+  const [clipMarquee, setClipMarquee] = useState<{
+    x1: number
+    y1: number
+    x2: number
+    y2: number
+  } | null>(null)
   const [sectionEditor, setSectionEditor] = useState<{
     sectionId: string
     x: number
@@ -249,12 +255,92 @@ export function Arrangement() {
   const handleLaneDown = (event: ReactPointerEvent<HTMLDivElement>, track: Track) => {
     if (event.button !== 0) return
     if ((event.target as HTMLElement).closest('.clip')) return
+    const content = timelineContentRef.current
+    if (!content) return
+    event.preventDefault()
+    const contentRect = content.getBoundingClientRect()
+    const startX = clamp(event.clientX - contentRect.left, 0, contentWidth)
+    const startY = clamp(
+      event.clientY - contentRect.top,
+      RULER_HEIGHT,
+      RULER_HEIGHT + project.tracks.length * TRACK_HEIGHT,
+    )
     const beat = beatFromClientX(event.clientX, event.altKey)
-    const current = useProjectStore.getState()
-    const clip = getNearestClip(track, beat, current.selectedClipId)
-    selectTrack(track.id, clip?.id ?? null)
-    setSelectedNoteIds([])
-    seekTo(beat)
+    const additive = event.shiftKey
+    const baseIds = additive ? [...useProjectStore.getState().selectedClipIds] : []
+    let moved = false
+    let lastKey = ''
+
+    const selectInBox = (x1: number, y1: number, x2: number, y2: number) => {
+      const left = Math.min(x1, x2)
+      const right = Math.max(x1, x2)
+      const top = Math.min(y1, y2)
+      const bottom = Math.max(y1, y2)
+      const state = useProjectStore.getState()
+      const hits: string[] = []
+      state.project.tracks.forEach((laneTrack, index) => {
+        const laneTop = RULER_HEIGHT + index * TRACK_HEIGHT + TRACK_GAP / 2
+        const laneBottom = laneTop + TRACK_HEIGHT - TRACK_GAP
+        if (laneBottom < top || laneTop > bottom) return
+        for (const clip of laneTrack.clips) {
+          const clipLeft = clip.start * zoom
+          const clipRight = (clip.start + clip.length) * zoom
+          if (clipRight < left || clipLeft > right) continue
+          hits.push(clip.id)
+        }
+      })
+      const ids = [...new Set([...baseIds, ...hits])]
+      const key = ids.join('|')
+      if (key === lastKey) return
+      lastKey = key
+      const primary =
+        state.selectedClipId && ids.includes(state.selectedClipId)
+          ? state.selectedClipId
+          : (ids[0] ?? null)
+      useProjectStore.getState().selectClips(ids, primary)
+    }
+
+    const onMove = (moveEvent: PointerEvent) => {
+      const x = clamp(moveEvent.clientX - contentRect.left, 0, contentWidth)
+      const y = clamp(
+        moveEvent.clientY - contentRect.top,
+        RULER_HEIGHT,
+        RULER_HEIGHT + project.tracks.length * TRACK_HEIGHT,
+      )
+      if (!moved && (Math.abs(x - startX) > 3 || Math.abs(y - startY) > 3)) {
+        moved = true
+        document.body.classList.add('is-marquee-selecting')
+      }
+      if (!moved) return
+      setClipMarquee({ x1: startX, y1: startY, x2: x, y2: y })
+      selectInBox(startX, startY, x, y)
+    }
+
+    const cleanup = () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      window.removeEventListener('pointercancel', onCancel)
+      document.body.classList.remove('is-marquee-selecting')
+      setClipMarquee(null)
+    }
+
+    const onUp = () => {
+      cleanup()
+      if (moved) {
+        useSessionStore.getState().setSelectedNoteIds([])
+        return
+      }
+      const current = useProjectStore.getState()
+      const nearest = getNearestClip(track, beat, current.selectedClipId)
+      selectTrack(track.id, nearest?.id ?? null)
+      setSelectedNoteIds([])
+      seekTo(beat)
+    }
+
+    const onCancel = () => cleanup()
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+    window.addEventListener('pointercancel', onCancel)
   }
 
   const handleLaneDoubleClick = (event: ReactMouseEvent<HTMLDivElement>, track: Track) => {
@@ -617,7 +703,7 @@ export function Arrangement() {
                         clip={clip}
                         track={track}
                         width={width}
-                        selected={clip.id === selectedClipId}
+                        selected={selectedClipIds.includes(clip.id)}
                         onPointerDown={(event, mode) => beginClipDrag(event, track, clip, mode)}
                         onDoubleClick={() => {
                           useProjectStore.getState().selectClip(track.id, clip.id)
@@ -631,6 +717,19 @@ export function Arrangement() {
             ))}
             <div className="timeline-tail" />
           </div>
+
+          {clipMarquee && (
+            <div
+              className="clip-marquee"
+              style={{
+                left: Math.min(clipMarquee.x1, clipMarquee.x2),
+                top: Math.min(clipMarquee.y1, clipMarquee.y2),
+                width: Math.abs(clipMarquee.x2 - clipMarquee.x1),
+                height: Math.abs(clipMarquee.y2 - clipMarquee.y1),
+              }}
+              aria-hidden="true"
+            />
+          )}
 
           {drag &&
             (() => {

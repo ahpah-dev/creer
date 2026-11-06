@@ -5,6 +5,13 @@ import { useSessionStore } from './store/session'
 import { seekTo, toggleLoop, toggleMute, togglePlayback, toggleSolo } from './lib/transport'
 import { deleteSelectedClip, duplicateSelectedClip } from './lib/clips'
 import { stopRecording, toggleRecording } from './lib/recording'
+import {
+  copySelectedClips,
+  copySelectedNotes,
+  cutSelectedClips,
+  cutSelectedNotes,
+  pasteClipboard,
+} from './lib/clipboard'
 import { isTypingTarget } from './lib/utils'
 import { TopBar } from './components/TopBar'
 import { Toolbar } from './components/Toolbar'
@@ -132,11 +139,32 @@ export default function App() {
         duplicateSelectedClip()
         return
       }
-      if (mod && lower === 'a' && session.dock === 'editor') {
-        const selected = getSelectedClip(projectStore.project, projectStore.selectedClipId)
-        if (selected) {
-          event.preventDefault()
-          session.setSelectedNoteIds(selected.clip.notes.map((note) => note.id))
+      if (mod && lower === 'c') {
+        event.preventDefault()
+        if (session.dock === 'editor' && session.selectedNoteIds.length) copySelectedNotes()
+        else copySelectedClips()
+        return
+      }
+      if (mod && lower === 'x') {
+        event.preventDefault()
+        if (session.dock === 'editor' && session.selectedNoteIds.length) cutSelectedNotes()
+        else cutSelectedClips()
+        return
+      }
+      if (mod && lower === 'v') {
+        event.preventDefault()
+        pasteClipboard()
+        return
+      }
+      if (mod && lower === 'a') {
+        event.preventDefault()
+        if (session.dock === 'editor') {
+          const selected = getSelectedClip(projectStore.project, projectStore.selectedClipId)
+          if (selected) session.setSelectedNoteIds(selected.clip.notes.map((note) => note.id))
+        } else {
+          projectStore.selectClips(
+            projectStore.project.tracks.flatMap((track) => track.clips.map((clip) => clip.id)),
+          )
         }
         return
       }
@@ -154,7 +182,7 @@ export default function App() {
             return
           }
         }
-        if (projectStore.selectedClipId) {
+        if (projectStore.selectedClipIds.length || projectStore.selectedClipId) {
           event.preventDefault()
           deleteSelectedClip()
         }

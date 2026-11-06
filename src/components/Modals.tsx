@@ -172,6 +172,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
             <Shortcut label="Record a take"><kbd>R</kbd></Shortcut>
             <Shortcut label="Mute / solo"><kbd>M</kbd><span> / </span><kbd>S</kbd></Shortcut>
             <Shortcut label="Duplicate clip"><kbd>{MOD_LABEL}</kbd><kbd>D</kbd></Shortcut>
+            <Shortcut label="Copy / cut / paste"><kbd>{MOD_LABEL}</kbd><kbd>C</kbd><span>/</span><kbd>X</kbd><span>/</span><kbd>V</kbd></Shortcut>
             <Shortcut label="Delete selection"><kbd>⌫</kbd></Shortcut>
             <Shortcut label="Switch editor"><kbd>1</kbd><span>–</span><kbd>4</kbd></Shortcut>
             <Shortcut label="Free drag (no snap)"><kbd>{ALT_LABEL}</kbd><span>+</span><kbd>drag</kbd></Shortcut>
@@ -183,12 +184,11 @@ function HelpModal({ onClose }: { onClose: () => void }) {
             <p>
               Drag a note up or down to hear each pitch as it moves. Zoom the piano roll
               with − / + or Ctrl/⌘ + scroll. Drag the grip above the editor tabs to make
-              the piano roll taller; double-click it to reset.
-            </p>
-            <p>
-              Hover a song section and use the pencil to rename or recolor it; the plus
-              adds a new section. Open the SWING pill in the top bar to add 8th- or
-              16th-note swing to playback and exports.
+              the piano roll taller; double-click it to reset. Drag across empty timeline
+              space to box-select clips, or use Draw/Select in the piano roll. Copy, cut
+              and paste work in both. Hover a song section and use the pencil to rename
+              or recolor it; the plus adds a new section. Open the SWING pill in the top
+              bar to add 8th- or 16th-note swing to playback and exports.
             </p>
           </div>
           <div className="help-tip">
@@ -202,7 +202,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           <div className="help-signature">
             <span>CREER</span>
             <i />
-            <span>v1.4</span>
+            <span>v1.5</span>
             <em>made for making</em>
           </div>
         </div>

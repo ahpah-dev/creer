@@ -3,10 +3,14 @@ import type { PointerEvent as ReactPointerEvent } from 'react'
 import {
   ArrowDown,
   ArrowUp,
+  BoxSelect,
   ChevronDown,
+  ClipboardPaste,
+  Copy,
   Grid2X2,
   Library,
   Magnet,
+  Pencil,
   Plus,
   Trash2,
   ZoomIn,
@@ -18,6 +22,10 @@ import { useSessionStore } from '../store/session'
 import { engine } from '../audio/engine'
 import { addClipOnTrack } from '../lib/clips'
 import { quantizeNotes } from '../lib/clips'
+import {
+  copySelectedNotes,
+  pasteClipboard,
+} from '../lib/clipboard'
 import { DRUM_NOTE_MAP, DRUM_NOTES, INSTRUMENT_MAP, isDrumInstrument } from '../data/instruments'
 import {
   clamp,
@@ -89,6 +97,8 @@ export function PianoRoll() {
   const setNoteLength = useSessionStore((state) => state.setNoteLength)
   const pianoZoom = useSessionStore((state) => state.pianoZoom)
   const setPianoZoom = useSessionStore((state) => state.setPianoZoom)
+  const pianoTool = useSessionStore((state) => state.pianoTool)
+  const setPianoTool = useSessionStore((state) => state.setPianoTool)
   const selectedNoteIds = useSessionStore((state) => state.selectedNoteIds)
   const setSelectedNoteIds = useSessionStore((state) => state.setSelectedNoteIds)
   const toast = useSessionStore((state) => state.toast)
@@ -99,6 +109,12 @@ export function PianoRoll() {
   const [previewNote, setPreviewNote] = useState<Note | null>(null)
   const [draft, setDraft] = useState<Note | null>(null)
   const [velocityPreview, setVelocityPreview] = useState<{ noteId: string; value: number } | null>(null)
+  const [noteMarquee, setNoteMarquee] = useState<{
+    x1: number
+    y1: number
+    x2: number
+    y2: number
+  } | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   const velocityScrollRef = useRef<HTMLDivElement>(null)
@@ -339,6 +355,89 @@ export function PianoRoll() {
     const rawStart = x / ppb
     const start = clamp(Math.floor((rawStart + 1e-8) / snap) * snap, 0, Math.max(0, (clip?.length ?? 1) - snap))
     return { start, pitch: pitchFromY(y), rect, x, y }
+  }
+
+  const beginNoteMarquee = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!clip || !track || event.button !== 0) return
+    const grid = gridRef.current
+    if (!grid) return
+    event.preventDefault()
+    event.stopPropagation()
+    const rect = grid.getBoundingClientRect()
+    const startX = clamp(event.clientX - rect.left, 0, gridWidth)
+    const startY = clamp(event.clientY - rect.top, 0, rows.length * ROW_HEIGHT)
+    const additive = event.shiftKey || event.metaKey || event.ctrlKey
+    const baseIds = additive ? [...selectedNoteIds] : []
+    let moved = false
+    let lastKey = ''
+
+    const selectInBox = (x1: number, y1: number, x2: number, y2: number) => {
+      const left = Math.min(x1, x2)
+      const right = Math.max(x1, x2)
+      const top = Math.min(y1, y2)
+      const bottom = Math.max(y1, y2)
+      const hits: string[] = []
+      for (const note of clip.notes) {
+        const rowIndex = rows.findIndex((row) => row.pitch === note.pitch)
+        if (rowIndex < 0) continue
+        const noteLeft = note.start * ppb
+        const noteRight = (note.start + note.duration) * ppb
+        const noteTop = rowIndex * ROW_HEIGHT
+        const noteBottom = noteTop + ROW_HEIGHT
+        if (
+          noteRight >= left &&
+          noteLeft <= right &&
+          noteBottom >= top &&
+          noteTop <= bottom
+        ) {
+          hits.push(note.id)
+        }
+      }
+      const ids = [...new Set([...baseIds, ...hits])]
+      const key = ids.join('|')
+      if (key === lastKey) return
+      lastKey = key
+      setSelectedNoteIds(ids)
+    }
+
+    const onMove = (moveEvent: PointerEvent) => {
+      const x = clamp(moveEvent.clientX - rect.left, 0, gridWidth)
+      const y = clamp(moveEvent.clientY - rect.top, 0, rows.length * ROW_HEIGHT)
+      if (!moved && (Math.abs(x - startX) > 3 || Math.abs(y - startY) > 3)) {
+        moved = true
+        document.body.classList.add('is-note-marquee-selecting')
+      }
+      if (!moved) return
+      setNoteMarquee({ x1: startX, y1: startY, x2: x, y2: y })
+      selectInBox(startX, startY, x, y)
+    }
+
+    const cleanup = () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      window.removeEventListener('pointercancel', onCancel)
+      document.body.classList.remove('is-note-marquee-selecting')
+      setNoteMarquee(null)
+    }
+
+    const onUp = () => {
+      cleanup()
+      if (!moved && !additive) setSelectedNoteIds([])
+    }
+
+    const onCancel = () => cleanup()
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+    window.addEventListener('pointercancel', onCancel)
+  }
+
+  const handleGridPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if ((event.target as HTMLElement).closest('.pr-note')) return
+    if (pianoTool === 'select' || event.shiftKey) {
+      beginNoteMarquee(event)
+      return
+    }
+    beginDraw(event)
   }
 
   const beginDraw = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -597,6 +696,16 @@ export function PianoRoll() {
         </div>
 
         <div className="piano-tools">
+          <button
+            className={`editor-tool piano-tool-toggle ${pianoTool === 'select' ? 'is-on' : ''}`}
+            onClick={() => setPianoTool(pianoTool === 'draw' ? 'select' : 'draw')}
+            title={pianoTool === 'draw' ? 'Box select notes (Shift + drag works too)' : 'Draw notes'}
+            aria-label={pianoTool === 'draw' ? 'Switch to box selection' : 'Switch to draw notes'}
+            aria-pressed={pianoTool === 'select'}
+          >
+            {pianoTool === 'draw' ? <Pencil size={14} /> : <BoxSelect size={14} />}
+            <span>{pianoTool === 'draw' ? 'Draw' : 'Select'}</span>
+          </button>
           <label className="editor-select" title="Length for new notes">
             <span>NOTE</span>
             <select
@@ -645,6 +754,23 @@ export function PianoRoll() {
             aria-label="Delete selected notes"
           >
             <Trash2 size={14} />
+          </button>
+          <button
+            className="editor-tool icon-only piano-clipboard-action"
+            onClick={() => copySelectedNotes()}
+            disabled={!selectedNoteIds.length}
+            title="Copy selected notes (Ctrl/⌘ + C)"
+            aria-label="Copy selected notes"
+          >
+            <Copy size={14} />
+          </button>
+          <button
+            className="editor-tool icon-only piano-clipboard-action"
+            onClick={() => pasteClipboard('notes')}
+            title="Paste notes at the playhead (Ctrl/⌘ + V)"
+            aria-label="Paste notes at the playhead"
+          >
+            <ClipboardPaste size={14} />
           </button>
           <div className="piano-zoom" role="group" aria-label="Piano roll zoom">
             <button
@@ -735,7 +861,7 @@ export function PianoRoll() {
                   ['--ppb' as string]: `${ppb}px`,
                   ['--row-h' as string]: `${ROW_HEIGHT}px`,
                 }}
-                onPointerDown={beginDraw}
+                onPointerDown={handleGridPointerDown}
                 onContextMenu={(event) => event.preventDefault()}
               >
                 <div className="pr-row-bg" aria-hidden="true">
@@ -798,6 +924,18 @@ export function PianoRoll() {
                     </div>
                   )
                 })}
+                {noteMarquee && (
+                  <div
+                    className="pr-marquee"
+                    style={{
+                      left: Math.min(noteMarquee.x1, noteMarquee.x2),
+                      top: Math.min(noteMarquee.y1, noteMarquee.y2),
+                      width: Math.abs(noteMarquee.x2 - noteMarquee.x1),
+                      height: Math.abs(noteMarquee.y2 - noteMarquee.y1),
+                    }}
+                    aria-hidden="true"
+                  />
+                )}
                 <div className="piano-playhead" ref={playheadRef} aria-hidden="true" />
               </div>
             </div>

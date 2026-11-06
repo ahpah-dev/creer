@@ -84,7 +84,11 @@ export const addTrackWithStarterClip = (
     ],
     lengthBeats: Math.max(current.lengthBeats, 32),
   }))
-  useProjectStore.setState({ selectedTrackId: track.id, selectedClipId: null })
+  useProjectStore.setState({
+    selectedTrackId: track.id,
+    selectedClipId: null,
+    selectedClipIds: [],
+  })
   if (options.starterClip !== false) {
     const beat = getCurrentBeat()
     const snapped = Math.max(0, Math.floor(beat / project.timeSig) * project.timeSig)

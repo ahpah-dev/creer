@@ -114,12 +114,14 @@ interface ProjectState {
   future: Project[]
   selectedTrackId: string
   selectedClipId: string | null
+  selectedClipIds: string[]
   lastHistoryKey: HistoryEntry | null
   apply: (updater: (project: Project) => Project, options?: UpdateOptions) => void
   undo: () => void
   redo: () => void
   selectTrack: (trackId: string, clipId?: string | null) => void
   selectClip: (trackId: string, clipId: string) => void
+  selectClips: (clipIds: string[], primaryId?: string | null) => void
   updateProject: (patch: Partial<Project>, options?: UpdateOptions) => void
   updateTrack: (trackId: string, patch: Partial<Track>, options?: UpdateOptions) => void
   updateTrackBy: (trackId: string, updater: (track: Track) => Track, options?: UpdateOptions) => void
@@ -129,6 +131,7 @@ interface ProjectState {
   updateClip: (trackId: string, clipId: string, patch: Partial<Clip>, options?: UpdateOptions) => void
   updateNotes: (trackId: string, clipId: string, notes: Note[], options?: UpdateOptions) => void
   deleteClip: (trackId: string, clipId: string) => void
+  deleteClips: (clipIds: string[]) => void
   duplicateClip: (trackId: string, clipId: string) => void
   replaceProject: (project: Project, opts?: { clearHistory?: boolean }) => void
   resetToDemo: () => void
@@ -143,10 +146,36 @@ const pickInitialSelection = (project: Project) => {
   return {
     selectedTrackId: selectedTrack?.id ?? '',
     selectedClipId: selectedClip?.id ?? null,
+    selectedClipIds: selectedClip ? [selectedClip.id] : [],
   }
 }
 
 const initialSelection = pickInitialSelection(initialProject)
+
+const reconcileSelection = (
+  project: Project,
+  clipIds: string[],
+  primaryId: string | null,
+  fallbackTrackId: string,
+) => {
+  const valid = new Set(project.tracks.flatMap((track) => track.clips.map((clip) => clip.id)))
+  let selectedClipIds = [...new Set(clipIds)].filter((id) => valid.has(id))
+  let selectedClipId = primaryId && valid.has(primaryId) ? primaryId : null
+  if (selectedClipId && !selectedClipIds.includes(selectedClipId)) {
+    selectedClipIds = [selectedClipId, ...selectedClipIds]
+  }
+  if (!selectedClipId) selectedClipId = selectedClipIds[0] ?? null
+  let selectedTrackId = project.tracks.some((track) => track.id === fallbackTrackId)
+    ? fallbackTrackId
+    : (project.tracks[0]?.id ?? '')
+  if (selectedClipId) {
+    const owner = project.tracks.find((track) =>
+      track.clips.some((clip) => clip.id === selectedClipId),
+    )
+    if (owner) selectedTrackId = owner.id
+  }
+  return { selectedClipIds, selectedClipId, selectedTrackId }
+}
 
 const makeId = (prefix: string) => uid(prefix)
 
@@ -194,21 +223,17 @@ export const useProjectStore = create<ProjectState>((set, get) => {
       const state = get()
       if (!state.past.length) return
       const previous = state.past[state.past.length - 1]
-      let selectedClipId = state.selectedClipId
-      let selectedTrackId = previous.tracks.some((track) => track.id === state.selectedTrackId)
-        ? state.selectedTrackId
-        : (previous.tracks[0]?.id ?? '')
-      if (selectedClipId) {
-        const track = previous.tracks.find((item) => item.clips.some((clip) => clip.id === selectedClipId))
-        if (track) selectedTrackId = track.id
-        else selectedClipId = null
-      }
+      const selection = reconcileSelection(
+        previous,
+        state.selectedClipIds,
+        state.selectedClipId,
+        state.selectedTrackId,
+      )
       set({
         project: previous,
         past: state.past.slice(0, -1),
         future: [state.project, ...state.future].slice(0, HISTORY_LIMIT),
-        selectedTrackId,
-        selectedClipId,
+        ...selection,
         lastHistoryKey: null,
       })
     },
@@ -216,29 +241,44 @@ export const useProjectStore = create<ProjectState>((set, get) => {
       const state = get()
       if (!state.future.length) return
       const next = state.future[0]
-      let selectedClipId = state.selectedClipId
-      let selectedTrackId = next.tracks.some((track) => track.id === state.selectedTrackId)
-        ? state.selectedTrackId
-        : (next.tracks[0]?.id ?? '')
-      if (selectedClipId) {
-        const track = next.tracks.find((item) => item.clips.some((clip) => clip.id === selectedClipId))
-        if (track) selectedTrackId = track.id
-        else selectedClipId = null
-      }
+      const selection = reconcileSelection(
+        next,
+        state.selectedClipIds,
+        state.selectedClipId,
+        state.selectedTrackId,
+      )
       set({
         project: next,
         past: [...state.past, state.project].slice(-HISTORY_LIMIT),
         future: state.future.slice(1),
-        selectedTrackId,
-        selectedClipId,
+        ...selection,
         lastHistoryKey: null,
       })
     },
     selectTrack: (trackId, clipId) => {
-      set({ selectedTrackId: trackId, selectedClipId: clipId === undefined ? get().selectedClipId : clipId })
+      const nextClipId = clipId === undefined ? get().selectedClipId : clipId
+      set({
+        selectedTrackId: trackId,
+        selectedClipId: nextClipId,
+        selectedClipIds: nextClipId ? [nextClipId] : [],
+      })
     },
     selectClip: (trackId, clipId) => {
-      set({ selectedTrackId: trackId, selectedClipId: clipId })
+      set({
+        selectedTrackId: trackId,
+        selectedClipId: clipId,
+        selectedClipIds: [clipId],
+      })
+    },
+    selectClips: (clipIds, primaryId) => {
+      const state = get()
+      const selection = reconcileSelection(
+        state.project,
+        clipIds,
+        primaryId ?? clipIds[0] ?? null,
+        state.selectedTrackId,
+      )
+      set(selection)
     },
     updateProject: (patch, options) => {
       apply((project) => ({ ...project, ...patch }), options)
@@ -267,17 +307,22 @@ export const useProjectStore = create<ProjectState>((set, get) => {
         tracks: [...project.tracks, track],
         lengthBeats: Math.max(project.lengthBeats, 32),
       }))
-      set({ selectedTrackId: track.id, selectedClipId: null })
+      set({ selectedTrackId: track.id, selectedClipId: null, selectedClipIds: [] })
     },
     removeTrack: (trackId) => {
       const state = get()
       const remaining = state.project.tracks.filter((track) => track.id !== trackId)
       if (!remaining.length) return
+      const nextProject = { ...state.project, tracks: remaining }
       apply((project) => ({ ...project, tracks: remaining }))
-      set({
-        selectedTrackId: state.selectedTrackId === trackId ? remaining[0].id : state.selectedTrackId,
-        selectedClipId: state.selectedTrackId === trackId ? null : state.selectedClipId,
-      })
+      set(
+        reconcileSelection(
+          nextProject,
+          state.selectedClipIds,
+          state.selectedClipId,
+          state.selectedTrackId === trackId ? (remaining[0]?.id ?? '') : state.selectedTrackId,
+        ),
+      )
     },
     addClip: (trackId, clip, options) => {
       apply(
@@ -290,7 +335,11 @@ export const useProjectStore = create<ProjectState>((set, get) => {
         }),
         options,
       )
-      set({ selectedTrackId: trackId, selectedClipId: clip.id })
+      set({
+        selectedTrackId: trackId,
+        selectedClipId: clip.id,
+        selectedClipIds: [clip.id],
+      })
     },
     updateClip: (trackId, clipId, patch, options) => {
       apply(
@@ -331,17 +380,34 @@ export const useProjectStore = create<ProjectState>((set, get) => {
         options,
       )
     },
-    deleteClip: (trackId, clipId) => {
+    deleteClip: (_trackId, clipId) => {
+      get().deleteClips([clipId])
+    },
+    deleteClips: (clipIds) => {
       const state = get()
-      apply((project) => ({
-        ...project,
-        tracks: project.tracks.map((track) =>
-          track.id === trackId
-            ? { ...track, clips: track.clips.filter((clip) => clip.id !== clipId) }
-            : track,
+      const doomed = new Set(clipIds)
+      if (!doomed.size) return
+      const nextProject = {
+        ...state.project,
+        tracks: state.project.tracks.map((track) => ({
+          ...track,
+          clips: track.clips.filter((clip) => !doomed.has(clip.id)),
+        })),
+      }
+      apply(() => nextProject)
+      const remainingSelection = state.selectedClipIds.filter((id) => !doomed.has(id))
+      const nextPrimary =
+        state.selectedClipId && !doomed.has(state.selectedClipId)
+          ? state.selectedClipId
+          : (remainingSelection[0] ?? null)
+      set(
+        reconcileSelection(
+          nextProject,
+          remainingSelection,
+          nextPrimary,
+          state.selectedTrackId,
         ),
-      }))
-      if (state.selectedClipId === clipId) set({ selectedClipId: null })
+      )
     },
     duplicateClip: (trackId, clipId) => {
       const state = get()
@@ -362,7 +428,11 @@ export const useProjectStore = create<ProjectState>((set, get) => {
         ),
         lengthBeats: Math.max(project.lengthBeats, newClip.start + newClip.length),
       }))
-      set({ selectedClipId: newClip.id, selectedTrackId: trackId })
+      set({
+        selectedClipId: newClip.id,
+        selectedClipIds: [newClip.id],
+        selectedTrackId: trackId,
+      })
     },
     replaceProject: (project, opts = {}) => {
       const normalized = normalizeProject(project)
@@ -392,6 +462,17 @@ export const getSelectedClip = (project: Project, selectedClipId: string | null)
     if (clip) return { track, clip }
   }
   return null
+}
+
+export const getSelectedClips = (project: Project, selectedClipIds: string[]) => {
+  const wanted = new Set(selectedClipIds)
+  const selected: { track: Track; clip: Clip }[] = []
+  for (const track of project.tracks) {
+    for (const clip of track.clips) {
+      if (wanted.has(clip.id)) selected.push({ track, clip })
+    }
+  }
+  return selected
 }
 
 export const saveProjectToStorage = (project: Project) => {

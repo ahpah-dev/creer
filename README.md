@@ -45,6 +45,7 @@ That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub P
 - **The sounds** — from Velvet Piano, Gilded Harp and Red Room Wurli to Deep End, Fretless, Aurora, Dust Choir, Neon Lead, Kalimba and the dust-edged Lo-Fi Kit. Every one is built from oscillators, filters, FM and noise.
 - **Live MIDI-style recording** — arm a track, hit record and play the keys or pads. Captured takes land in the arrangement.
 - **MIDI keyboard input** — connect a hardware keyboard through the MIDI button in the top bar. Note on/off, velocity, sustain and hot-plugging are supported, and incoming MIDI is captured while recording.
+- **Box selection & clipboard** — drag a box over empty timeline space to select clips, or switch the piano roll to **Select** and drag a box over notes. Cut, copy and paste either selection from the toolbar or with `Ctrl/⌘ + X / C / V`.
 - **Loop library** — ten curated, tempo-aware parts that preview and drop into the song.
 - **Swing mode** — open the **SWING** pill in the top bar to enable 8th- or 16th-note swing, then dial it from straight to a full triplet feel. It is applied to playback and WAV exports.
 - **Mixer** — per-track faders, pans, reverb/delay sends, mute/solo and meters, plus a master strip with its own effects and limiter.
@@ -54,7 +55,7 @@ That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub P
 
 The audio is synthesised live with Web Audio. There are no samples or external audio assets.
 
-> **New in 1.4** — swing mode with 8th- or 16th-note divisions, a straight-to-triplet amount control, and matching playback/export timing. The 1.3 release added vertical piano-roll resizing, 1.2 added piano-roll zoom, and 1.1 brought the 22-sound instrument library, live pitch feedback while dragging notes, and editable song sections.
+> **New in 1.5** — box selection for clips and notes, plus cut/copy/paste in the timeline and piano roll. The 1.4 release added swing mode, 1.3 added vertical piano-roll resizing, 1.2 added piano-roll zoom, and 1.1 brought the 22-sound instrument library, live pitch feedback while dragging notes, and editable song sections.
 
 ## A look inside
 
@@ -63,6 +64,11 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 
 ### Resizable piano roll
 ![Creer piano roll resized vertically](screenshots/piano-resize.png)
+
+### Box selection & clipboard
+![Creer timeline box selection](screenshots/clip-box-select.png)
+
+![Creer piano-roll box selection](screenshots/note-box-select.png)
 
 ### Instrument library
 ![Creer instrument library](screenshots/library.png)
@@ -87,8 +93,9 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 | Area | What to do |
 | --- | --- |
 | Transport | `Space` plays and pauses. `L` toggles the loop. `R` starts/stops a take. |
-| Arrangement | Double-click an empty lane for a new clip. Double-click a clip to open its editor. Hover a section and use the pencil to rename, recolor, loop or delete it; **+** adds a section. |
-| Piano roll | Click to draw, drag to move, use the right handle to resize. Moving a note up or down auditions the new pitch. Zoom with the − / + control or Ctrl/⌘ + scroll; click the percentage to fit. Drag the grip above the editor tabs to resize vertically; double-click it to reset. The lower lane edits velocity. |
+| Arrangement | Double-click an empty lane for a new clip. Drag across empty space to box-select clips; Shift adds to the selection. Double-click a clip to open its editor. Hover a section and use the pencil to rename, recolor, loop or delete it; **+** adds a section. |
+| Piano roll | Click to draw, drag to move, use the right handle to resize. Use the **Draw / Select** button (or Shift + drag) for box selection. Moving a note up or down auditions the new pitch. Zoom with the − / + control or Ctrl/⌘ + scroll; click the percentage to fit. Drag the grip above the editor tabs to resize vertically; double-click it to reset. The lower lane edits velocity. |
+| Clipboard | `Ctrl/⌘ + X`, `C`, `V` cut, copy and paste notes in the piano roll or clips in the timeline. Copy/paste is also available from the timeline toolbar and the piano-roll copy/paste buttons. |
 | Instrument library | Open **Sounds & Keys** and click the sound name (or **Browse**). Search, audition, then click a card to load it on the current track. |
 | Recording | Arm a track with the dot in its header, press record, then play the on-screen keys or pads. |
 | Loops | Open the **Loops** tab, preview with the play button, add with **Add**. |
@@ -105,7 +112,9 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 | `Ctrl/⌘ + Z` | Undo |
 | `Ctrl/⌘ + Shift + Z` | Redo |
 | `Ctrl/⌘ + D` | Duplicate selected clip |
-| `Ctrl/⌘ + A` | Select all notes in the open clip |
+| `Ctrl/⌘ + C` / `X` / `V` | Copy / cut / paste notes or clips |
+| `Ctrl/⌘ + A` | Select all notes in the open clip, or all clips in the timeline |
+| `Shift + drag` | Add a box selection in the timeline or piano roll |
 | `Delete / Backspace` | Delete selected notes, or the selected clip |
 | `R` | Record a take |
 | `L` | Toggle loop |

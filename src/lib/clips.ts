@@ -31,13 +31,19 @@ export const addClipOnTrack = (trackId: string, beat?: number, lengthBars = 4) =
 export const deleteSelectedClip = () => {
   const store = useProjectStore.getState()
   const session = useSessionStore.getState()
-  if (!session.selectedNoteIds.length) {
-    const selected = getSelectedClip(store.project, store.selectedClipId)
-    if (selected) {
-      store.deleteClip(selected.track.id, selected.clip.id)
-      session.toast('Clip deleted', `${MOD_LABEL}Z brings it back.`, 'default')
-    }
-  }
+  if (session.selectedNoteIds.length) return
+  const ids = store.selectedClipIds.length
+    ? store.selectedClipIds
+    : store.selectedClipId
+      ? [store.selectedClipId]
+      : []
+  if (!ids.length) return
+  store.deleteClips(ids)
+  session.toast(
+    `${ids.length} clip${ids.length === 1 ? '' : 's'} deleted`,
+    `${MOD_LABEL}+Z brings ${ids.length === 1 ? 'it' : 'them'} back.`,
+    'default',
+  )
 }
 
 export const duplicateSelectedClip = () => {
