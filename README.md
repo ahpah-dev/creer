@@ -2,9 +2,15 @@
 
 **A warm, fast digital audio workstation for the web.** Make a beat, hum a melody, borrow a loop and turn it into a song — all in the browser, with no account and no upload.
 
+**Play online:** [**ahpah-dev.github.io/creer**](https://ahpah-dev.github.io/creer/)
+
 ![Creer studio](screenshots/studio.png)
 
 ## Open it
+
+### Play online
+
+Open **[ahpah-dev.github.io/creer](https://ahpah-dev.github.io/creer/)**. The site is served over HTTPS, so Web MIDI permissions are available directly in the browser.
 
 ### The quick way
 
@@ -29,7 +35,7 @@ To produce the packed file again:
 npm run build:standalone
 ```
 
-That writes both `standalone/index.html` and the finished `Creer.html`.
+That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub Pages copy at `docs/index.html`.
 
 ## What is inside
 
