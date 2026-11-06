@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import {
   ArrowDown,
@@ -9,6 +9,8 @@ import {
   Magnet,
   Plus,
   Trash2,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react'
 import type { Clip, Note, Track } from '../types'
 import { useProjectStore, getSelectedClip } from '../store/project'
@@ -30,6 +32,9 @@ import {
 const LABEL_WIDTH = 58
 const ROW_HEIGHT = 16
 const MIN_ROWS = 24
+const MIN_PIANO_ZOOM = 1
+const MAX_PIANO_ZOOM = 8
+const PIANO_ZOOM_LEVELS = [1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4, 5, 6, 8]
 
 interface Row {
   pitch: number
@@ -82,6 +87,8 @@ export function PianoRoll() {
   const snap = useSessionStore((state) => state.snap)
   const noteLength = useSessionStore((state) => state.noteLength)
   const setNoteLength = useSessionStore((state) => state.setNoteLength)
+  const pianoZoom = useSessionStore((state) => state.pianoZoom)
+  const setPianoZoom = useSessionStore((state) => state.setPianoZoom)
   const selectedNoteIds = useSessionStore((state) => state.selectedNoteIds)
   const setSelectedNoteIds = useSessionStore((state) => state.setSelectedNoteIds)
   const toast = useSessionStore((state) => state.toast)
@@ -96,6 +103,8 @@ export function PianoRoll() {
   const gridRef = useRef<HTMLDivElement>(null)
   const velocityScrollRef = useRef<HTMLDivElement>(null)
   const playheadRef = useRef<HTMLDivElement>(null)
+  const pendingZoomAnchor = useRef<{ beat: number; viewportX: number } | null>(null)
+  const zoomAtPointRef = useRef<(nextZoom: number, clientX?: number) => void>(() => {})
   const auditionRef = useRef<{
     pitch: number
     key: string | null
@@ -107,9 +116,10 @@ export function PianoRoll() {
   const track = selected?.track ?? project.tracks.find((item) => item.id === selectedTrackId) ?? null
   const clip = selected?.clip ?? null
   const rows = useMemo(() => (track && clip ? buildRows(track, clip) : []), [track, clip])
-  const gridWidth = clip
+  const fitWidth = clip
     ? Math.max(320, Math.min(clip.length * 72, Math.max(480, availableWidth - LABEL_WIDTH - 20)))
     : 0
+  const gridWidth = clip ? Math.max(160, Math.round(fitWidth * pianoZoom)) : 0
   const ppb = clip ? gridWidth / Math.max(0.25, clip.length) : 48
   const contentWidth = LABEL_WIDTH + gridWidth
   const selectedNote = clip?.notes.find((note) => selectedNoteIds.includes(note.id)) ?? null
@@ -174,6 +184,71 @@ export function PianoRoll() {
     })
     entry.autoTimer = window.setTimeout(() => finishAudition(entry), hold)
   }
+
+  const stepZoom = (direction: 1 | -1) => {
+    if (direction > 0) {
+      return (
+        PIANO_ZOOM_LEVELS.find((level) => level > pianoZoom + 0.001) ?? MAX_PIANO_ZOOM
+      )
+    }
+    return (
+      [...PIANO_ZOOM_LEVELS].reverse().find((level) => level < pianoZoom - 0.001) ??
+      MIN_PIANO_ZOOM
+    )
+  }
+
+  const zoomAtPoint = (nextZoom: number, clientX?: number) => {
+    if (!clip) return
+    const next = Math.round(clamp(nextZoom, MIN_PIANO_ZOOM, MAX_PIANO_ZOOM) * 100) / 100
+    if (Math.abs(next - pianoZoom) < 0.001) return
+    const scroller = scrollRef.current
+    if (!scroller) {
+      setPianoZoom(next)
+      return
+    }
+    const rect = scroller.getBoundingClientRect()
+    const viewportX =
+      clientX === undefined
+        ? Math.max(LABEL_WIDTH, rect.width / 2)
+        : clamp(clientX - rect.left, LABEL_WIDTH, Math.max(LABEL_WIDTH, rect.width - 12))
+    const beat = clamp((scroller.scrollLeft + viewportX - LABEL_WIDTH) / ppb, 0, clip.length)
+    pendingZoomAnchor.current = { beat, viewportX }
+    setPianoZoom(next)
+  }
+  zoomAtPointRef.current = zoomAtPoint
+
+  useLayoutEffect(() => {
+    const pending = pendingZoomAnchor.current
+    if (!pending || !clip) return
+    const scroller = scrollRef.current
+    if (!scroller) return
+    const nextPpb = gridWidth / Math.max(0.25, clip.length)
+    const maxScroll = Math.max(0, LABEL_WIDTH + gridWidth - scroller.clientWidth)
+    const nextLeft = clamp(
+      LABEL_WIDTH + pending.beat * nextPpb - pending.viewportX,
+      0,
+      maxScroll,
+    )
+    scroller.scrollLeft = nextLeft
+    if (velocityScrollRef.current) velocityScrollRef.current.scrollLeft = nextLeft
+    pendingZoomAnchor.current = null
+  }, [pianoZoom, gridWidth, clip])
+
+  useEffect(() => {
+    const scroller = scrollRef.current
+    if (!scroller) return
+    const onWheel = (event: WheelEvent) => {
+      if (!event.ctrlKey && !event.metaKey) return
+      const delta = event.deltaY || event.deltaX
+      if (!delta) return
+      event.preventDefault()
+      const current = useSessionStore.getState().pianoZoom
+      const factor = Math.exp(-delta * 0.0018)
+      zoomAtPointRef.current(current * factor, event.clientX)
+    }
+    scroller.addEventListener('wheel', onWheel, { passive: false })
+    return () => scroller.removeEventListener('wheel', onWheel)
+  }, [clip?.id])
 
   useEffect(() => {
     return () => {
@@ -571,6 +646,34 @@ export function PianoRoll() {
           >
             <Trash2 size={14} />
           </button>
+          <div className="piano-zoom" role="group" aria-label="Piano roll zoom">
+            <button
+              className="editor-tool icon-only"
+              onClick={() => zoomAtPoint(stepZoom(-1))}
+              disabled={pianoZoom <= MIN_PIANO_ZOOM}
+              title="Zoom out (Ctrl/⌘ + scroll)"
+              aria-label="Zoom out"
+            >
+              <ZoomOut size={14} />
+            </button>
+            <button
+              className="piano-zoom-value"
+              onClick={() => zoomAtPoint(MIN_PIANO_ZOOM)}
+              title="Fit clip to width (Ctrl/⌘ + scroll to zoom)"
+              aria-label={`Piano roll zoom ${Math.round(pianoZoom * 100)} percent. Click to fit.`}
+            >
+              {Math.round(pianoZoom * 100)}%
+            </button>
+            <button
+              className="editor-tool icon-only"
+              onClick={() => zoomAtPoint(stepZoom(1))}
+              disabled={pianoZoom >= MAX_PIANO_ZOOM}
+              title="Zoom in (Ctrl/⌘ + scroll)"
+              aria-label="Zoom in"
+            >
+              <ZoomIn size={14} />
+            </button>
+          </div>
         </div>
 
         <div className="piano-status">

@@ -40,7 +40,7 @@ That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub P
 ## What is inside
 
 - **Six-track demo song, “Golden Hour”** — play it immediately, solo parts, or pull it apart to learn how it was built.
-- **Piano-roll editor** — draw, drag, resize and nudge notes, change velocity, quantize, transpose, split clips, and edit drum patterns by drum name. Drag a note up or down and you hear each new pitch as it moves.
+- **Piano-roll editor** — draw, drag, resize and nudge notes, change velocity, quantize, transpose, split clips, and edit drum patterns by drum name. Drag a note up or down and you hear each new pitch as it moves. Zoom in from 100% to 800% with the − / + controls, or hold Ctrl/⌘ and scroll to zoom around the pointer.
 - **Instrument library** — 22 synthesized sounds across Keys, Bass, Pads, Leads and Drums. Search or filter the collection, audition any sound, load it onto the current track with one click, or grow a new track from it.
 - **The sounds** — from Velvet Piano, Gilded Harp and Red Room Wurli to Deep End, Fretless, Aurora, Dust Choir, Neon Lead, Kalimba and the dust-edged Lo-Fi Kit. Every one is built from oscillators, filters, FM and noise.
 - **Live MIDI-style recording** — arm a track, hit record and play the keys or pads. Captured takes land in the arrangement.
@@ -53,9 +53,12 @@ That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub P
 
 The audio is synthesised live with Web Audio. There are no samples or external audio assets.
 
-> **New in 1.1** — the 22-sound instrument library with search and auditions, live pitch feedback while dragging notes, and song sections you can rename, recolor, add and remove.
+> **New in 1.2** — piano-roll zoom with fit-to-width and cursor-anchored Ctrl/⌘ + scroll. The 1.1 release added the 22-sound instrument library with search and auditions, live pitch feedback while dragging notes, and song sections you can rename, recolor, add and remove.
 
 ## A look inside
+
+### Piano-roll zoom
+![Creer piano-roll zoom](screenshots/piano-zoom.png)
 
 ### Instrument library
 ![Creer instrument library](screenshots/library.png)
@@ -78,7 +81,7 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 | --- | --- |
 | Transport | `Space` plays and pauses. `L` toggles the loop. `R` starts/stops a take. |
 | Arrangement | Double-click an empty lane for a new clip. Double-click a clip to open its editor. Hover a section and use the pencil to rename, recolor, loop or delete it; **+** adds a section. |
-| Piano roll | Click to draw, drag to move, use the right handle to resize. Moving a note up or down auditions the new pitch. The lower lane edits velocity. |
+| Piano roll | Click to draw, drag to move, use the right handle to resize. Moving a note up or down auditions the new pitch. Zoom with the − / + control or Ctrl/⌘ + scroll; click the percentage to fit. The lower lane edits velocity. |
 | Instrument library | Open **Sounds & Keys** and click the sound name (or **Browse**). Search, audition, then click a card to load it on the current track. |
 | Recording | Arm a track with the dot in its header, press record, then play the on-screen keys or pads. |
 | Loops | Open the **Loops** tab, preview with the play button, add with **Add**. |

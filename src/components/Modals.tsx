@@ -181,8 +181,9 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           <div className="help-tip">
             <Info size={14} />
             <p>
-              Drag a note up or down to hear each pitch as it moves. Hover a song section
-              and use the pencil to rename or recolor it; the plus adds a new section.
+              Drag a note up or down to hear each pitch as it moves. Zoom the piano roll
+              with − / + or Ctrl/⌘ + scroll. Hover a song section and use the pencil to
+              rename or recolor it; the plus adds a new section.
             </p>
           </div>
           <div className="help-tip">
@@ -196,7 +197,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           <div className="help-signature">
             <span>CREER</span>
             <i />
-            <span>v1.1</span>
+            <span>v1.2</span>
             <em>made for making</em>
           </div>
         </div>

@@ -11,6 +11,8 @@ interface SessionState {
   setDockCollapsed: (collapsed: boolean) => void
   zoom: number
   setZoom: (zoom: number) => void
+  pianoZoom: number
+  setPianoZoom: (zoom: number) => void
   snap: number
   setSnap: (snap: number) => void
   noteLength: number
@@ -58,6 +60,23 @@ const writeZoom = (value: number) => {
   }
 }
 
+const readPianoZoom = () => {
+  try {
+    const raw = Number(localStorage.getItem('creer.pianoZoom'))
+    return Number.isFinite(raw) && raw >= 1 && raw <= 8 ? raw : 1
+  } catch {
+    return 1
+  }
+}
+
+const writePianoZoom = (value: number) => {
+  try {
+    localStorage.setItem('creer.pianoZoom', String(value))
+  } catch {
+    /* storage can be unavailable in private or embedded contexts */
+  }
+}
+
 export const useSessionStore = create<SessionState>((set, get) => ({
   dock: 'editor',
   setDock: (dock) =>
@@ -73,6 +92,12 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     const next = clamp(zoom, 8, 56)
     writeZoom(next)
     set({ zoom: next })
+  },
+  pianoZoom: readPianoZoom(),
+  setPianoZoom: (zoom) => {
+    const next = Math.round(clamp(zoom, 1, 8) * 100) / 100
+    writePianoZoom(next)
+    set({ pianoZoom: next })
   },
   snap: 0.25,
   setSnap: (snap) => set({ snap }),
