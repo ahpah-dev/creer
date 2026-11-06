@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
+  AudioWaveform,
   Check,
   ChevronDown,
   Circle,
@@ -245,6 +246,16 @@ function SongSettings() {
   }
 
   const keyLabel = `${project.key} ${project.scale === 'minor' ? 'min' : 'maj'}`
+  const swing = project.swing
+  const updateSwing = (
+    patch: Partial<typeof swing>,
+    coalesce?: string,
+  ) => {
+    updateProject(
+      { swing: { ...swing, ...patch } },
+      coalesce ? { coalesce } : undefined,
+    )
+  }
 
   return (
     <div className="song-settings" ref={ref}>
@@ -265,6 +276,18 @@ function SongSettings() {
       >
         <span className="meta-pill-label">KEY</span>
         <span className="meta-pill-value">{keyLabel}</span>
+      </button>
+      <button
+        className={`meta-pill swing-pill ${open ? 'is-active' : ''} ${swing.enabled ? 'is-on' : ''}`}
+        onClick={() => setOpen(!open)}
+        aria-label="Swing settings"
+        data-tip="Swing"
+      >
+        <span className="meta-pill-label">SWING</span>
+        <span className="meta-pill-value">
+          <AudioWaveform size={10} />
+          {swing.enabled ? `${Math.round(swing.amount)}%` : 'OFF'}
+        </span>
       </button>
       {open && (
         <div className="popover song-popover">
@@ -347,6 +370,68 @@ function SongSettings() {
                 ))}
               </div>
             </div>
+          </div>
+          <div className="swing-panel">
+            <div className="swing-head">
+              <div>
+                <div className="field-label">Swing</div>
+                <span className={`swing-state ${swing.enabled ? 'is-on' : ''}`}>
+                  {swing.enabled
+                    ? `${swing.division}th-note swing`
+                    : 'Straight time'}
+                </span>
+              </div>
+              <button
+                className={`swing-switch ${swing.enabled ? 'is-on' : ''}`}
+                role="switch"
+                aria-checked={swing.enabled}
+                aria-label="Enable swing"
+                onClick={() =>
+                  updateSwing({
+                    enabled: !swing.enabled,
+                    amount: !swing.enabled && swing.amount === 0 ? 50 : swing.amount,
+                  })
+                }
+              >
+                <span />
+              </button>
+            </div>
+            <div className="swing-slider-row">
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={swing.amount}
+                disabled={!swing.enabled}
+                onChange={(event) =>
+                  updateSwing({ amount: Number(event.target.value) }, 'swing-amount')
+                }
+                aria-label="Swing amount"
+                aria-valuetext={`${Math.round(swing.amount)} percent`}
+                style={{ ['--swing-progress' as string]: `${swing.amount}%` }}
+              />
+              <strong>{Math.round(swing.amount)}%</strong>
+            </div>
+            <div className="swing-division-row">
+              <div className="segmented">
+                {([8, 16] as const).map((division) => (
+                  <button
+                    key={division}
+                    className={swing.division === division ? 'is-selected' : ''}
+                    aria-pressed={swing.division === division}
+                    onClick={() => updateSwing({ division })}
+                  >
+                    {division}th
+                  </button>
+                ))}
+              </div>
+              <span>0% straight · 100% triplet</span>
+            </div>
+            <p className="swing-note">
+              Delays every second {swing.division}th note. Applied to playback
+              and WAV exports.
+            </p>
           </div>
           <p className="popover-note">Tempo changes while playing restart the transport, so everything stays in time.</p>
         </div>

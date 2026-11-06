@@ -90,6 +90,13 @@ export interface MasterSettings {
   delay: number
 }
 
+export interface SwingSettings {
+  enabled: boolean
+  /** 0 = straight, 100 = full triplet feel. */
+  amount: number
+  division: 8 | 16
+}
+
 export interface Project {
   version: 1
   id: string
@@ -102,6 +109,7 @@ export interface Project {
   tracks: Track[]
   sections: Section[]
   loop: LoopSettings
+  swing: SwingSettings
   master: MasterSettings
   createdAt: string
   updatedAt: string

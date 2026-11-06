@@ -61,6 +61,17 @@ export const normalizeProject = (input: unknown): Project => {
       start: Math.max(0, raw.loop?.start ?? 0),
       end: Math.max(1, raw.loop?.end ?? 16),
     },
+    swing: {
+      enabled: Boolean(raw.swing?.enabled),
+      amount: Math.max(
+        0,
+        Math.min(
+          100,
+          typeof raw.swing?.amount === 'number' ? raw.swing.amount : 50,
+        ),
+      ),
+      division: raw.swing?.division === 16 ? 16 : 8,
+    },
     master: {
       volume: typeof raw.master?.volume === 'number' ? raw.master.volume : 0.8,
       reverb: typeof raw.master?.reverb === 'number' ? raw.master.reverb : 0.28,

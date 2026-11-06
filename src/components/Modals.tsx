@@ -187,7 +187,8 @@ function HelpModal({ onClose }: { onClose: () => void }) {
             </p>
             <p>
               Hover a song section and use the pencil to rename or recolor it; the plus
-              adds a new section.
+              adds a new section. Open the SWING pill in the top bar to add 8th- or
+              16th-note swing to playback and exports.
             </p>
           </div>
           <div className="help-tip">
@@ -201,7 +202,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           <div className="help-signature">
             <span>CREER</span>
             <i />
-            <span>v1.3</span>
+            <span>v1.4</span>
             <em>made for making</em>
           </div>
         </div>

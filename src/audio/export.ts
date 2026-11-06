@@ -1,5 +1,6 @@
 import type { Project } from '../types'
 import { contentEnd } from '../lib/utils'
+import { swingOffset } from '../lib/swing'
 import { createMasterBus, createTrackBus } from './graph'
 import { triggerNote } from './synth'
 
@@ -69,12 +70,13 @@ export const renderProjectToWav = async (project: Project): Promise<{ blob: Blob
     for (const clip of track.clips) {
       for (const note of clip.notes) {
         if (note.start < 0 || note.start >= clip.length - 1e-7) continue
+        const beat = clip.start + note.start
         triggerNote(
           ctx,
           bus.input,
           track.instrument,
           note.pitch,
-          startAt + (clip.start + note.start) * spb,
+          startAt + (beat + swingOffset(beat, project.swing)) * spb,
           Math.max(0.03, note.duration * spb),
           note.velocity,
         )

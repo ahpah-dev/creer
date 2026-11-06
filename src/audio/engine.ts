@@ -8,6 +8,7 @@ import {
   type TrackBus,
 } from './graph'
 import { triggerNote, type VoiceHandle } from './synth'
+import { swingOffset } from '../lib/swing'
 
 interface NoteEvent {
   beat: number
@@ -356,8 +357,9 @@ export class AudioEngine {
       for (const clip of track.clips) {
         for (const note of clip.notes) {
           if (note.start < 0 || note.start >= clip.length - 1e-7) continue
+          const beat = clip.start + note.start
           events.push({
-            beat: clip.start + note.start,
+            beat: beat + swingOffset(beat, project.swing),
             durationBeats: Math.max(0.03, note.duration),
             pitch: note.pitch,
             velocity: note.velocity,

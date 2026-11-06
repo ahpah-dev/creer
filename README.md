@@ -46,6 +46,7 @@ That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub P
 - **Live MIDI-style recording** — arm a track, hit record and play the keys or pads. Captured takes land in the arrangement.
 - **MIDI keyboard input** — connect a hardware keyboard through the MIDI button in the top bar. Note on/off, velocity, sustain and hot-plugging are supported, and incoming MIDI is captured while recording.
 - **Loop library** — ten curated, tempo-aware parts that preview and drop into the song.
+- **Swing mode** — open the **SWING** pill in the top bar to enable 8th- or 16th-note swing, then dial it from straight to a full triplet feel. It is applied to playback and WAV exports.
 - **Mixer** — per-track faders, pans, reverb/delay sends, mute/solo and meters, plus a master strip with its own effects and limiter.
 - **Arrangement tools** — drag clips across tracks, resize them, loop sections, scrub the timeline, zoom, snap, duplicate, split and undo. Song sections are yours: rename and recolor them from the pencil, add new ones with **+**, or delete them.
 - **WAV export** — offline-rendered stereo 44.1 kHz / 16-bit master, with all effects and the reverb tail.
@@ -53,7 +54,7 @@ That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub P
 
 The audio is synthesised live with Web Audio. There are no samples or external audio assets.
 
-> **New in 1.3** — drag the grip above the editor tabs to resize the piano roll vertically; double-click it to reset. The 1.2 release added piano-roll zoom, and 1.1 brought the 22-sound instrument library, live pitch feedback while dragging notes, and editable song sections.
+> **New in 1.4** — swing mode with 8th- or 16th-note divisions, a straight-to-triplet amount control, and matching playback/export timing. The 1.3 release added vertical piano-roll resizing, 1.2 added piano-roll zoom, and 1.1 brought the 22-sound instrument library, live pitch feedback while dragging notes, and editable song sections.
 
 ## A look inside
 
@@ -75,6 +76,9 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 ### Loop library
 ![Creer loop library](screenshots/loops.png)
 
+### Swing
+![Creer swing settings](screenshots/swing.png)
+
 ### Sounds & Keys
 ![Creer keyboard](screenshots/keys.png)
 
@@ -88,6 +92,7 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 | Instrument library | Open **Sounds & Keys** and click the sound name (or **Browse**). Search, audition, then click a card to load it on the current track. |
 | Recording | Arm a track with the dot in its header, press record, then play the on-screen keys or pads. |
 | Loops | Open the **Loops** tab, preview with the play button, add with **Add**. |
+| Swing | Open the **SWING** pill in the top bar, switch it on, choose 8th or 16th notes and set the amount. The same timing is used in the WAV export. |
 | Mixer | Faders, pan, reverb/delay sends and master effects. Double-click a knob to reset it to its natural centre. |
 | MIDI | Click **MIDI** in the top bar, enable input and choose your keyboard. It plays the armed track (or the selected track if none is armed). |
 | Export | **Export** renders the full arrangement to a WAV. Loop settings are not applied to the bounce. |

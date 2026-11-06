@@ -302,6 +302,7 @@ export const createDemoProject = (): Project => {
       { id: uid('s'), name: 'Outro', start: 48, length: 16 },
     ],
     loop: { enabled: false, start: 16, end: 48 },
+    swing: { enabled: false, amount: 50, division: 8 },
     master: { volume: 0.8, reverb: 0.28, delay: 0.16 },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
