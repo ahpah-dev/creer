@@ -1,0 +1,7 @@
+node_modules/
+dist/
+standalone/
+shots/
+tsconfig.tsbuildinfo
+*.log
+.DS_Store
