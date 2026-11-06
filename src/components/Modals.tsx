@@ -152,7 +152,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
             </div>
             <div>
               <span className="step-number">03</span>
-              <p><strong>Browse the library.</strong> Twenty-two synthesized instruments are waiting in Sounds &amp; Keys, each with a one-click audition.</p>
+              <p><strong>Browse the library.</strong> Thirty-six synthesized sounds, including six drum kits, are waiting in Sounds &amp; Keys, each with a one-click audition.</p>
             </div>
             <div>
               <span className="step-number">04</span>
@@ -203,7 +203,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           <div className="help-signature">
             <span>CREER</span>
             <i />
-            <span>v1.6</span>
+            <span>v1.7</span>
             <em>made for making</em>
           </div>
         </div>

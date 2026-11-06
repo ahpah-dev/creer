@@ -2,8 +2,26 @@ import { Drum, Guitar, Music2, Piano, Sparkles, Waves } from 'lucide-react'
 import type { InstrumentId } from '../types'
 import { isDrumInstrument } from '../data/instruments'
 
-const sparkleIds: InstrumentId[] = ['pluck', 'bell', 'musicbox', 'neon', 'kalimba']
+const sparkleIds: InstrumentId[] = [
+  'pluck',
+  'bell',
+  'musicbox',
+  'neon',
+  'kalimba',
+  'celesta',
+  'vibraphone',
+  'halo',
+]
 const waveIds: InstrumentId[] = ['pad', 'strings', 'aurora', 'choir']
+const guitarIds: InstrumentId[] = [
+  'bass',
+  'sub',
+  'fretless',
+  'eightoheight',
+  'reese',
+  'nylon',
+  'cello',
+]
 
 export function TrackIcon({ instrument, size = 14 }: { instrument: InstrumentId; size?: number }) {
   const Icon =
@@ -11,7 +29,7 @@ export function TrackIcon({ instrument, size = 14 }: { instrument: InstrumentId;
       ? Music2
       : isDrumInstrument(instrument)
         ? Drum
-        : instrument === 'bass' || instrument === 'sub' || instrument === 'fretless'
+        : guitarIds.includes(instrument)
           ? Guitar
           : waveIds.includes(instrument)
             ? Waves

@@ -41,8 +41,8 @@ That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub P
 
 - **Six-track demo song, “Golden Hour”** — play it immediately, solo parts, or pull it apart to learn how it was built.
 - **Piano-roll editor** — draw, drag, resize and nudge notes, change velocity, quantize, transpose, split clips, and edit drum patterns by drum name. Drag a note up or down and you hear each new pitch as it moves. Zoom in from 100% to 800% with the − / + controls, or hold Ctrl/⌘ and scroll to zoom around the pointer. Drag the grip above the editor tabs to make the piano roll as tall as you like; double-click the grip to reset its height.
-- **Instrument library** — 22 synthesized sounds across Keys, Bass, Pads, Leads and Drums. Search or filter the collection, audition any sound, load it onto the current track with one click, or grow a new track from it.
-- **The sounds** — from Velvet Piano, Gilded Harp and Red Room Wurli to Deep End, Fretless, Aurora, Dust Choir, Neon Lead, Kalimba and the dust-edged Lo-Fi Kit. Every one is built from oscillators, filters, FM and noise.
+- **Instrument library** — 36 synthesized sounds across Keys, Bass, Pads, Leads and Drums, including six drum kits. Search or filter the collection, audition any sound, load it onto the current track with one click, or grow a new track from it.
+- **The sounds** — from Velvet Piano, Silver Celesta, Vibraphone and Harpsichord to Eight Oh Eight, Reese, Nylon Guitar, Air Flute, Brass Room, Super Saw and Solo Cello. The drum room now holds Studio, Lo-Fi, Hand Percussion, Vintage, 808 and Brush kits. Every one is built from oscillators, filters, FM and noise.
 - **Live MIDI-style recording** — arm a track, hit record and play the keys or pads. Captured takes land in the arrangement.
 - **MIDI keyboard input** — connect a hardware keyboard through the MIDI button in the top bar. Note on/off, velocity, sustain and hot-plugging are supported, and incoming MIDI is captured while recording.
 - **Box selection & clipboard** — drag a box over empty timeline space to select clips, or switch the piano roll to **Select** and drag a box over notes. Cut, copy and paste either selection from the toolbar or with `Ctrl/⌘ + X / C / V`.
@@ -56,7 +56,7 @@ That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub P
 
 The audio is synthesised live with Web Audio. There are no samples or external audio assets.
 
-> **New in 1.6** — per-track and master insert effect chains with 11 effect types, reordering, bypass and live parameter control, all matched in the WAV export. The 1.5 release added box selection and clipboard editing, 1.4 added swing mode, 1.3 added vertical piano-roll resizing, 1.2 added piano-roll zoom, and 1.1 brought the 22-sound instrument library, live pitch feedback while dragging notes, and editable song sections.
+> **New in 1.7** — fourteen new sounds: Silver Celesta, Vibraphone, Harpsichord, Eight Oh Eight, Reese, Nylon Guitar, Air Flute, Brass Room, Super Saw, Solo Cello, Halo Pad, plus Vintage, 808 and Brush drum kits. The 1.6 release added per-track and master insert effect chains, 1.5 added box selection and clipboard editing, 1.4 added swing mode, 1.3 added vertical piano-roll resizing, 1.2 added piano-roll zoom, and 1.1 brought the original 22-sound instrument library, live pitch feedback while dragging notes, and editable song sections.
 
 ## A look inside
 
@@ -73,6 +73,11 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 
 ### Instrument library
 ![Creer instrument library](screenshots/library.png)
+
+### Drum kits
+![Creer drum kit library](screenshots/drum-library.png)
+
+![Creer Brush Kit pads](screenshots/drum-kit.png)
 
 ### Song sections
 ![Creer section editor](screenshots/section-editor.png)

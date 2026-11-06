@@ -74,6 +74,30 @@ export const INSTRUMENTS: InstrumentInfo[] = [
     color: '#caa47c',
   },
   {
+    id: 'celesta',
+    name: 'Silver Celesta',
+    shortName: 'Celesta',
+    category: 'Keys',
+    description: 'A small, silver-keyed celesta with a soft hammer and a long bell tail.',
+    color: '#d8d0b4',
+  },
+  {
+    id: 'vibraphone',
+    name: 'Vibraphone',
+    shortName: 'Vibes',
+    category: 'Keys',
+    description: 'Warm aluminum bars, a slow motor and a shimmer that hangs in the room.',
+    color: '#a9c6c0',
+  },
+  {
+    id: 'harpsichord',
+    name: 'Harpsichord',
+    shortName: 'Harpsi',
+    category: 'Keys',
+    description: 'A bright plucked keyboard with a woody body and a delicate quill attack.',
+    color: '#c9a97d',
+  },
+  {
     id: 'bass',
     name: 'Round Bass',
     shortName: 'Bass',
@@ -96,6 +120,22 @@ export const INSTRUMENTS: InstrumentInfo[] = [
     category: 'Bass',
     description: 'A smooth, singing bass with a slow vibrato and soft edges.',
     color: '#bea571',
+  },
+  {
+    id: 'eightoheight',
+    name: 'Eight Oh Eight',
+    shortName: '808',
+    category: 'Bass',
+    description: 'A long, saturated 808 bass with a soft attack and a deep, patient tail.',
+    color: '#d6a05f',
+  },
+  {
+    id: 'reese',
+    name: 'Reese',
+    shortName: 'Reese',
+    category: 'Bass',
+    description: 'Detuned saws and a slow filter drift for a wide, restless low end.',
+    color: '#b39a69',
   },
   {
     id: 'pad',
@@ -128,6 +168,54 @@ export const INSTRUMENTS: InstrumentInfo[] = [
     category: 'Pads',
     description: 'A weathered choir hum with breath, air and a little tape hiss.',
     color: '#b0a6cb',
+  },
+  {
+    id: 'halo',
+    name: 'Halo Pad',
+    shortName: 'Halo',
+    category: 'Pads',
+    description: 'A high, slow-blooming pad with a soft shimmer around the edges.',
+    color: '#94b6d0',
+  },
+  {
+    id: 'nylon',
+    name: 'Nylon Guitar',
+    shortName: 'Nylon',
+    category: 'Leads',
+    description: 'A warm fingerpicked nylon string with a woody body and a soft pluck.',
+    color: '#d1a37f',
+  },
+  {
+    id: 'flute',
+    name: 'Air Flute',
+    shortName: 'Flute',
+    category: 'Leads',
+    description: 'A breathy wooden flute with a gentle vibrato and plenty of air.',
+    color: '#a8c6b4',
+  },
+  {
+    id: 'brass',
+    name: 'Brass Room',
+    shortName: 'Brass',
+    category: 'Leads',
+    description: 'A warm analog brass section with a rounded swell and a mellow bite.',
+    color: '#d89468',
+  },
+  {
+    id: 'supersaw',
+    name: 'Super Saw',
+    shortName: 'Saw',
+    category: 'Leads',
+    description: 'Seven detuned saws stacked into a wide, glowing lead.',
+    color: '#e19a83',
+  },
+  {
+    id: 'cello',
+    name: 'Solo Cello',
+    shortName: 'Cello',
+    category: 'Leads',
+    description: 'A close, bowed cello with a woody body and a slow, human vibrato.',
+    color: '#b58a6d',
   },
   {
     id: 'pluck',
@@ -180,6 +268,33 @@ export const INSTRUMENTS: InstrumentInfo[] = [
     color: '#c9a878',
     isDrums: true,
   },
+  {
+    id: 'vintage',
+    name: 'Vintage Kit',
+    shortName: 'Vintage',
+    category: 'Drums',
+    description: 'Dry 1970s drums with a tight kick, a crackly snare and short, smoky cymbals.',
+    color: '#cf9271',
+    isDrums: true,
+  },
+  {
+    id: 'kit808',
+    name: '808 Room',
+    shortName: '808 Kit',
+    category: 'Drums',
+    description: 'Deep, slow-decaying 808 drums with a saturated low end and electro handclaps.',
+    color: '#e0a06d',
+    isDrums: true,
+  },
+  {
+    id: 'brush',
+    name: 'Brush Kit',
+    shortName: 'Brush',
+    category: 'Drums',
+    description: 'A soft jazz kit played with brushes — airy snare swirls, dark ride and warm toms.',
+    color: '#b8aa8c',
+    isDrums: true,
+  },
 ]
 
 export const INSTRUMENT_MAP = Object.fromEntries(
@@ -188,7 +303,14 @@ export const INSTRUMENT_MAP = Object.fromEntries(
 
 export const INSTRUMENT_GROUPS = ['Keys', 'Bass', 'Pads', 'Leads', 'Drums'] as const
 
-export const DRUM_INSTRUMENT_IDS: InstrumentId[] = ['drums', 'lofi', 'hand']
+export const DRUM_INSTRUMENT_IDS: InstrumentId[] = [
+  'drums',
+  'lofi',
+  'hand',
+  'vintage',
+  'kit808',
+  'brush',
+]
 
 export const isDrumInstrument = (instrument: InstrumentId) =>
   DRUM_INSTRUMENT_IDS.includes(instrument)

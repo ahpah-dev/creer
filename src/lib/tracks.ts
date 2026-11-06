@@ -26,9 +26,23 @@ const defaults: Record<InstrumentId, { volume: number; reverb: number; delay: nu
   choir: { volume: 0.46, reverb: 0.42, delay: 0.06 },
   neon: { volume: 0.54, reverb: 0.18, delay: 0.24 },
   kalimba: { volume: 0.58, reverb: 0.26, delay: 0.08 },
+  celesta: { volume: 0.62, reverb: 0.3, delay: 0.08 },
+  vibraphone: { volume: 0.6, reverb: 0.34, delay: 0.06 },
+  harpsichord: { volume: 0.62, reverb: 0.22, delay: 0.06 },
+  eightoheight: { volume: 0.82, reverb: 0.02, delay: 0.02 },
+  reese: { volume: 0.74, reverb: 0.06, delay: 0.03 },
+  nylon: { volume: 0.64, reverb: 0.22, delay: 0.12 },
+  flute: { volume: 0.52, reverb: 0.28, delay: 0.12 },
+  brass: { volume: 0.58, reverb: 0.18, delay: 0.1 },
+  supersaw: { volume: 0.52, reverb: 0.2, delay: 0.14 },
+  cello: { volume: 0.58, reverb: 0.24, delay: 0.08 },
+  halo: { volume: 0.46, reverb: 0.48, delay: 0.08 },
   drums: { volume: 0.84, reverb: 0.08, delay: 0.03 },
   lofi: { volume: 0.8, reverb: 0.12, delay: 0.04 },
   hand: { volume: 0.72, reverb: 0.14, delay: 0.04 },
+  vintage: { volume: 0.82, reverb: 0.1, delay: 0.03 },
+  kit808: { volume: 0.82, reverb: 0.06, delay: 0.03 },
+  brush: { volume: 0.68, reverb: 0.18, delay: 0.04 },
 }
 
 export const createTrack = (

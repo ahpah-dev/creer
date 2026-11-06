@@ -136,22 +136,20 @@ const makeVoice = (
 
 const finalize = (
   out: GainNode,
-  _ctx: Ctx,
-  sources: AudioScheduledSourceNode[],
+  ctx: Ctx,
+  _sources: AudioScheduledSourceNode[],
   endTime: number,
 ) => {
-  const last = sources[sources.length - 1]
-  if (last) {
-    last.onended = () => {
-      window.setTimeout(() => {
-        try {
-          out.disconnect()
-        } catch {
-          /* noop */
-        }
-      }, 120)
-    }
-  }
+  window.setTimeout(
+    () => {
+      try {
+        out.disconnect()
+      } catch {
+        /* noop */
+      }
+    },
+    Math.max(0, (endTime - ctx.currentTime + 0.25) * 1000),
+  )
   return { out, endTime }
 }
 
@@ -1299,6 +1297,727 @@ const playKalimba = (
 
 // ── Drums ──────────────────────────────────────────────────────────────
 
+const playCelesta = (
+  ctx: Ctx,
+  destination: AudioNode,
+  pitch: number,
+  when: number,
+  duration: number,
+  velocity: number,
+) => {
+  const out = createOutput(ctx)
+  const filter = ctx.createBiquadFilter()
+  filter.type = 'lowpass'
+  filter.frequency.value = 6200
+  filter.Q.value = 0.45
+  filter.connect(out)
+  const f = midiToHz(pitch)
+  const sources: AudioScheduledSourceNode[] = []
+  const carrier = ctx.createOscillator()
+  carrier.type = 'sine'
+  carrier.frequency.value = f
+  const modulator = ctx.createOscillator()
+  modulator.type = 'sine'
+  modulator.frequency.value = f * 3.01
+  const modDepth = ctx.createGain()
+  modDepth.gain.setValueAtTime(f * (1.15 + velocity * 0.5), when)
+  modDepth.gain.exponentialRampToValueAtTime(Math.max(1, f * 0.035), when + 0.7)
+  modulator.connect(modDepth)
+  modDepth.connect(carrier.frequency)
+  const body = ctx.createGain()
+  body.gain.value = 0.48
+  carrier.connect(body)
+  body.connect(filter)
+  const tine = ctx.createOscillator()
+  tine.type = 'sine'
+  tine.frequency.value = f * 4.02
+  const tineGain = ctx.createGain()
+  tineGain.gain.setValueAtTime(0.12 * velocity, when)
+  tineGain.gain.exponentialRampToValueAtTime(0.0001, when + 0.6)
+  tine.connect(tineGain)
+  tineGain.connect(filter)
+  const hammer = ctx.createBufferSource()
+  hammer.buffer = makeNoiseBuffer(ctx)
+  const hammerFilter = ctx.createBiquadFilter()
+  hammerFilter.type = 'bandpass'
+  hammerFilter.frequency.value = 5200
+  hammerFilter.Q.value = 0.8
+  const hammerGain = ctx.createGain()
+  hammerGain.gain.setValueAtTime(0.025 * velocity, when)
+  hammerGain.gain.exponentialRampToValueAtTime(0.0001, when + 0.035)
+  hammer.connect(hammerFilter)
+  hammerFilter.connect(hammerGain)
+  hammerGain.connect(out)
+  for (const node of [carrier, modulator, tine]) {
+    node.start(when)
+    node.stop(when + duration + 1.1)
+    sources.push(node)
+  }
+  hammer.start(when)
+  hammer.stop(when + 0.05)
+  sources.push(hammer)
+  const end = applyEnvelope(out, when, duration, {
+    attack: 0.003,
+    decay: 1.4,
+    sustain: 0.025,
+    release: 0.55,
+    peak: 0.14 + velocity * 0.08,
+  })
+  out.connect(destination)
+  finalize(out, ctx, sources, end)
+  return makeVoice(ctx, 'celesta', out, sources, end, [filter])
+}
+
+const playVibraphone = (
+  ctx: Ctx,
+  destination: AudioNode,
+  pitch: number,
+  when: number,
+  duration: number,
+  velocity: number,
+) => {
+  const out = createOutput(ctx)
+  const filter = ctx.createBiquadFilter()
+  filter.type = 'lowpass'
+  filter.frequency.value = 6800
+  filter.Q.value = 0.45
+  const tremolo = ctx.createGain()
+  tremolo.gain.value = 0.86
+  const lfo = ctx.createOscillator()
+  lfo.frequency.value = 5.1
+  const lfoDepth = ctx.createGain()
+  lfoDepth.gain.value = 0.12
+  lfo.connect(lfoDepth)
+  lfoDepth.connect(tremolo.gain)
+  lfo.start(when)
+  lfo.stop(when + duration + 2.2)
+  filter.connect(tremolo)
+  tremolo.connect(out)
+  const f = midiToHz(pitch)
+  const sources: AudioScheduledSourceNode[] = [lfo]
+  const partials = [
+    { ratio: 1, gain: 0.54 },
+    { ratio: 4.01, gain: 0.16 },
+    { ratio: 9.15, gain: 0.045 },
+  ]
+  for (const partial of partials) {
+    const osc = ctx.createOscillator()
+    osc.type = 'sine'
+    osc.frequency.value = f * partial.ratio
+    const gain = ctx.createGain()
+    gain.gain.value = partial.gain
+    osc.connect(gain)
+    gain.connect(filter)
+    osc.start(when)
+    osc.stop(when + duration + 2)
+    sources.push(osc)
+  }
+  const end = applyEnvelope(out, when, duration, {
+    attack: 0.004,
+    decay: 2.6,
+    sustain: 0.04,
+    release: 1.15,
+    peak: 0.13 + velocity * 0.08,
+  })
+  out.connect(destination)
+  finalize(out, ctx, sources, end)
+  return makeVoice(ctx, 'vibraphone', out, sources, end, [filter, tremolo])
+}
+
+const playHarpsichord = (
+  ctx: Ctx,
+  destination: AudioNode,
+  pitch: number,
+  when: number,
+  duration: number,
+  velocity: number,
+) => {
+  const out = createOutput(ctx)
+  const highpass = ctx.createBiquadFilter()
+  highpass.type = 'highpass'
+  highpass.frequency.value = 120
+  const filter = ctx.createBiquadFilter()
+  filter.type = 'lowpass'
+  filter.frequency.value = 6200
+  filter.Q.value = 0.55
+  highpass.connect(filter)
+  filter.connect(out)
+  const f = midiToHz(pitch)
+  const sources: AudioScheduledSourceNode[] = []
+  const layers = [
+    { ratio: 1, type: 'triangle' as OscillatorType, gain: 0.5 },
+    { ratio: 2.002, type: 'sawtooth' as OscillatorType, gain: 0.1 },
+    { ratio: 3.005, type: 'sine' as OscillatorType, gain: 0.055 },
+  ]
+  for (const layer of layers) {
+    const osc = ctx.createOscillator()
+    osc.type = layer.type
+    osc.frequency.value = f * layer.ratio
+    osc.detune.value = layer.ratio === 1 ? -2 : 2
+    const gain = ctx.createGain()
+    gain.gain.value = layer.gain
+    osc.connect(gain)
+    gain.connect(highpass)
+    osc.start(when)
+    osc.stop(when + duration + 0.55)
+    sources.push(osc)
+  }
+  const quill = ctx.createBufferSource()
+  quill.buffer = makeNoiseBuffer(ctx)
+  const quillFilter = ctx.createBiquadFilter()
+  quillFilter.type = 'bandpass'
+  quillFilter.frequency.value = 2800
+  quillFilter.Q.value = 1.1
+  const quillGain = ctx.createGain()
+  quillGain.gain.setValueAtTime(0.05 * velocity, when)
+  quillGain.gain.exponentialRampToValueAtTime(0.0001, when + 0.04)
+  quill.connect(quillFilter)
+  quillFilter.connect(quillGain)
+  quillGain.connect(highpass)
+  quill.start(when)
+  quill.stop(when + 0.06)
+  sources.push(quill)
+  const end = applyEnvelope(out, when, duration, {
+    attack: 0.002,
+    decay: 0.62,
+    sustain: 0.012,
+    release: 0.3,
+    peak: 0.15 + velocity * 0.07,
+  })
+  out.connect(destination)
+  finalize(out, ctx, sources, end)
+  return makeVoice(ctx, 'harpsichord', out, sources, end, [highpass, filter])
+}
+
+const play808Bass = (
+  ctx: Ctx,
+  destination: AudioNode,
+  pitch: number,
+  when: number,
+  duration: number,
+  velocity: number,
+) => {
+  const out = createOutput(ctx)
+  const filter = ctx.createBiquadFilter()
+  filter.type = 'lowpass'
+  filter.frequency.value = 1100
+  filter.Q.value = 0.45
+  const shaper = ctx.createWaveShaper()
+  shaper.curve = makeSoftClipCurve(1.65)
+  shaper.oversample = '2x'
+  filter.connect(shaper)
+  shaper.connect(out)
+  const f = midiToHz(pitch)
+  const sources: AudioScheduledSourceNode[] = []
+  const osc = ctx.createOscillator()
+  osc.type = 'sine'
+  osc.frequency.setValueAtTime(f * 1.35, when)
+  osc.frequency.exponentialRampToValueAtTime(f, when + 0.1)
+  const gain = ctx.createGain()
+  gain.gain.value = 0.9
+  osc.connect(gain)
+  gain.connect(filter)
+  const sub = ctx.createOscillator()
+  sub.type = 'sine'
+  sub.frequency.value = f / 2
+  const subGain = ctx.createGain()
+  subGain.gain.value = 0.18
+  sub.connect(subGain)
+  subGain.connect(filter)
+  const click = ctx.createBufferSource()
+  click.buffer = makeNoiseBuffer(ctx)
+  const clickFilter = ctx.createBiquadFilter()
+  clickFilter.type = 'highpass'
+  clickFilter.frequency.value = 1400
+  const clickGain = ctx.createGain()
+  clickGain.gain.setValueAtTime(0.025 * velocity, when)
+  clickGain.gain.exponentialRampToValueAtTime(0.0001, when + 0.018)
+  click.connect(clickFilter)
+  clickFilter.connect(clickGain)
+  clickGain.connect(filter)
+  for (const node of [osc, sub]) {
+    node.start(when)
+    node.stop(when + duration + 0.8)
+    sources.push(node)
+  }
+  click.start(when)
+  click.stop(when + 0.03)
+  sources.push(click)
+  const end = applyEnvelope(out, when, duration, {
+    attack: 0.008,
+    decay: 1.1,
+    sustain: 0.7,
+    release: 0.45,
+    peak: 0.2 + velocity * 0.08,
+  })
+  out.connect(destination)
+  finalize(out, ctx, sources, end)
+  return makeVoice(ctx, 'eightoheight', out, sources, end, [filter, shaper])
+}
+
+const playReese = (
+  ctx: Ctx,
+  destination: AudioNode,
+  pitch: number,
+  when: number,
+  duration: number,
+  velocity: number,
+) => {
+  const out = createOutput(ctx)
+  const filter = ctx.createBiquadFilter()
+  filter.type = 'lowpass'
+  filter.Q.value = 2.8
+  filter.frequency.setValueAtTime(480, when)
+  filter.frequency.linearRampToValueAtTime(780 + velocity * 300, when + Math.min(1.2, duration))
+  filter.connect(out)
+  const f = midiToHz(pitch)
+  const sources: AudioScheduledSourceNode[] = []
+  const lfo = ctx.createOscillator()
+  lfo.type = 'sine'
+  lfo.frequency.value = 0.19
+  const lfoDepth = ctx.createGain()
+  lfoDepth.gain.value = 130
+  lfo.connect(lfoDepth)
+  lfoDepth.connect(filter.frequency)
+  lfo.start(when)
+  lfo.stop(when + duration + 0.7)
+  sources.push(lfo)
+  for (const cents of [-16, 0, 16]) {
+    const osc = ctx.createOscillator()
+    osc.type = 'sawtooth'
+    osc.frequency.value = f
+    osc.detune.value = cents
+    const gain = ctx.createGain()
+    gain.gain.value = 0.24
+    osc.connect(gain)
+    gain.connect(filter)
+    osc.start(when)
+    osc.stop(when + duration + 0.65)
+    sources.push(osc)
+  }
+  const sub = ctx.createOscillator()
+  sub.type = 'sine'
+  sub.frequency.value = f / 2
+  const subGain = ctx.createGain()
+  subGain.gain.value = 0.16
+  sub.connect(subGain)
+  subGain.connect(filter)
+  sub.start(when)
+  sub.stop(when + duration + 0.65)
+  sources.push(sub)
+  const end = applyEnvelope(out, when, duration, {
+    attack: 0.035,
+    decay: 0.35,
+    sustain: 0.82,
+    release: 0.5,
+    peak: 0.13 + velocity * 0.06,
+  })
+  out.connect(destination)
+  finalize(out, ctx, sources, end)
+  return makeVoice(ctx, 'reese', out, sources, end, [filter])
+}
+
+const playNylon = (
+  ctx: Ctx,
+  destination: AudioNode,
+  pitch: number,
+  when: number,
+  duration: number,
+  velocity: number,
+) => {
+  const out = createOutput(ctx)
+  const body = ctx.createBiquadFilter()
+  body.type = 'lowpass'
+  body.frequency.value = 4200
+  body.Q.value = 0.65
+  const wood = ctx.createBiquadFilter()
+  wood.type = 'peaking'
+  wood.frequency.value = 190
+  wood.Q.value = 0.9
+  wood.gain.value = 2.4
+  const warmth = ctx.createBiquadFilter()
+  warmth.type = 'highpass'
+  warmth.frequency.value = 90
+  body.connect(wood)
+  wood.connect(warmth)
+  warmth.connect(out)
+  const f = midiToHz(pitch)
+  const sources: AudioScheduledSourceNode[] = []
+  const partials = [
+    { ratio: 1, type: 'triangle' as OscillatorType, gain: 0.5, detune: -2 },
+    { ratio: 2.005, type: 'sine' as OscillatorType, gain: 0.2, detune: 2 },
+    { ratio: 3.01, type: 'sine' as OscillatorType, gain: 0.09, detune: -3 },
+    { ratio: 4.02, type: 'triangle' as OscillatorType, gain: 0.045, detune: 3 },
+    { ratio: 5.03, type: 'sine' as OscillatorType, gain: 0.022, detune: -4 },
+  ]
+  for (const partial of partials) {
+    const osc = ctx.createOscillator()
+    osc.type = partial.type
+    osc.frequency.value = f * partial.ratio
+    osc.detune.value = partial.detune
+    const gain = ctx.createGain()
+    gain.gain.value = partial.gain
+    osc.connect(gain)
+    gain.connect(body)
+    osc.start(when)
+    osc.stop(when + duration + 0.8)
+    sources.push(osc)
+  }
+  const pick = ctx.createBufferSource()
+  pick.buffer = makeNoiseBuffer(ctx)
+  const pickFilter = ctx.createBiquadFilter()
+  pickFilter.type = 'bandpass'
+  pickFilter.frequency.value = 2400
+  pickFilter.Q.value = 0.8
+  const pickGain = ctx.createGain()
+  pickGain.gain.setValueAtTime(0.045 * velocity, when)
+  pickGain.gain.exponentialRampToValueAtTime(0.0001, when + 0.035)
+  pick.connect(pickFilter)
+  pickFilter.connect(pickGain)
+  pickGain.connect(body)
+  pick.start(when)
+  pick.stop(when + 0.05)
+  sources.push(pick)
+  const end = applyEnvelope(out, when, duration, {
+    attack: 0.002,
+    decay: 1.35,
+    sustain: 0.022,
+    release: 0.42,
+    peak: 0.16 + velocity * 0.07,
+  })
+  out.connect(destination)
+  finalize(out, ctx, sources, end)
+  return makeVoice(ctx, 'nylon', out, sources, end, [body, wood, warmth])
+}
+
+const playFlute = (
+  ctx: Ctx,
+  destination: AudioNode,
+  pitch: number,
+  when: number,
+  duration: number,
+  velocity: number,
+) => {
+  const out = createOutput(ctx)
+  const filter = ctx.createBiquadFilter()
+  filter.type = 'lowpass'
+  filter.frequency.value = 6800
+  filter.Q.value = 0.4
+  filter.connect(out)
+  const f = midiToHz(pitch)
+  const sources: AudioScheduledSourceNode[] = []
+  const vibrato = ctx.createOscillator()
+  vibrato.frequency.value = 5.2
+  const vibratoDepth = ctx.createGain()
+  vibratoDepth.gain.setValueAtTime(0, when)
+  vibratoDepth.gain.linearRampToValueAtTime(5.5, when + 0.55)
+  vibrato.connect(vibratoDepth)
+  vibrato.start(when)
+  vibrato.stop(when + duration + 0.8)
+  sources.push(vibrato)
+  const fundamental = ctx.createOscillator()
+  fundamental.type = 'sine'
+  fundamental.frequency.value = f
+  vibratoDepth.connect(fundamental.detune)
+  const fundamentalGain = ctx.createGain()
+  fundamentalGain.gain.value = 0.54
+  fundamental.connect(fundamentalGain)
+  fundamentalGain.connect(filter)
+  const overtone = ctx.createOscillator()
+  overtone.type = 'triangle'
+  overtone.frequency.value = f * 2.004
+  const overtoneGain = ctx.createGain()
+  overtoneGain.gain.value = 0.045
+  overtone.connect(overtoneGain)
+  overtoneGain.connect(filter)
+  const breath = ctx.createBufferSource()
+  breath.buffer = makeNoiseBuffer(ctx)
+  breath.loop = true
+  const breathFilter = ctx.createBiquadFilter()
+  breathFilter.type = 'bandpass'
+  breathFilter.frequency.value = 1700
+  breathFilter.Q.value = 0.75
+  const breathGain = ctx.createGain()
+  breathGain.gain.value = 0.035 * velocity
+  breath.connect(breathFilter)
+  breathFilter.connect(breathGain)
+  breathGain.connect(out)
+  for (const node of [fundamental, overtone, breath]) {
+    node.start(when)
+    node.stop(when + duration + 0.75)
+    sources.push(node)
+  }
+  const end = applyEnvelope(out, when, duration, {
+    attack: 0.065,
+    decay: 0.3,
+    sustain: 0.82,
+    release: 0.4,
+    peak: 0.11 + velocity * 0.05,
+  })
+  out.connect(destination)
+  finalize(out, ctx, sources, end)
+  return makeVoice(ctx, 'flute', out, sources, end, [filter])
+}
+
+const playBrass = (
+  ctx: Ctx,
+  destination: AudioNode,
+  pitch: number,
+  when: number,
+  duration: number,
+  velocity: number,
+) => {
+  const out = createOutput(ctx)
+  const filter = ctx.createBiquadFilter()
+  filter.type = 'lowpass'
+  filter.Q.value = 0.9
+  filter.frequency.setValueAtTime(520, when)
+  filter.frequency.exponentialRampToValueAtTime(3200 + velocity * 900, when + 0.16)
+  filter.frequency.exponentialRampToValueAtTime(1700, when + 0.85)
+  filter.connect(out)
+  const f = midiToHz(pitch)
+  const sources: AudioScheduledSourceNode[] = []
+  const vibrato = ctx.createOscillator()
+  vibrato.frequency.value = 5.05
+  const vibratoDepth = ctx.createGain()
+  vibratoDepth.gain.value = 3.2
+  vibrato.connect(vibratoDepth)
+  vibrato.start(when)
+  vibrato.stop(when + duration + 0.7)
+  sources.push(vibrato)
+  for (const cents of [-8, 0, 8]) {
+    const osc = ctx.createOscillator()
+    osc.type = 'sawtooth'
+    osc.frequency.value = f
+    osc.detune.value = cents
+    vibratoDepth.connect(osc.detune)
+    const gain = ctx.createGain()
+    gain.gain.value = 0.23
+    osc.connect(gain)
+    gain.connect(filter)
+    osc.start(when)
+    osc.stop(when + duration + 0.65)
+    sources.push(osc)
+  }
+  const air = ctx.createBufferSource()
+  air.buffer = makeNoiseBuffer(ctx)
+  air.loop = true
+  const airFilter = ctx.createBiquadFilter()
+  airFilter.type = 'bandpass'
+  airFilter.frequency.value = 1200
+  airFilter.Q.value = 0.6
+  const airGain = ctx.createGain()
+  airGain.gain.value = 0.012
+  air.connect(airFilter)
+  airFilter.connect(airGain)
+  airGain.connect(filter)
+  air.start(when)
+  air.stop(when + duration + 0.65)
+  sources.push(air)
+  const end = applyEnvelope(out, when, duration, {
+    attack: 0.055,
+    decay: 0.25,
+    sustain: 0.76,
+    release: 0.38,
+    peak: 0.12 + velocity * 0.06,
+  })
+  out.connect(destination)
+  finalize(out, ctx, sources, end)
+  return makeVoice(ctx, 'brass', out, sources, end, [filter])
+}
+
+const playSupersaw = (
+  ctx: Ctx,
+  destination: AudioNode,
+  pitch: number,
+  when: number,
+  duration: number,
+  velocity: number,
+) => {
+  const out = createOutput(ctx)
+  const filter = ctx.createBiquadFilter()
+  filter.type = 'lowpass'
+  filter.Q.value = 0.9
+  filter.frequency.setValueAtTime(1200, when)
+  filter.frequency.exponentialRampToValueAtTime(5200, when + 0.14)
+  filter.frequency.exponentialRampToValueAtTime(3200, when + 0.7)
+  filter.connect(out)
+  const f = midiToHz(pitch)
+  const sources: AudioScheduledSourceNode[] = []
+  for (const cents of [-21, -14, -7, 0, 7, 14, 21]) {
+    const osc = ctx.createOscillator()
+    osc.type = 'sawtooth'
+    osc.frequency.value = f
+    osc.detune.value = cents
+    const gain = ctx.createGain()
+    gain.gain.value = 0.14
+    osc.connect(gain)
+    gain.connect(filter)
+    osc.start(when)
+    osc.stop(when + duration + 0.5)
+    sources.push(osc)
+  }
+  const sub = ctx.createOscillator()
+  sub.type = 'sine'
+  sub.frequency.value = f / 2
+  const subGain = ctx.createGain()
+  subGain.gain.value = 0.12
+  sub.connect(subGain)
+  subGain.connect(filter)
+  sub.start(when)
+  sub.stop(when + duration + 0.5)
+  sources.push(sub)
+  const end = applyEnvelope(out, when, duration, {
+    attack: 0.022,
+    decay: 0.24,
+    sustain: 0.72,
+    release: 0.32,
+    peak: 0.12 + velocity * 0.06,
+  })
+  out.connect(destination)
+  finalize(out, ctx, sources, end)
+  return makeVoice(ctx, 'supersaw', out, sources, end, [filter])
+}
+
+const playCello = (
+  ctx: Ctx,
+  destination: AudioNode,
+  pitch: number,
+  when: number,
+  duration: number,
+  velocity: number,
+) => {
+  const out = createOutput(ctx)
+  const filter = ctx.createBiquadFilter()
+  filter.type = 'lowpass'
+  filter.frequency.value = 1800
+  filter.Q.value = 0.75
+  const body = ctx.createBiquadFilter()
+  body.type = 'peaking'
+  body.frequency.value = 280
+  body.Q.value = 0.8
+  body.gain.value = 2.2
+  filter.connect(body)
+  body.connect(out)
+  const f = midiToHz(pitch)
+  const sources: AudioScheduledSourceNode[] = []
+  const vibrato = ctx.createOscillator()
+  vibrato.frequency.value = 4.6
+  const vibratoDepth = ctx.createGain()
+  vibratoDepth.gain.setValueAtTime(0, when)
+  vibratoDepth.gain.linearRampToValueAtTime(4.8, when + 0.8)
+  vibrato.connect(vibratoDepth)
+  vibrato.start(when)
+  vibrato.stop(when + duration + 1.1)
+  sources.push(vibrato)
+  for (const cents of [-6, 0, 6]) {
+    const osc = ctx.createOscillator()
+    osc.type = 'sawtooth'
+    osc.frequency.value = f
+    osc.detune.value = cents
+    vibratoDepth.connect(osc.detune)
+    const gain = ctx.createGain()
+    gain.gain.value = 0.25
+    osc.connect(gain)
+    gain.connect(filter)
+    osc.start(when)
+    osc.stop(when + duration + 1.05)
+    sources.push(osc)
+  }
+  const bow = ctx.createBufferSource()
+  bow.buffer = makeNoiseBuffer(ctx)
+  bow.loop = true
+  const bowFilter = ctx.createBiquadFilter()
+  bowFilter.type = 'bandpass'
+  bowFilter.frequency.value = 2400
+  bowFilter.Q.value = 0.9
+  const bowGain = ctx.createGain()
+  bowGain.gain.value = 0.018
+  bow.connect(bowFilter)
+  bowFilter.connect(bowGain)
+  bowGain.connect(filter)
+  bow.start(when)
+  bow.stop(when + duration + 1.05)
+  sources.push(bow)
+  const end = applyEnvelope(out, when, duration, {
+    attack: 0.19,
+    decay: 0.4,
+    sustain: 0.78,
+    release: 0.85,
+    peak: 0.12 + velocity * 0.06,
+  })
+  out.connect(destination)
+  finalize(out, ctx, sources, end)
+  return makeVoice(ctx, 'cello', out, sources, end, [filter, body])
+}
+
+const playHalo = (
+  ctx: Ctx,
+  destination: AudioNode,
+  pitch: number,
+  when: number,
+  duration: number,
+  velocity: number,
+) => {
+  const out = createOutput(ctx)
+  const filter = ctx.createBiquadFilter()
+  filter.type = 'lowpass'
+  filter.frequency.value = 3400
+  filter.Q.value = 0.55
+  const highpass = ctx.createBiquadFilter()
+  highpass.type = 'highpass'
+  highpass.frequency.value = 150
+  filter.connect(highpass)
+  highpass.connect(out)
+  const f = midiToHz(pitch)
+  const sources: AudioScheduledSourceNode[] = []
+  const partials = [
+    { ratio: 0.5, gain: 0.16, detune: -4 },
+    { ratio: 1, gain: 0.26, detune: 3 },
+    { ratio: 1.5, gain: 0.12, detune: -3 },
+    { ratio: 2.003, gain: 0.09, detune: 4 },
+    { ratio: 3.002, gain: 0.04, detune: -2 },
+  ]
+  for (const partial of partials) {
+    const osc = ctx.createOscillator()
+    osc.type = 'sine'
+    osc.frequency.value = f * partial.ratio
+    osc.detune.value = partial.detune
+    const gain = ctx.createGain()
+    gain.gain.value = partial.gain
+    osc.connect(gain)
+    gain.connect(filter)
+    osc.start(when)
+    osc.stop(when + duration + 2.6)
+    sources.push(osc)
+  }
+  const air = ctx.createBufferSource()
+  air.buffer = makeNoiseBuffer(ctx)
+  air.loop = true
+  const airFilter = ctx.createBiquadFilter()
+  airFilter.type = 'bandpass'
+  airFilter.frequency.value = 2600
+  airFilter.Q.value = 0.6
+  const airGain = ctx.createGain()
+  airGain.gain.value = 0.012
+  air.connect(airFilter)
+  airFilter.connect(airGain)
+  airGain.connect(filter)
+  air.start(when)
+  air.stop(when + duration + 2.6)
+  sources.push(air)
+  const end = applyEnvelope(out, when, duration, {
+    attack: 1.25,
+    decay: 0.7,
+    sustain: 0.82,
+    release: 2.3,
+    peak: 0.075 + velocity * 0.035,
+  })
+  out.connect(destination)
+  finalize(out, ctx, sources, end)
+  return makeVoice(ctx, 'halo', out, sources, end, [filter, highpass])
+}
+
 const playDrum = (
   ctx: Ctx,
   destination: AudioNode,
@@ -1624,6 +2343,317 @@ const playHandDrum = (
   return makeVoice(ctx, 'hand', out, sources, end)
 }
 
+type KitStyle = 'vintage' | 'kit808' | 'brush'
+
+interface KitProfile {
+  tone: number
+  drive: number
+  kickStart: number
+  kickEnd: number
+  kickDecay: number
+  kickPeak: number
+  click: number
+  clickFreq: number
+  snareBodyFreq: number
+  snareBodyDecay: number
+  snareBodyPeak: number
+  snareNoiseFreq: number
+  snareNoiseDecay: number
+  snareNoisePeak: number
+  clapFreq: number
+  clapDecay: number
+  clapSpread: number
+  clapPeak: number
+  hatClosed: number
+  hatOpen: number
+  hatHighpass: number
+  tomBase: number
+  crashDecay: number
+  rideDecay: number
+  ridePeak: number
+  brush: boolean
+}
+
+const KIT_PROFILES: Record<KitStyle, KitProfile> = {
+  vintage: {
+    tone: 7600,
+    drive: 1.1,
+    kickStart: 170,
+    kickEnd: 48,
+    kickDecay: 0.34,
+    kickPeak: 0.7,
+    click: 0.07,
+    clickFreq: 1800,
+    snareBodyFreq: 210,
+    snareBodyDecay: 0.16,
+    snareBodyPeak: 0.25,
+    snareNoiseFreq: 1800,
+    snareNoiseDecay: 0.23,
+    snareNoisePeak: 0.3,
+    clapFreq: 1500,
+    clapDecay: 0.16,
+    clapSpread: 0.018,
+    clapPeak: 0.2,
+    hatClosed: 0.05,
+    hatOpen: 0.32,
+    hatHighpass: 7200,
+    tomBase: 140,
+    crashDecay: 0.9,
+    rideDecay: 0.55,
+    ridePeak: 0.12,
+    brush: false,
+  },
+  kit808: {
+    tone: 9000,
+    drive: 1.6,
+    kickStart: 140,
+    kickEnd: 40,
+    kickDecay: 0.95,
+    kickPeak: 0.85,
+    click: 0.02,
+    clickFreq: 2200,
+    snareBodyFreq: 240,
+    snareBodyDecay: 0.12,
+    snareBodyPeak: 0.18,
+    snareNoiseFreq: 2300,
+    snareNoiseDecay: 0.2,
+    snareNoisePeak: 0.28,
+    clapFreq: 1900,
+    clapDecay: 0.25,
+    clapSpread: 0.035,
+    clapPeak: 0.24,
+    hatClosed: 0.035,
+    hatOpen: 0.5,
+    hatHighpass: 8500,
+    tomBase: 110,
+    crashDecay: 1.3,
+    rideDecay: 0.7,
+    ridePeak: 0.14,
+    brush: false,
+  },
+  brush: {
+    tone: 5200,
+    drive: 1,
+    kickStart: 105,
+    kickEnd: 45,
+    kickDecay: 0.28,
+    kickPeak: 0.35,
+    click: 0.015,
+    clickFreq: 1200,
+    snareBodyFreq: 175,
+    snareBodyDecay: 0.1,
+    snareBodyPeak: 0.1,
+    snareNoiseFreq: 2600,
+    snareNoiseDecay: 0.5,
+    snareNoisePeak: 0.12,
+    clapFreq: 1300,
+    clapDecay: 0.3,
+    clapSpread: 0.015,
+    clapPeak: 0.1,
+    hatClosed: 0.08,
+    hatOpen: 0.4,
+    hatHighpass: 6000,
+    tomBase: 125,
+    crashDecay: 1,
+    rideDecay: 1.1,
+    ridePeak: 0.09,
+    brush: true,
+  },
+}
+
+const playKitDrum = (
+  ctx: Ctx,
+  destination: AudioNode,
+  pitch: number,
+  when: number,
+  velocity: number,
+  style: KitStyle,
+) => {
+  const profile = KIT_PROFILES[style]
+  const out = createOutput(ctx)
+  const tone = ctx.createBiquadFilter()
+  tone.type = 'lowpass'
+  tone.frequency.value = profile.tone
+  tone.Q.value = 0.55
+  const shaper = ctx.createWaveShaper()
+  shaper.curve = makeSoftClipCurve(profile.drive)
+  shaper.oversample = '2x'
+  const pan = pitch === 42 || pitch === 46 ? 0.2 : pitch === 41 ? -0.2 : pitch === 43 ? 0.14 : 0
+  const panner = ctx.createStereoPanner()
+  panner.pan.value = pan
+  out.connect(tone)
+  tone.connect(shaper)
+  shaper.connect(panner)
+  panner.connect(destination)
+  const sources: AudioScheduledSourceNode[] = []
+  const level = 0.5 + velocity * 0.5
+  let end = when + 0.5
+
+  const noiseBurst = (
+    duration: number,
+    type: BiquadFilterType,
+    frequency: number,
+    q: number,
+    peak: number,
+    rate = 1,
+  ) => {
+    const noise = ctx.createBufferSource()
+    noise.buffer = makeNoiseBuffer(ctx)
+    noise.playbackRate.value = rate
+    const filter = ctx.createBiquadFilter()
+    filter.type = type
+    filter.frequency.value = frequency
+    filter.Q.value = q
+    const gain = ctx.createGain()
+    gain.gain.setValueAtTime(Math.max(0.0001, peak), when)
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + duration)
+    noise.connect(filter)
+    filter.connect(gain)
+    gain.connect(out)
+    noise.start(when)
+    noise.stop(when + duration + 0.02)
+    sources.push(noise)
+    end = Math.max(end, when + duration)
+  }
+
+  if (pitch === 36) {
+    const osc = ctx.createOscillator()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(profile.kickStart, when)
+    osc.frequency.exponentialRampToValueAtTime(profile.kickEnd, when + profile.kickDecay * 0.55)
+    const gain = ctx.createGain()
+    gain.gain.setValueAtTime(0.0001, when)
+    gain.gain.linearRampToValueAtTime(profile.kickPeak * level, when + 0.004)
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + profile.kickDecay)
+    osc.connect(gain)
+    gain.connect(out)
+    osc.start(when)
+    osc.stop(when + profile.kickDecay + 0.02)
+    sources.push(osc)
+    if (profile.click > 0) {
+      noiseBurst(0.022, 'highpass', profile.clickFreq, 0.7, profile.click * level, 1.4)
+    }
+    end = when + profile.kickDecay
+  } else if (pitch === 38) {
+    if (profile.brush) {
+      noiseBurst(profile.snareNoiseDecay, 'bandpass', profile.snareNoiseFreq, 0.7, profile.snareNoisePeak * level, 0.85)
+      noiseBurst(profile.snareNoiseDecay * 0.7, 'highpass', 5600, 0.5, 0.035 * level, 0.7)
+    } else {
+      noiseBurst(profile.snareNoiseDecay, 'bandpass', profile.snareNoiseFreq, 0.9, profile.snareNoisePeak * level, 1.1)
+      noiseBurst(profile.snareNoiseDecay * 0.55, 'highpass', 4800, 0.7, profile.snareNoisePeak * 0.42 * level, 1.1)
+    }
+    const body = ctx.createOscillator()
+    body.type = 'triangle'
+    body.frequency.setValueAtTime(profile.snareBodyFreq, when)
+    body.frequency.exponentialRampToValueAtTime(profile.snareBodyFreq * 0.72, when + profile.snareBodyDecay)
+    const gain = ctx.createGain()
+    gain.gain.setValueAtTime(profile.snareBodyPeak * level, when)
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + profile.snareBodyDecay)
+    body.connect(gain)
+    gain.connect(out)
+    body.start(when)
+    body.stop(when + profile.snareBodyDecay + 0.02)
+    sources.push(body)
+    end = when + profile.snareNoiseDecay
+  } else if (pitch === 39) {
+    for (let i = 0; i < 3; i++) {
+      const noise = ctx.createBufferSource()
+      noise.buffer = makeNoiseBuffer(ctx)
+      const filter = ctx.createBiquadFilter()
+      filter.type = 'bandpass'
+      filter.frequency.value = profile.clapFreq
+      filter.Q.value = 0.9
+      const gain = ctx.createGain()
+      const t = when + i * profile.clapSpread
+      gain.gain.setValueAtTime(0.0001, t)
+      gain.gain.linearRampToValueAtTime(profile.clapPeak * level, t + 0.003)
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + profile.clapDecay)
+      noise.connect(filter)
+      filter.connect(gain)
+      gain.connect(out)
+      noise.start(t)
+      noise.stop(t + profile.clapDecay + 0.02)
+      sources.push(noise)
+    }
+    end = when + profile.clapDecay + profile.clapSpread * 2
+  } else if (pitch === 42 || pitch === 46) {
+    const open = pitch === 46
+    const decay = open ? profile.hatOpen : profile.hatClosed
+    noiseBurst(decay, 'highpass', profile.hatHighpass, 0.65, (open ? 0.17 : 0.15) * level, 1.15)
+    noiseBurst(decay * 0.75, 'bandpass', profile.hatHighpass + 2600, 1.2, 0.08 * level, 1.4)
+    end = when + decay
+  } else if (pitch === 37) {
+    noiseBurst(0.032, 'bandpass', 2300, 3, 0.24 * level, 1)
+    noiseBurst(0.022, 'highpass', 5200, 0.7, 0.06 * level, 1)
+    end = when + 0.08
+  } else if (pitch === 41 || pitch === 43 || pitch === 45) {
+    const base =
+      pitch === 41 ? profile.tomBase : pitch === 43 ? profile.tomBase * 1.9 : profile.tomBase * 1.35
+    const osc = ctx.createOscillator()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(base, when)
+    osc.frequency.exponentialRampToValueAtTime(base * 0.58, when + 0.24)
+    const gain = ctx.createGain()
+    gain.gain.setValueAtTime(0.38 * level, when)
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.32)
+    osc.connect(gain)
+    gain.connect(out)
+    osc.start(when)
+    osc.stop(when + 0.34)
+    sources.push(osc)
+    noiseBurst(0.07, 'lowpass', 900, 0.8, 0.07 * level)
+    end = when + 0.36
+  } else if (pitch === 49) {
+    noiseBurst(profile.crashDecay, 'highpass', 5200, 0.55, 0.2 * level, 1)
+    noiseBurst(profile.crashDecay * 0.8, 'bandpass', 9000, 0.5, 0.09 * level, 1.3)
+    const osc = ctx.createOscillator()
+    osc.type = 'sine'
+    osc.frequency.value = 640
+    const gain = ctx.createGain()
+    gain.gain.setValueAtTime(0.02 * level, when)
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.6)
+    osc.connect(gain)
+    gain.connect(out)
+    osc.start(when)
+    osc.stop(when + 0.65)
+    sources.push(osc)
+    end = when + profile.crashDecay
+  } else if (pitch === 51) {
+    noiseBurst(profile.rideDecay, 'highpass', 7600, 0.55, profile.ridePeak * level, 1.15)
+    if (!profile.brush) {
+      noiseBurst(profile.rideDecay * 0.7, 'bandpass', 4100, 1, 0.055 * level, 1.5)
+    }
+    end = when + profile.rideDecay
+  } else if (pitch === 56) {
+    for (const freq of [540, 800]) {
+      const osc = ctx.createOscillator()
+      osc.type = 'square'
+      osc.frequency.value = style === 'kit808' ? freq * 0.94 : freq
+      const filter = ctx.createBiquadFilter()
+      filter.type = 'bandpass'
+      filter.frequency.value = style === 'kit808' ? 900 : 1100
+      filter.Q.value = 1.2
+      const gain = ctx.createGain()
+      gain.gain.setValueAtTime(0.055 * level, when)
+      gain.gain.exponentialRampToValueAtTime(0.0001, when + 0.32)
+      osc.connect(filter)
+      filter.connect(gain)
+      gain.connect(out)
+      osc.start(when)
+      osc.stop(when + 0.34)
+      sources.push(osc)
+    }
+    end = when + 0.36
+  } else {
+    noiseBurst(0.08, 'highpass', 3000, 0.7, 0.06 * level)
+    end = when + 0.1
+  }
+
+  out.gain.setValueAtTime(0.9, when)
+  finalize(out, ctx, sources, end)
+  return makeVoice(ctx, style, out, sources, end, [tone, shaper, panner])
+}
+
 export const triggerNote = (
   ctx: Ctx,
   destination: AudioNode,
@@ -1646,6 +2676,9 @@ export const triggerNote = (
   }
   if (instrument === 'hand') {
     return playHandDrum(ctx, destination, pitch, when, safeVelocity)
+  }
+  if (instrument === 'vintage' || instrument === 'kit808' || instrument === 'brush') {
+    return playKitDrum(ctx, destination, pitch, when, safeVelocity, instrument)
   }
   switch (instrument) {
     case 'piano':
@@ -1686,6 +2719,28 @@ export const triggerNote = (
       return playOrgan(ctx, destination, pitch, when, duration, safeVelocity)
     case 'marimba':
       return playMarimba(ctx, destination, pitch, when, duration, safeVelocity)
+    case 'celesta':
+      return playCelesta(ctx, destination, pitch, when, duration, safeVelocity)
+    case 'vibraphone':
+      return playVibraphone(ctx, destination, pitch, when, duration, safeVelocity)
+    case 'harpsichord':
+      return playHarpsichord(ctx, destination, pitch, when, duration, safeVelocity)
+    case 'eightoheight':
+      return play808Bass(ctx, destination, pitch, when, duration, safeVelocity)
+    case 'reese':
+      return playReese(ctx, destination, pitch, when, duration, safeVelocity)
+    case 'nylon':
+      return playNylon(ctx, destination, pitch, when, duration, safeVelocity)
+    case 'flute':
+      return playFlute(ctx, destination, pitch, when, duration, safeVelocity)
+    case 'brass':
+      return playBrass(ctx, destination, pitch, when, duration, safeVelocity)
+    case 'supersaw':
+      return playSupersaw(ctx, destination, pitch, when, duration, safeVelocity)
+    case 'cello':
+      return playCello(ctx, destination, pitch, when, duration, safeVelocity)
+    case 'halo':
+      return playHalo(ctx, destination, pitch, when, duration, safeVelocity)
     default:
       return playPiano(ctx, destination, pitch, when, duration, safeVelocity)
   }
