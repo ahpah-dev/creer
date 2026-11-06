@@ -2185,6 +2185,7 @@ body.is-knob-dragging * {
 .editor-dock {
   flex: none;
   height: var(--dock-h);
+  max-height: calc(100% - 160px);
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -2198,6 +2199,59 @@ body.is-knob-dragging * {
 
 .editor-dock.is-collapsed {
   height: 42px;
+  max-height: 42px;
+}
+
+.editor-dock.is-resizing {
+  transition: none;
+}
+
+.dock-resize-handle {
+  position: absolute;
+  top: -4px;
+  left: 0;
+  right: 0;
+  height: 10px;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.dock-resize-handle span {
+  width: 46px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(243, 235, 223, 0.23);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.13);
+  transition: width 0.13s ease, background 0.13s ease, box-shadow 0.13s ease;
+}
+
+.dock-resize-handle:hover span,
+.editor-dock.is-resizing .dock-resize-handle span {
+  width: 58px;
+  background: rgba(242, 166, 121, 0.8);
+  box-shadow: 0 0 8px rgba(242, 166, 121, 0.2);
+}
+
+.dock-resize-handle:focus-visible {
+  outline: none;
+}
+
+.dock-resize-handle:focus-visible span {
+  width: 52px;
+  background: var(--accent);
+  box-shadow:
+    0 0 0 3px rgba(242, 166, 121, 0.13),
+    0 0 8px rgba(242, 166, 121, 0.2);
+}
+
+body.is-dock-resizing,
+body.is-dock-resizing * {
+  cursor: ns-resize !important;
+  user-select: none !important;
 }
 
 .dock-tabs {
