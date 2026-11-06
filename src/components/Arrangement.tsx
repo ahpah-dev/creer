@@ -38,6 +38,7 @@ export function Arrangement() {
   const project = useProjectStore((state) => state.project)
   const selectedTrackId = useProjectStore((state) => state.selectedTrackId)
   const selectedClipIds = useProjectStore((state) => state.selectedClipIds)
+  const selectedClipId = useProjectStore((state) => state.selectedClipId)
   const updateClip = useProjectStore((state) => state.updateClip)
   const updateProject = useProjectStore((state) => state.updateProject)
   const selectClip = useProjectStore((state) => state.selectClip)
@@ -171,6 +172,23 @@ export function Arrangement() {
       scroller.scrollTop = Math.max(0, rowTop - RULER_HEIGHT - 6)
     }
   }, [selectedTrackId, project.tracks.length])
+
+  // Bring a selected clip into view when it is outside the visible timeline.
+  useEffect(() => {
+    const scroller = timelineRef.current
+    if (!scroller || !selectedClipId) return
+    const clip = useProjectStore
+      .getState()
+      .project.tracks.flatMap((track) => track.clips)
+      .find((item) => item.id === selectedClipId)
+    if (!clip) return
+    const x = clip.start * zoom
+    const visibleStart = scroller.scrollLeft
+    const visibleEnd = visibleStart + scroller.clientWidth
+    if (x < visibleStart + 20 || x > visibleEnd - 72) {
+      scroller.scrollTo({ left: Math.max(0, x - 84), behavior: 'smooth' })
+    }
+  }, [selectedClipId, zoom])
 
   const beatFromClientX = (clientX: number, bypassSnap = false) => {
     const rect = rulerRef.current?.getBoundingClientRect()

@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import type { DockTab, Toast } from '../types'
 import { clamp, uid } from '../lib/utils'
 
-export type ModalType = 'help' | 'new' | 'export' | 'addTrack' | 'sounds' | null
+export type ModalType = 'help' | 'new' | 'export' | 'addTrack' | 'sounds' | 'idea' | null
 
 interface SessionState {
   dock: DockTab

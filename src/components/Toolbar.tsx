@@ -6,6 +6,7 @@ import {
   Minus,
   Plus,
   Scissors,
+  Sparkles,
   Trash2,
   ZoomIn,
   ZoomOut,
@@ -39,6 +40,15 @@ export function Toolbar() {
           </span>
           <span>New track</span>
           <span className="key-hint">T</span>
+        </button>
+        <button
+          className="idea-button"
+          onClick={() => setModal('idea')}
+          aria-label="Generate a song idea"
+          data-tip="Spark a whole section"
+        >
+          <Sparkles size={14} />
+          <span>Idea</span>
         </button>
         <div className="toolbar-separator" />
         <label className="select-control" data-tip="Timeline grid">

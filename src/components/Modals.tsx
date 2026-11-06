@@ -15,6 +15,7 @@ import {
   Search,
   Sparkles,
   Square,
+  Wand2,
   X,
 } from 'lucide-react'
 import type { InstrumentId } from '../types'
@@ -26,6 +27,19 @@ import { engine } from '../audio/engine'
 import { downloadBlob, renderProjectToWav, safeFilename } from '../audio/export'
 import { addTrackWithStarterClip } from '../lib/tracks'
 import { stopRecording } from '../lib/recording'
+import {
+  getCurrentBeat,
+  pauseTransport,
+  playTransport,
+  seekTo,
+  syncEngineProject,
+} from '../lib/transport'
+import {
+  IDEA_STYLES,
+  generateIdea,
+  type IdeaPlacement,
+  type IdeaStyleId,
+} from '../lib/idea'
 import { ALT_LABEL, contentEnd, formatDuration, MOD_LABEL, SHIFT_LABEL } from '../lib/utils'
 import { TrackIcon } from './TrackIcon'
 
@@ -190,7 +204,8 @@ function HelpModal({ onClose }: { onClose: () => void }) {
               selection together. Hover a song section and use the pencil to rename
               or recolor it; the plus adds a new section. Open the SWING pill in the top
               bar to add 8th- or 16th-note swing to playback and exports. The Effects tab
-              builds an insert chain on any track or the master.
+              builds an insert chain on any track or the master, and the Idea button can
+              sketch a whole section for you in one click.
             </p>
           </div>
           <div className="help-tip">
@@ -204,7 +219,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           <div className="help-signature">
             <span>CREER</span>
             <i />
-            <span>v1.7.1</span>
+            <span>v1.8</span>
             <em>made for making</em>
           </div>
         </div>
@@ -654,6 +669,155 @@ function SoundLibraryModal({ onClose }: { onClose: () => void }) {
   )
 }
 
+function IdeaModal({ onClose }: { onClose: () => void }) {
+  const project = useProjectStore((state) => state.project)
+  const apply = useProjectStore((state) => state.apply)
+  const selectClip = useProjectStore((state) => state.selectClip)
+  const setDock = useSessionStore((state) => state.setDock)
+  const setSelectedNoteIds = useSessionStore((state) => state.setSelectedNoteIds)
+  const toast = useSessionStore((state) => state.toast)
+  const [styleId, setStyleId] = useState<IdeaStyleId>('lofi')
+  const [bars, setBars] = useState(8)
+  const [placement, setPlacement] = useState<IdeaPlacement>('end')
+  const [generating, setGenerating] = useState(false)
+  const style = IDEA_STYLES.find((item) => item.id === styleId) ?? IDEA_STYLES[0]
+  const shownBpm = placement === 'fresh' ? style.bpm : project.bpm
+
+  const generate = (play: boolean) => {
+    if (generating) return
+    setGenerating(true)
+    if (useSessionStore.getState().isPlaying) pauseTransport()
+    const result = generateIdea(project, {
+      styleId,
+      bars,
+      placement,
+      playhead: getCurrentBeat(),
+    })
+    apply(() => result.project)
+    syncEngineProject()
+    seekTo(result.startBeat)
+    setDock('editor')
+    setSelectedNoteIds([])
+    if (result.focusTrackId && result.focusClipId) {
+      selectClip(result.focusTrackId, result.focusClipId)
+    }
+    onClose()
+    toast(
+      `${style.label} idea ready`,
+      `${result.summary} · ${MOD_LABEL}+Z to undo.`,
+      'success',
+    )
+    if (play) {
+      window.setTimeout(() => {
+        void playTransport()
+      }, 80)
+    }
+  }
+
+  return (
+    <ModalShell
+      eyebrow="SPARK AN IDEA"
+      title="Start with a feeling."
+      subtitle="One click builds a section — drums, bass, harmony and a melody. Then take it somewhere."
+      onClose={onClose}
+      size="wide"
+      footer={
+        <>
+          <span className="modal-footer-note">
+            {placement === 'fresh'
+              ? 'This replaces the current session. Undo restores it.'
+              : 'Adds a new section to the song. Undo is one step back.'}
+          </span>
+          <div className="modal-actions">
+            <button className="button button-secondary" onClick={() => generate(false)} disabled={generating}>
+              Generate only
+            </button>
+            <button className="button button-primary" onClick={() => generate(true)} disabled={generating}>
+              <Play size={14} fill="currentColor" />
+              Generate &amp; play
+            </button>
+          </div>
+        </>
+      }
+    >
+      <div className="idea-styles">
+        {IDEA_STYLES.map((item) => (
+          <button
+            key={item.id}
+            className={`idea-style ${styleId === item.id ? 'is-selected' : ''}`}
+            style={{ '--idea-color': item.color } as CSSProperties}
+            onClick={() => setStyleId(item.id)}
+            aria-pressed={styleId === item.id}
+          >
+            <span className="idea-style-top">
+              <span>{item.label}</span>
+              <em>{item.bpm} BPM</em>
+            </span>
+            <strong>{item.description}</strong>
+            <span className="idea-style-tags">
+              {item.drums ? 'Drums' : 'No drums'} · Bass · Chords · Melody
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <div className="idea-options">
+        <div className="idea-option-group">
+          <span className="field-label">LENGTH</span>
+          <div className="segmented">
+            {[4, 8, 16].map((value) => (
+              <button
+                key={value}
+                className={bars === value ? 'is-selected' : ''}
+                onClick={() => setBars(value)}
+              >
+                {value} bars
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="idea-option-group">
+          <span className="field-label">PLACE IT</span>
+          <div className="segmented">
+            <button className={placement === 'end' ? 'is-selected' : ''} onClick={() => setPlacement('end')}>
+              At song end
+            </button>
+            <button className={placement === 'playhead' ? 'is-selected' : ''} onClick={() => setPlacement('playhead')}>
+              At playhead
+            </button>
+            <button className={placement === 'fresh' ? 'is-selected' : ''} onClick={() => setPlacement('fresh')}>
+              New song
+            </button>
+          </div>
+        </div>
+        <div className="idea-readout">
+          <span><em>KEY</em><strong>{project.key} {project.scale}</strong></span>
+          <span><em>TEMPO</em><strong>{shownBpm} BPM</strong></span>
+          <span><em>SKETCH</em><strong>{style.label}</strong></span>
+        </div>
+      </div>
+
+      <div className="idea-tip">
+        <Wand2 size={14} />
+        <p>
+          Each sketch writes into matching tracks when it can, so you can build a song section
+          by section. The melody is selected when it lands.
+        </p>
+        <button
+          className="idea-surprise"
+          onClick={() => {
+            const next = IDEA_STYLES[Math.floor(Math.random() * IDEA_STYLES.length)]
+            setStyleId(next.id)
+            setBars([4, 8, 16][Math.floor(Math.random() * 3)])
+          }}
+        >
+          <Sparkles size={12} /> Surprise me
+        </button>
+      </div>
+    </ModalShell>
+  )
+}
+
 export function ModalRoot() {
   const modal = useSessionStore((state) => state.modal)
   const setModal = useSessionStore((state) => state.setModal)
@@ -664,6 +828,7 @@ export function ModalRoot() {
   if (modal === 'export') return <ExportModal onClose={close} />
   if (modal === 'addTrack') return <AddTrackModal onClose={close} />
   if (modal === 'sounds') return <SoundLibraryModal onClose={close} />
+  if (modal === 'idea') return <IdeaModal onClose={close} />
   return null
 }
 

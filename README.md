@@ -41,6 +41,7 @@ That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub P
 
 - **Six-track demo song, “Golden Hour”** — play it immediately, solo parts, or pull it apart to learn how it was built.
 - **Piano-roll editor** — draw, drag, resize and nudge notes, change velocity, quantize, transpose, split clips, and edit drum patterns by drum name. Drag a note up or down and you hear each new pitch as it moves; drag any selected note and the whole selection moves together. Zoom in from 100% to 800% with the − / + controls, or hold Ctrl/⌘ and scroll to zoom around the pointer. Drag the grip above the editor tabs to make the piano roll as tall as you like; double-click the grip to reset its height.
+- **Spark an idea** — press **Idea** to generate a whole section in one click. Six styles write drums, bass, chords, texture and a melody into matching tracks, add a named section, and can start playing immediately. Undo is one step.
 - **Instrument library** — 36 synthesized sounds across Keys, Bass, Pads, Leads and Drums, including six drum kits. Search or filter the collection, audition any sound, load it onto the current track with one click, or grow a new track from it.
 - **The sounds** — from Velvet Piano, Silver Celesta, Vibraphone and Harpsichord to Eight Oh Eight, Reese, Nylon Guitar, Air Flute, Brass Room, Super Saw and Solo Cello. The drum room now holds Studio, Lo-Fi, Hand Percussion, Vintage, 808 and Brush kits. Every one is built from oscillators, filters, FM and noise.
 - **Live MIDI-style recording** — arm a track, hit record and play the keys or pads. Captured takes land in the arrangement.
@@ -56,7 +57,7 @@ That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub P
 
 The audio is synthesised live with Web Audio. There are no samples or external audio assets.
 
-> **New in 1.7.1** — dragging any note inside a multi-note selection now moves the entire selection together, preserving the group and relative timing. The 1.7 release added fourteen new sounds: Silver Celesta, Vibraphone, Harpsichord, Eight Oh Eight, Reese, Nylon Guitar, Air Flute, Brass Room, Super Saw, Solo Cello, Halo Pad, plus Vintage, 808 and Brush drum kits. The 1.6 release added per-track and master insert effect chains, 1.5 added box selection and clipboard editing, 1.4 added swing mode, 1.3 added vertical piano-roll resizing, 1.2 added piano-roll zoom, and 1.1 brought the original 22-sound instrument library, live pitch feedback while dragging notes, and editable song sections.
+> **New in 1.8** — **Spark an idea** builds a complete section in one click: six styles, drums, bass, chords, texture and melody, with optional instant playback and a timeline that follows the new section. The 1.7.1 release added group note dragging; 1.7 added fourteen new sounds: Silver Celesta, Vibraphone, Harpsichord, Eight Oh Eight, Reese, Nylon Guitar, Air Flute, Brass Room, Super Saw, Solo Cello, Halo Pad, plus Vintage, 808 and Brush drum kits. The 1.6 release added per-track and master insert effect chains, 1.5 added box selection and clipboard editing, 1.4 added swing mode, 1.3 added vertical piano-roll resizing, 1.2 added piano-roll zoom, and 1.1 brought the original 22-sound instrument library, live pitch feedback while dragging notes, and editable song sections.
 
 ## A look inside
 
@@ -78,6 +79,11 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 ![Creer drum kit library](screenshots/drum-library.png)
 
 ![Creer Brush Kit pads](screenshots/drum-kit.png)
+
+### Spark an idea
+![Creer idea generator](screenshots/idea.png)
+
+![Creer generated section](screenshots/idea-arrangement.png)
 
 ### Song sections
 ![Creer section editor](screenshots/section-editor.png)
@@ -107,6 +113,7 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 | Arrangement | Double-click an empty lane for a new clip. Drag across empty space to box-select clips; Shift adds to the selection. Double-click a clip to open its editor. Hover a section and use the pencil to rename, recolor, loop or delete it; **+** adds a section. |
 | Piano roll | Click to draw, drag to move, use the right handle to resize. Use the **Draw / Select** button (or Shift + drag) for box selection. Drag any selected note to move the whole selection. Moving a note up or down auditions the new pitch. Zoom with the − / + control or Ctrl/⌘ + scroll; click the percentage to fit. Drag the grip above the editor tabs to resize vertically; double-click it to reset. The lower lane edits velocity. |
 | Clipboard | `Ctrl/⌘ + X`, `C`, `V` cut, copy and paste notes in the piano roll or clips in the timeline. Copy/paste is also available from the timeline toolbar and the piano-roll copy/paste buttons. |
+| Spark an idea | Press **Idea** in the toolbar. Choose a style, length and placement, then **Generate & play** or **Generate only**. The new section can reuse matching tracks or start a fresh sketch. |
 | Instrument library | Open **Sounds & Keys** and click the sound name (or **Browse**). Search, audition, then click a card to load it on the current track. |
 | Recording | Arm a track with the dot in its header, press record, then play the on-screen keys or pads. |
 | Loops | Open the **Loops** tab, preview with the play button, add with **Add**. |
