@@ -4,6 +4,7 @@ import type {
   KeyboardEvent as ReactKeyboardEvent,
   PointerEvent as ReactPointerEvent,
 } from 'react'
+import { Wand2 } from 'lucide-react'
 import { INSTRUMENT_MAP } from '../data/instruments'
 import { engine } from '../audio/engine'
 import { useProjectStore } from '../store/project'
@@ -214,12 +215,20 @@ function ChannelStrip({ track, index }: { track: Track; index: number }) {
   const updateTrack = useProjectStore((state) => state.updateTrack)
   const selectTrack = useProjectStore((state) => state.selectTrack)
   const selectedTrackId = useProjectStore((state) => state.selectedTrackId)
+  const setDock = useSessionStore((state) => state.setDock)
+  const setEffectsTarget = useSessionStore((state) => state.setEffectsTarget)
   const info = INSTRUMENT_MAP[track.instrument]
 
   const focusTrack = () => {
     const store = useProjectStore.getState()
     const clip = track.clips.find((item) => item.id === store.selectedClipId) ?? track.clips[0]
     selectTrack(track.id, clip?.id ?? null)
+  }
+
+  const openEffects = () => {
+    focusTrack()
+    setEffectsTarget('track')
+    setDock('effects')
   }
 
   return (
@@ -303,6 +312,19 @@ function ChannelStrip({ track, index }: { track: Track; index: number }) {
         >
           S
         </button>
+        <button
+          className={`channel-fx ${track.effects.length ? 'has-fx' : ''}`}
+          onClick={(event) => {
+            event.stopPropagation()
+            openEffects()
+          }}
+          aria-label={`Open effects for ${track.name}`}
+          title="Open the effect chain"
+        >
+          <Wand2 size={9} />
+          <span>FX</span>
+          <b>{track.effects.length}</b>
+        </button>
         <span className="channel-type">{info.category.toUpperCase()}</span>
       </div>
     </div>
@@ -313,6 +335,8 @@ export function Mixer() {
   const project = useProjectStore((state) => state.project)
   const updateProject = useProjectStore((state) => state.updateProject)
   const toast = useSessionStore((state) => state.toast)
+  const setDock = useSessionStore((state) => state.setDock)
+  const setEffectsTarget = useSessionStore((state) => state.setEffectsTarget)
 
   return (
     <div className="mixer">
@@ -364,6 +388,17 @@ export function Mixer() {
         </div>
         <div className="master-footer">
           <span className="limiter-pill"><i /> LIMITER</span>
+          <button
+            className={`master-fx ${project.master.effects.length ? 'has-fx' : ''}`}
+            onClick={() => {
+              setEffectsTarget('master')
+              setDock('effects')
+            }}
+            aria-label="Open master effects"
+            title="Open the master effect chain"
+          >
+            <Wand2 size={9} /> FX <b>{project.master.effects.length}</b>
+          </button>
           <button
             className="master-reset"
             onClick={() => {

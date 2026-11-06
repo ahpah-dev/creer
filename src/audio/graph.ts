@@ -1,4 +1,5 @@
-import type { MasterSettings, Track } from '../types'
+import type { EffectInstance, MasterSettings, Track } from '../types'
+import { createEffectChain } from './effects'
 import { createReverbImpulse, makeSoftClipCurve } from './synth'
 
 export interface MasterBus {
@@ -12,6 +13,7 @@ export interface MasterBus {
   setReverb: (amount: number) => void
   setDelay: (amount: number) => void
   setDelayTime: (seconds: number) => void
+  setEffects: (effects: EffectInstance[]) => void
 }
 
 export interface TrackBus {
@@ -24,6 +26,7 @@ export interface TrackBus {
   setVolume: (volume: number) => void
   setPan: (pan: number) => void
   setSends: (reverb: number, delay: number) => void
+  setEffects: (effects: EffectInstance[]) => void
 }
 
 const volumeCurve = (value: number) => Math.pow(Math.max(0, Math.min(1, value)), 1.35)
@@ -35,6 +38,7 @@ export const createMasterBus = (
   bpm: number,
 ): MasterBus => {
   const input = ctx.createGain()
+  const effectChain = createEffectChain(ctx)
   const highpass = ctx.createBiquadFilter()
   highpass.type = 'highpass'
   highpass.frequency.value = 24
@@ -58,7 +62,8 @@ export const createMasterBus = (
   analyser.fftSize = 512
   analyser.smoothingTimeConstant = 0.65
 
-  input.connect(highpass)
+  input.connect(effectChain.input)
+  effectChain.output.connect(highpass)
   highpass.connect(saturator)
   saturator.connect(compressor)
   compressor.connect(masterGain)
@@ -98,6 +103,8 @@ export const createMasterBus = (
   delayFilter.connect(delayReturn)
   delayReturn.connect(input)
 
+  effectChain.setEffects(settings.effects)
+
   return {
     input,
     analyser,
@@ -117,6 +124,7 @@ export const createMasterBus = (
     setDelayTime: (seconds) => {
       delay.delayTime.setTargetAtTime(seconds, ctx.currentTime, 0.04)
     },
+    setEffects: (effects) => effectChain.setEffects(effects),
   }
 }
 
@@ -126,6 +134,7 @@ export const createTrackBus = (
   track: Track,
 ): TrackBus => {
   const input = ctx.createGain()
+  const effectChain = createEffectChain(ctx)
   const fader = ctx.createGain()
   fader.gain.value = volumeCurve(track.volume)
   const panner = ctx.createStereoPanner()
@@ -139,7 +148,8 @@ export const createTrackBus = (
   const delaySend = ctx.createGain()
   delaySend.gain.value = track.delaySend
 
-  input.connect(fader)
+  input.connect(effectChain.input)
+  effectChain.output.connect(fader)
   fader.connect(panner)
   panner.connect(analyser)
   analyser.connect(master.input)
@@ -147,6 +157,8 @@ export const createTrackBus = (
   reverbSend.connect(master.reverbInput)
   panner.connect(delaySend)
   delaySend.connect(master.delayInput)
+
+  effectChain.setEffects(track.effects)
 
   return {
     input,
@@ -165,6 +177,7 @@ export const createTrackBus = (
       reverbSend.gain.setTargetAtTime(reverb, ctx.currentTime, 0.03)
       delaySend.gain.setTargetAtTime(delay, ctx.currentTime, 0.03)
     },
+    setEffects: (effects) => effectChain.setEffects(effects),
   }
 }
 

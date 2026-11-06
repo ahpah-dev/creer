@@ -63,6 +63,7 @@ export const createTrack = (
     armed: options.arm ?? false,
     reverbSend: settings.reverb,
     delaySend: settings.delay,
+    effects: [],
     clips: [],
   }
 }

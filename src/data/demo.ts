@@ -202,6 +202,7 @@ const makeTrack = (
   armed: false,
   reverbSend,
   delaySend,
+  effects: [],
   clips,
 })
 
@@ -303,7 +304,7 @@ export const createDemoProject = (): Project => {
     ],
     loop: { enabled: false, start: 16, end: 48 },
     swing: { enabled: false, amount: 50, division: 8 },
-    master: { volume: 0.8, reverb: 0.28, delay: 0.16 },
+    master: { volume: 0.8, reverb: 0.28, delay: 0.16, effects: [] },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }

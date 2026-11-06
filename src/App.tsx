@@ -231,8 +231,8 @@ export default function App() {
         session.setModal('help')
         return
       }
-      if (key === '1' || key === '2' || key === '3' || key === '4') {
-        const docks = ['editor', 'mixer', 'loops', 'keys'] as const
+      if (['1', '2', '3', '4', '5'].includes(key)) {
+        const docks = ['editor', 'mixer', 'effects', 'loops', 'keys'] as const
         session.setDock(docks[Number(key) - 1])
         return
       }

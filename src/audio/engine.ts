@@ -72,6 +72,7 @@ export class AudioEngine {
       this.master.setReverb(project.master.reverb)
       this.master.setDelay(project.master.delay)
       this.master.setDelayTime((60 / Math.max(40, project.bpm)) * 0.75)
+      this.master.setEffects(project.master.effects)
     }
     this.syncTrackBuses()
     if (wasPlaying && loopChanged) {
@@ -379,6 +380,7 @@ export class AudioEngine {
     const ids = new Set(this.project.tracks.map((track) => track.id))
     for (const [id, bus] of this.buses) {
       if (!ids.has(id)) {
+        bus.setEffects([])
         try {
           bus.input.disconnect()
           bus.panner.disconnect()
@@ -401,6 +403,7 @@ export class AudioEngine {
       bus.setVolume(audible ? track.volume : 0)
       bus.setPan(track.pan)
       bus.setSends(track.reverbSend, track.delaySend)
+      bus.setEffects(track.effects)
     }
   }
 

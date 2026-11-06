@@ -46,6 +46,7 @@ That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub P
 - **Live MIDI-style recording** — arm a track, hit record and play the keys or pads. Captured takes land in the arrangement.
 - **MIDI keyboard input** — connect a hardware keyboard through the MIDI button in the top bar. Note on/off, velocity, sustain and hot-plugging are supported, and incoming MIDI is captured while recording.
 - **Box selection & clipboard** — drag a box over empty timeline space to select clips, or switch the piano roll to **Select** and drag a box over notes. Cut, copy and paste either selection from the toolbar or with `Ctrl/⌘ + X / C / V`.
+- **Effect chains** — open the **Effects** tab to build an eight-slot insert chain on any track or the master. Filter, drive, EQ, chorus, phaser, tremolo, auto-pan, delay, room reverb, compressor and bitcrush are available; each can be bypassed, reordered and adjusted live, and the same chain is used in WAV exports.
 - **Loop library** — ten curated, tempo-aware parts that preview and drop into the song.
 - **Swing mode** — open the **SWING** pill in the top bar to enable 8th- or 16th-note swing, then dial it from straight to a full triplet feel. It is applied to playback and WAV exports.
 - **Mixer** — per-track faders, pans, reverb/delay sends, mute/solo and meters, plus a master strip with its own effects and limiter.
@@ -55,7 +56,7 @@ That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub P
 
 The audio is synthesised live with Web Audio. There are no samples or external audio assets.
 
-> **New in 1.5** — box selection for clips and notes, plus cut/copy/paste in the timeline and piano roll. The 1.4 release added swing mode, 1.3 added vertical piano-roll resizing, 1.2 added piano-roll zoom, and 1.1 brought the 22-sound instrument library, live pitch feedback while dragging notes, and editable song sections.
+> **New in 1.6** — per-track and master insert effect chains with 11 effect types, reordering, bypass and live parameter control, all matched in the WAV export. The 1.5 release added box selection and clipboard editing, 1.4 added swing mode, 1.3 added vertical piano-roll resizing, 1.2 added piano-roll zoom, and 1.1 brought the 22-sound instrument library, live pitch feedback while dragging notes, and editable song sections.
 
 ## A look inside
 
@@ -82,6 +83,11 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 ### Loop library
 ![Creer loop library](screenshots/loops.png)
 
+### Effects
+![Creer effect browser](screenshots/effects-browser.png)
+
+![Creer effect chain](screenshots/effects-chain.png)
+
 ### Swing
 ![Creer swing settings](screenshots/swing.png)
 
@@ -99,6 +105,7 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 | Instrument library | Open **Sounds & Keys** and click the sound name (or **Browse**). Search, audition, then click a card to load it on the current track. |
 | Recording | Arm a track with the dot in its header, press record, then play the on-screen keys or pads. |
 | Loops | Open the **Loops** tab, preview with the play button, add with **Add**. |
+| Effects | Open **Effects**, choose **Track** or **Master**, and click **Add effect**. Adjust the card controls, reorder with the arrows, and bypass with the power button. Each chain holds up to eight inserts. |
 | Swing | Open the **SWING** pill in the top bar, switch it on, choose 8th or 16th notes and set the amount. The same timing is used in the WAV export. |
 | Mixer | Faders, pan, reverb/delay sends and master effects. Double-click a knob to reset it to its natural centre. |
 | MIDI | Click **MIDI** in the top bar, enable input and choose your keyboard. It plays the armed track (or the selected track if none is armed). |
@@ -120,7 +127,7 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 | `L` | Toggle loop |
 | `M` / `S` | Mute / solo the selected track |
 | `T` | New track |
-| `1` – `4` | Switch editors |
+| `1` – `5` | Switch editors |
 | `Arrow keys` | Seek by bar; nudge selected notes |
 | `A` – `K` | Musical typing (when Sounds & Keys is open) |
 | `Z` / `X` | Octave down / up (keyboard) |

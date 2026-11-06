@@ -3,7 +3,15 @@ import type {
   KeyboardEvent as ReactKeyboardEvent,
   PointerEvent as ReactPointerEvent,
 } from 'react'
-import { ChevronDown, ChevronUp, Keyboard, Library, Piano, SlidersHorizontal } from 'lucide-react'
+import {
+  ChevronDown,
+  ChevronUp,
+  Keyboard,
+  Library,
+  Piano,
+  SlidersHorizontal,
+  Wand2,
+} from 'lucide-react'
 import { getSelectedClip, useProjectStore } from '../store/project'
 import { useSessionStore } from '../store/session'
 import type { DockTab } from '../types'
@@ -12,6 +20,7 @@ import { PianoRoll } from './PianoRoll'
 import { Mixer } from './Mixer'
 import { LoopLibrary } from './LoopLibrary'
 import { KeyboardPanel } from './KeyboardPanel'
+import { EffectsPanel } from './EffectsPanel'
 
 const MIN_DOCK_HEIGHT = 190
 const MIN_ARRANGEMENT_HEIGHT = 160
@@ -45,6 +54,7 @@ const clearDockHeight = () => {
 const TABS: { id: DockTab; label: string; icon: typeof Piano }[] = [
   { id: 'editor', label: 'Piano Roll', icon: Piano },
   { id: 'mixer', label: 'Mixer', icon: SlidersHorizontal },
+  { id: 'effects', label: 'Effects', icon: Wand2 },
   { id: 'loops', label: 'Loops', icon: Library },
   { id: 'keys', label: 'Sounds & Keys', icon: Keyboard },
 ]
@@ -56,8 +66,12 @@ export function EditorDock() {
   const setCollapsed = useSessionStore((state) => state.setDockCollapsed)
   const project = useProjectStore((state) => state.project)
   const selectedClipId = useProjectStore((state) => state.selectedClipId)
+  const selectedTrackId = useProjectStore((state) => state.selectedTrackId)
+  const effectsTarget = useSessionStore((state) => state.effectsTarget)
   const selected = getSelectedClip(project, selectedClipId)
-  const track = selected?.track
+  const track = selected?.track ?? project.tracks.find((item) => item.id === selectedTrackId)
+  const effectCount =
+    effectsTarget === 'master' ? project.master.effects.length : (track?.effects.length ?? 0)
   const dockRef = useRef<HTMLElement>(null)
   const resizeDrag = useRef<{
     startY: number
@@ -162,9 +176,11 @@ export function EditorDock() {
         : 'No clip selected'
       : dock === 'mixer'
         ? `${project.tracks.length} channels · master`
-        : dock === 'loops'
-          ? 'Curated starting points'
-          : 'Play live · record ideas'
+        : dock === 'effects'
+          ? `${effectsTarget === 'master' ? 'Master' : (track?.name ?? 'No track')} · ${effectCount} insert${effectCount === 1 ? '' : 's'}`
+          : dock === 'loops'
+            ? 'Curated starting points'
+            : 'Play live · record ideas'
 
   return (
     <section
@@ -214,6 +230,7 @@ export function EditorDock() {
                 className={`dock-tab ${dock === tab.id && !collapsed ? 'is-active' : ''}`}
                 role="tab"
                 aria-selected={dock === tab.id && !collapsed}
+                aria-label={tab.label}
                 onClick={() => {
                   setDock(tab.id)
                 }}
@@ -246,6 +263,7 @@ export function EditorDock() {
         <div className="dock-body">
           {dock === 'editor' && <PianoRoll />}
           {dock === 'mixer' && <Mixer />}
+          {dock === 'effects' && <EffectsPanel />}
           {dock === 'loops' && <LoopLibrary />}
           {dock === 'keys' && <KeyboardPanel />}
         </div>

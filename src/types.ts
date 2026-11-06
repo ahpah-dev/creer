@@ -55,6 +55,28 @@ export interface Clip {
   notes: Note[]
 }
 
+export type EffectCategory = 'Tone' | 'Modulation' | 'Dynamics' | 'Space' | 'Lo-Fi'
+
+export type EffectType =
+  | 'filter'
+  | 'drive'
+  | 'eq'
+  | 'chorus'
+  | 'phaser'
+  | 'tremolo'
+  | 'autopan'
+  | 'delay'
+  | 'reverb'
+  | 'compressor'
+  | 'bitcrush'
+
+export interface EffectInstance {
+  id: string
+  type: EffectType
+  enabled: boolean
+  params: Record<string, number>
+}
+
 export interface Track {
   id: string
   name: string
@@ -67,6 +89,7 @@ export interface Track {
   armed: boolean
   reverbSend: number
   delaySend: number
+  effects: EffectInstance[]
   clips: Clip[]
 }
 
@@ -88,6 +111,7 @@ export interface MasterSettings {
   volume: number
   reverb: number
   delay: number
+  effects: EffectInstance[]
 }
 
 export interface SwingSettings {
@@ -144,7 +168,7 @@ export interface DragState {
 
 export type SnapValue = number
 
-export type DockTab = 'editor' | 'mixer' | 'loops' | 'keys'
+export type DockTab = 'editor' | 'mixer' | 'effects' | 'loops' | 'keys'
 
 export interface Toast {
   id: string

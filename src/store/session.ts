@@ -41,6 +41,8 @@ interface SessionState {
   setKeyboardOctave: (octave: number) => void
   pianoTool: 'draw' | 'select'
   setPianoTool: (tool: 'draw' | 'select') => void
+  effectsTarget: 'track' | 'master'
+  setEffectsTarget: (target: 'track' | 'master') => void
   previewingLoop: string | null
   setPreviewingLoop: (id: string | null) => void
 }
@@ -135,6 +137,8 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   setKeyboardOctave: (keyboardOctave) => set({ keyboardOctave: clamp(keyboardOctave, 1, 5) }),
   pianoTool: 'draw',
   setPianoTool: (pianoTool) => set({ pianoTool }),
+  effectsTarget: 'track',
+  setEffectsTarget: (effectsTarget) => set({ effectsTarget }),
   previewingLoop: null,
   setPreviewingLoop: (previewingLoop) => set({ previewingLoop }),
 }))

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { Clip, Note, Project, Track } from '../types'
 import { createDemoProject, createEmptyProject } from '../data/demo'
+import { normalizeEffects } from '../data/effects'
 import { deepClone, projectEnd, uid } from '../lib/utils'
 
 const STORAGE_KEY = 'creer.project.v1'
@@ -22,6 +23,7 @@ export const normalizeProject = (input: unknown): Project => {
     armed: Boolean(track.armed),
     reverbSend: typeof track.reverbSend === 'number' ? track.reverbSend : 0.12,
     delaySend: typeof track.delaySend === 'number' ? track.delaySend : 0.05,
+    effects: normalizeEffects(track.effects),
     clips: Array.isArray(track.clips)
       ? track.clips.map((clip) => ({
           id: clip.id ?? uid('c'),
@@ -76,6 +78,7 @@ export const normalizeProject = (input: unknown): Project => {
       volume: typeof raw.master?.volume === 'number' ? raw.master.volume : 0.8,
       reverb: typeof raw.master?.reverb === 'number' ? raw.master.reverb : 0.28,
       delay: typeof raw.master?.delay === 'number' ? raw.master.delay : 0.16,
+      effects: normalizeEffects(raw.master?.effects),
     },
     createdAt: raw.createdAt ?? new Date().toISOString(),
     updatedAt: raw.updatedAt ?? new Date().toISOString(),

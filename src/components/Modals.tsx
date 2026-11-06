@@ -174,7 +174,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
             <Shortcut label="Duplicate clip"><kbd>{MOD_LABEL}</kbd><kbd>D</kbd></Shortcut>
             <Shortcut label="Copy / cut / paste"><kbd>{MOD_LABEL}</kbd><kbd>C</kbd><span>/</span><kbd>X</kbd><span>/</span><kbd>V</kbd></Shortcut>
             <Shortcut label="Delete selection"><kbd>⌫</kbd></Shortcut>
-            <Shortcut label="Switch editor"><kbd>1</kbd><span>–</span><kbd>4</kbd></Shortcut>
+            <Shortcut label="Switch editor"><kbd>1</kbd><span>–</span><kbd>5</kbd></Shortcut>
             <Shortcut label="Free drag (no snap)"><kbd>{ALT_LABEL}</kbd><span>+</span><kbd>drag</kbd></Shortcut>
             <Shortcut label="Musical typing"><kbd>A</kbd><span>–</span><kbd>K</kbd></Shortcut>
             <Shortcut label="Nudge notes"><kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd></Shortcut>
@@ -188,7 +188,8 @@ function HelpModal({ onClose }: { onClose: () => void }) {
               space to box-select clips, or use Draw/Select in the piano roll. Copy, cut
               and paste work in both. Hover a song section and use the pencil to rename
               or recolor it; the plus adds a new section. Open the SWING pill in the top
-              bar to add 8th- or 16th-note swing to playback and exports.
+              bar to add 8th- or 16th-note swing to playback and exports. The Effects tab
+              builds an insert chain on any track or the master.
             </p>
           </div>
           <div className="help-tip">
@@ -202,7 +203,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           <div className="help-signature">
             <span>CREER</span>
             <i />
-            <span>v1.5</span>
+            <span>v1.6</span>
             <em>made for making</em>
           </div>
         </div>
