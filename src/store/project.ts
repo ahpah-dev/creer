@@ -2,6 +2,8 @@ import { create } from 'zustand'
 import type { Clip, Note, Project, Track } from '../types'
 import { createDemoProject, createEmptyProject } from '../data/demo'
 import { normalizeEffects } from '../data/effects'
+import { INSTRUMENT_MAP } from '../data/instruments'
+import { resolveVoice } from '../audio/voiceShaping'
 import { deepClone, projectEnd, uid } from '../lib/utils'
 
 const STORAGE_KEY = 'creer.project.v1'
@@ -14,7 +16,7 @@ export const normalizeProject = (input: unknown): Project => {
   const tracks: Track[] = raw.tracks.map((track) => ({
     id: track.id ?? uid('t'),
     name: track.name ?? 'Untitled Track',
-    instrument: track.instrument ?? 'piano',
+    instrument: track.instrument && INSTRUMENT_MAP[track.instrument] ? track.instrument : 'piano',
     color: track.color ?? '#e0a465',
     volume: typeof track.volume === 'number' ? track.volume : 0.7,
     pan: typeof track.pan === 'number' ? track.pan : 0,
@@ -24,6 +26,21 @@ export const normalizeProject = (input: unknown): Project => {
     reverbSend: typeof track.reverbSend === 'number' ? track.reverbSend : 0.12,
     delaySend: typeof track.delaySend === 'number' ? track.delaySend : 0.05,
     effects: normalizeEffects(track.effects),
+    ...(track.voice && typeof track.voice === 'object'
+      ? (() => {
+          const voice = resolveVoice(track.voice)
+          const num = (value: unknown, fallback: number, min: number, max: number) =>
+            typeof value === 'number' && Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback
+          return {
+            voice: {
+              octave: Math.round(num(voice.octave, 0, -2, 2)),
+              attack: num(voice.attack, 0, 0, 1.5),
+              tone: num(voice.tone, 0, -1, 1),
+              dynamics: num(voice.dynamics, 1, 0, 1),
+            },
+          }
+        })()
+      : {}),
     clips: Array.isArray(track.clips)
       ? track.clips.map((clip) => ({
           id: clip.id ?? uid('c'),

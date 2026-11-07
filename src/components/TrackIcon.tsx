@@ -11,8 +11,11 @@ const sparkleIds: InstrumentId[] = [
   'celesta',
   'vibraphone',
   'halo',
+  'steelpan',
+  'crystal',
+  'chip',
 ]
-const waveIds: InstrumentId[] = ['pad', 'strings', 'aurora', 'choir']
+const waveIds: InstrumentId[] = ['pad', 'strings', 'aurora', 'choir', 'velour', 'tapestrings', 'ocarina', 'trumpet']
 const guitarIds: InstrumentId[] = [
   'bass',
   'sub',
@@ -21,6 +24,10 @@ const guitarIds: InstrumentId[] = [
   'reese',
   'nylon',
   'cello',
+  'acid',
+  'upright',
+  'pulsebass',
+  'steelguitar',
 ]
 
 export function TrackIcon({ instrument, size = 14 }: { instrument: InstrumentId; size?: number }) {

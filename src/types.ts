@@ -29,12 +29,29 @@ export type InstrumentId =
   | 'supersaw'
   | 'cello'
   | 'halo'
+  | 'grand'
+  | 'clav'
+  | 'steelpan'
+  | 'pipe'
+  | 'acid'
+  | 'upright'
+  | 'pulsebass'
+  | 'velour'
+  | 'crystal'
+  | 'tapestrings'
+  | 'steelguitar'
+  | 'chip'
+  | 'trumpet'
+  | 'ocarina'
   | 'drums'
   | 'lofi'
   | 'hand'
   | 'vintage'
   | 'kit808'
   | 'brush'
+  | 'trap'
+  | 'house'
+  | 'breaks'
 
 export type InstrumentCategory = 'Keys' | 'Bass' | 'Pads' | 'Leads' | 'Drums'
 
@@ -46,6 +63,8 @@ export interface InstrumentInfo {
   description: string
   color: string
   isDrums?: boolean
+  /** Added in the 2.0 sound update. */
+  isNew?: boolean
 }
 
 export interface Note {
@@ -91,6 +110,18 @@ export interface EffectInstance {
   params: Record<string, number>
 }
 
+/** Per-track playing controls that sit in front of the instrument. */
+export interface VoiceSettings {
+  /** Whole-octave transpose, -2..2. Ignored by drum kits. */
+  octave: number
+  /** Extra fade-in in seconds, 0..1.5. */
+  attack: number
+  /** Dark (-1) to bright (+1) tilt. */
+  tone: number
+  /** How much note velocity matters, 0 (flat) .. 1 (full). */
+  dynamics: number
+}
+
 export interface Track {
   id: string
   name: string
@@ -104,6 +135,7 @@ export interface Track {
   reverbSend: number
   delaySend: number
   effects: EffectInstance[]
+  voice?: VoiceSettings
   clips: Clip[]
 }
 

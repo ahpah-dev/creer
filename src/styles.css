@@ -170,7 +170,7 @@ select:focus-visible,
 .eyebrow {
   display: block;
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   font-weight: 500;
   letter-spacing: 0.16em;
   color: var(--muted);
@@ -191,7 +191,7 @@ kbd {
   background: rgba(255, 255, 255, 0.035);
   color: var(--text-dim);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 9.1px;
   line-height: 1;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
 }
@@ -212,7 +212,7 @@ kbd {
   border: 1px solid var(--line-strong);
   color: var(--text-dim);
   font-family: var(--font-sans);
-  font-size: 9px;
+  font-size: 9.8px;
   font-weight: 450;
   letter-spacing: 0.01em;
   white-space: nowrap;
@@ -326,7 +326,7 @@ kbd {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 10.5px;
+  font-size: 10.8px;
 }
 
 .preview-sound:hover {
@@ -458,7 +458,7 @@ kbd {
   padding-left: 2px;
   margin-top: 0;
   font-family: var(--font-mono);
-  font-size: 7.5px;
+  font-size: 8.8px;
   letter-spacing: 0.045em;
   color: var(--faint);
   white-space: nowrap;
@@ -633,7 +633,7 @@ kbd {
 
 .readout-label {
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   letter-spacing: 0.12em;
   color: var(--faint);
 }
@@ -654,7 +654,7 @@ kbd {
   gap: 8px;
   margin-top: 1px;
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 9.1px;
   color: var(--faint);
   font-variant-numeric: tabular-nums;
 }
@@ -663,7 +663,7 @@ kbd {
   border: 1px solid rgba(243, 235, 223, 0.1);
   border-radius: 3px;
   padding: 0 3px;
-  font-size: 6.5px;
+  font-size: 8.1px;
   color: var(--muted);
   line-height: 11px;
 }
@@ -698,14 +698,14 @@ kbd {
 
 .meta-pill-label {
   font-family: var(--font-mono);
-  font-size: 6px;
+  font-size: 8px;
   letter-spacing: 0.13em;
   color: var(--faint);
 }
 
 .meta-pill-value {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--text-dim);
   white-space: nowrap;
 }
@@ -757,7 +757,7 @@ kbd {
   align-items: center;
   gap: 5px;
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 9.1px;
   letter-spacing: 0.03em;
   color: var(--faint);
   white-space: nowrap;
@@ -867,7 +867,7 @@ kbd {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 530;
   white-space: nowrap;
   transition: background 0.13s ease, border-color 0.13s ease, color 0.13s ease;
@@ -892,7 +892,7 @@ kbd {
 
 .key-hint {
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   color: var(--faint);
   border: 1px solid var(--line);
   border-radius: 3px;
@@ -937,14 +937,14 @@ kbd {
 
 .select-label {
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   letter-spacing: 0.12em;
   color: var(--faint);
 }
 
 .select-value {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 9.8px;
   color: var(--text-dim);
   min-width: 20px;
 }
@@ -970,7 +970,7 @@ kbd {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 10.5px;
+  font-size: 10.8px;
   transition: color 0.12s ease, background 0.12s ease;
 }
 
@@ -993,14 +993,14 @@ kbd {
 
 .timeline-length {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 9.1px;
   color: var(--faint);
   white-space: nowrap;
 }
 
 .timeline-length span {
   color: var(--text-dim);
-  font-size: 9px;
+  font-size: 9.8px;
 }
 
 .zoom-control {
@@ -1096,7 +1096,7 @@ kbd {
 
 .headers-eyebrow {
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   letter-spacing: 0.16em;
   color: var(--faint);
 }
@@ -1110,7 +1110,7 @@ kbd {
 
 .track-count {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: 9.5px;
   color: var(--faint);
   padding-bottom: 1px;
 }
@@ -1185,7 +1185,7 @@ kbd {
   width: 14px;
   flex: none;
   font-family: var(--font-mono);
-  font-size: 7.5px;
+  font-size: 8.8px;
   color: var(--faint);
 }
 
@@ -1312,7 +1312,7 @@ kbd {
   background: transparent;
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   font-weight: 500;
   padding: 0;
   line-height: 1;
@@ -1431,7 +1431,7 @@ kbd {
   border-radius: 7px;
   background: transparent;
   color: var(--faint);
-  font-size: 9.5px;
+  font-size: 10.1px;
   transition: color 0.13s ease, border-color 0.13s ease, background 0.13s ease;
 }
 
@@ -1514,7 +1514,7 @@ kbd {
   background: transparent;
   color: inherit;
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   letter-spacing: 0.1em;
   text-align: left;
   text-transform: uppercase;
@@ -1637,7 +1637,7 @@ kbd {
   justify-content: space-between;
   padding: 6px 1px 2px;
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   color: #887b6d;
 }
 
@@ -1705,7 +1705,7 @@ kbd {
   min-width: 47px;
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: 9.5px;
   font-weight: 400;
   color: var(--text-dim);
 }
@@ -1729,7 +1729,7 @@ kbd {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 8.5px;
+  font-size: 9.5px;
 }
 
 .section-action:hover:not(:disabled) {
@@ -1777,7 +1777,7 @@ kbd {
   left: 5px;
   bottom: 6px;
   font-family: var(--font-mono);
-  font-size: 7.5px;
+  font-size: 8.8px;
   line-height: 1;
   color: var(--faint);
   font-variant-numeric: tabular-nums;
@@ -1846,7 +1846,7 @@ kbd {
   left: 9px;
   top: 3px;
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   letter-spacing: 0.06em;
   color: rgba(242, 166, 121, 0.6);
   white-space: nowrap;
@@ -1967,7 +1967,7 @@ kbd {
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 9px;
+  font-size: 9.8px;
   color: var(--faint);
   opacity: 0;
   pointer-events: none;
@@ -2067,7 +2067,7 @@ kbd {
 .clip-name {
   flex: 1;
   min-width: 0;
-  font-size: 9.5px;
+  font-size: 10.1px;
   font-weight: 590;
   letter-spacing: 0.005em;
   color: rgba(255, 248, 238, 0.94);
@@ -2080,7 +2080,7 @@ kbd {
 .clip-instrument {
   flex: none;
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   letter-spacing: 0.05em;
   color: rgba(255, 244, 230, 0.45);
   text-transform: uppercase;
@@ -2092,7 +2092,7 @@ kbd {
 }
 
 .clip.is-narrow .clip-name {
-  font-size: 8.5px;
+  font-size: 9.5px;
 }
 
 .clip-note-field {
@@ -2354,7 +2354,7 @@ body.is-dock-resizing * {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 10.5px;
+  font-size: 10.8px;
   font-weight: 500;
   letter-spacing: 0.005em;
   transition: color 0.13s ease, background 0.13s ease;
@@ -2403,7 +2403,7 @@ body.is-dock-resizing * {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 9px;
+  font-size: 9.8px;
   color: var(--text-dim);
   padding: 3px 7px;
   border: 1px solid var(--line);
@@ -2424,7 +2424,7 @@ body.is-dock-resizing * {
 
 .dock-context-text {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 9.1px;
   color: var(--faint);
   white-space: nowrap;
   overflow: hidden;
@@ -2486,7 +2486,7 @@ body.is-dock-resizing * {
   background: transparent;
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   letter-spacing: 0.09em;
 }
 
@@ -2525,7 +2525,7 @@ body.is-dock-resizing * {
 
 .fx-target-info em {
   font-family: var(--font-mono);
-  font-size: 5.8px;
+  font-size: 8px;
   letter-spacing: 0.12em;
   color: var(--faint);
   font-style: normal;
@@ -2536,7 +2536,7 @@ body.is-dock-resizing * {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 10.5px;
+  font-size: 10.8px;
   font-weight: 550;
   color: var(--text-dim);
 }
@@ -2544,7 +2544,7 @@ body.is-dock-resizing * {
 .fx-target-info b {
   margin-left: 3px;
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   font-weight: 400;
   color: var(--faint);
   white-space: nowrap;
@@ -2568,7 +2568,7 @@ body.is-dock-resizing * {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 8.5px;
+  font-size: 9.5px;
   white-space: nowrap;
 }
 
@@ -2584,7 +2584,7 @@ body.is-dock-resizing * {
   border-radius: 5px;
   background: transparent;
   color: var(--faint);
-  font-size: 8px;
+  font-size: 9.1px;
 }
 
 .fx-clear:hover {
@@ -2623,7 +2623,7 @@ body.is-dock-resizing * {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   font-family: var(--font-mono);
-  font-size: 5.5px;
+  font-size: 8px;
   letter-spacing: 0.12em;
   color: #665b50;
 }
@@ -2690,7 +2690,7 @@ body.is-dock-resizing * {
 }
 
 .fx-card-title strong {
-  font-size: 9.5px;
+  font-size: 10.1px;
   font-weight: 560;
   color: var(--text-dim);
   white-space: nowrap;
@@ -2700,7 +2700,7 @@ body.is-dock-resizing * {
 
 .fx-card-title em {
   font-family: var(--font-mono);
-  font-size: 5.8px;
+  font-size: 8px;
   font-style: normal;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -2753,7 +2753,7 @@ body.is-dock-resizing * {
 
 .fx-param-head em {
   font-family: var(--font-mono);
-  font-size: 5.7px;
+  font-size: 8px;
   font-style: normal;
   letter-spacing: 0.1em;
   color: var(--faint);
@@ -2761,7 +2761,7 @@ body.is-dock-resizing * {
 
 .fx-param-head b {
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   font-weight: 400;
   color: var(--text-dim);
   white-space: nowrap;
@@ -2837,7 +2837,7 @@ body.is-dock-resizing * {
   gap: 2px;
   border-top: 1px solid var(--line);
   font-family: var(--font-mono);
-  font-size: 5.8px;
+  font-size: 8px;
   color: var(--faint);
 }
 
@@ -2891,7 +2891,7 @@ body.is-dock-resizing * {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  font-size: 8px;
+  font-size: 9.1px;
 }
 
 .fx-add-card:hover {
@@ -2931,7 +2931,7 @@ body.is-dock-resizing * {
 
 .fx-empty p {
   margin: 0 0 8px;
-  font-size: 8.5px;
+  font-size: 9.5px;
   color: var(--faint);
 }
 
@@ -2993,7 +2993,7 @@ body.is-dock-resizing * {
 
 .fx-browser-head p {
   margin: 0;
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--muted);
 }
 
@@ -3054,7 +3054,7 @@ body.is-dock-resizing * {
 
 .fx-library-copy em {
   font-family: var(--font-mono);
-  font-size: 5.8px;
+  font-size: 8px;
   font-style: normal;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -3062,14 +3062,14 @@ body.is-dock-resizing * {
 }
 
 .fx-library-copy strong {
-  font-size: 10.5px;
+  font-size: 10.8px;
   font-weight: 560;
   color: var(--text-dim);
 }
 
 .fx-library-copy span {
   margin-top: 2px;
-  font-size: 8px;
+  font-size: 9.1px;
   line-height: 1.35;
   color: #8d7f70;
 }
@@ -3081,7 +3081,7 @@ body.is-dock-resizing * {
   gap: 3px;
   margin-top: 4px;
   color: var(--fx-color);
-  font-size: 7.5px;
+  font-size: 8.8px;
   opacity: 0.8;
 }
 
@@ -3092,7 +3092,7 @@ body.is-dock-resizing * {
 .fx-browser-limit {
   margin: 12px 0 0;
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   color: #c58d7b;
 }
 
@@ -3171,7 +3171,7 @@ body.is-dock-resizing * {
   border-bottom: 1px solid transparent;
   background: transparent;
   color: var(--text);
-  font-size: 10.5px;
+  font-size: 10.8px;
   font-weight: 570;
   letter-spacing: 0;
   outline: none;
@@ -3189,7 +3189,7 @@ body.is-dock-resizing * {
 
 .inspector-title > span {
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   color: var(--faint);
   letter-spacing: 0.01em;
   white-space: nowrap;
@@ -3225,7 +3225,7 @@ body.is-dock-resizing * {
 
 .editor-select > span {
   font-family: var(--font-mono);
-  font-size: 6px;
+  font-size: 8px;
   letter-spacing: 0.1em;
   color: var(--faint);
 }
@@ -3237,7 +3237,7 @@ body.is-dock-resizing * {
   border: none;
   color: var(--text-dim);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 9.1px;
   padding: 0 2px;
   cursor: pointer;
   outline: none;
@@ -3263,7 +3263,7 @@ body.is-dock-resizing * {
   border-radius: 5px;
   background: transparent;
   color: var(--muted);
-  font-size: 9px;
+  font-size: 9.8px;
   transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
 }
 
@@ -3338,7 +3338,7 @@ body.is-note-marquee-selecting {
   background: transparent;
   color: #9c8e7f;
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   letter-spacing: 0.02em;
   transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease;
 }
@@ -3355,7 +3355,7 @@ body.is-note-marquee-selecting {
 
 .tool-label {
   font-family: var(--font-mono);
-  font-size: 5.5px;
+  font-size: 8px;
   letter-spacing: 0.1em;
   color: var(--faint);
   padding: 0 2px;
@@ -3367,7 +3367,7 @@ body.is-note-marquee-selecting {
   align-items: center;
   gap: 6px;
   font-family: var(--font-mono);
-  font-size: 7.5px;
+  font-size: 8.8px;
   color: var(--faint);
   white-space: nowrap;
   min-width: 190px;
@@ -3380,7 +3380,7 @@ body.is-note-marquee-selecting {
 
 .selected-note-name {
   color: var(--accent);
-  font-size: 8px;
+  font-size: 9.1px;
 }
 
 .piano-status-divider {
@@ -3431,7 +3431,7 @@ body.is-note-marquee-selecting {
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: 6px;
+  font-size: 8px;
   letter-spacing: 0.1em;
   color: var(--faint);
 }
@@ -3459,7 +3459,7 @@ body.is-note-marquee-selecting {
   left: 5px;
   top: 7px;
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   color: var(--faint);
   white-space: nowrap;
 }
@@ -3486,7 +3486,7 @@ body.is-note-marquee-selecting {
   border-bottom: 1px solid rgba(243, 235, 223, 0.022);
   background: #15120f;
   font-family: var(--font-mono);
-  font-size: 7.5px;
+  font-size: 8.8px;
   color: #8a7e70;
   cursor: pointer;
   user-select: none;
@@ -3562,7 +3562,7 @@ body.is-note-marquee-selecting {
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.22), 0 1px 2px rgba(0, 0, 0, 0.24);
   color: #251b13;
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -3645,13 +3645,13 @@ body.is-note-marquee-selecting {
 }
 
 .velocity-label span {
-  font-size: 5.5px;
+  font-size: 8px;
   letter-spacing: 0.07em;
   color: #807263;
 }
 
 .velocity-label strong {
-  font-size: 9px;
+  font-size: 9.8px;
   font-weight: 400;
   color: var(--text-dim);
   line-height: 1;
@@ -3867,7 +3867,7 @@ body.is-note-marquee-selecting {
 
 .channel-number {
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   color: var(--faint);
   padding-top: 2px;
   flex: none;
@@ -3883,7 +3883,7 @@ body.is-note-marquee-selecting {
 
 .channel-name {
   color: var(--text-dim);
-  font-size: 9.5px;
+  font-size: 10.1px;
   font-weight: 570;
   white-space: nowrap;
   overflow: hidden;
@@ -3897,7 +3897,7 @@ body.is-note-marquee-selecting {
 
 .channel-instrument {
   font-family: var(--font-mono);
-  font-size: 6px;
+  font-size: 8px;
   letter-spacing: 0.06em;
   color: var(--faint);
   text-transform: uppercase;
@@ -3981,7 +3981,7 @@ body.is-note-marquee-selecting {
 
 .knob-label {
   font-family: var(--font-mono);
-  font-size: 5.5px;
+  font-size: 8px;
   letter-spacing: 0.08em;
   color: var(--faint);
   line-height: 1;
@@ -3989,7 +3989,7 @@ body.is-note-marquee-selecting {
 
 .knob-value {
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   color: var(--muted);
   line-height: 1.1;
 }
@@ -4080,7 +4080,7 @@ body.is-note-marquee-selecting {
 
 .fader-readout {
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   color: var(--faint);
   line-height: 1;
   white-space: nowrap;
@@ -4088,7 +4088,7 @@ body.is-note-marquee-selecting {
 
 .fader-readout em {
   font-style: normal;
-  font-size: 5.5px;
+  font-size: 8px;
   opacity: 0.6;
 }
 
@@ -4134,7 +4134,7 @@ body.is-note-marquee-selecting {
 .channel-type {
   margin-left: auto;
   font-family: var(--font-mono);
-  font-size: 5.5px;
+  font-size: 8px;
   letter-spacing: 0.04em;
   color: var(--faint);
   white-space: nowrap;
@@ -4153,7 +4153,7 @@ body.is-note-marquee-selecting {
   align-items: center;
   gap: 1px;
   font-family: var(--font-mono);
-  font-size: 5.3px;
+  font-size: 8px;
   letter-spacing: 0.02em;
 }
 
@@ -4204,7 +4204,7 @@ body.is-note-marquee-selecting {
 .mixer-add-track em {
   font-style: normal;
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
 }
 
 .mixer-add-track:hover {
@@ -4243,7 +4243,7 @@ body.is-note-marquee-selecting {
 .master-head em {
   font-style: normal;
   font-family: var(--font-mono);
-  font-size: 6px;
+  font-size: 8px;
   color: var(--faint);
   letter-spacing: 0.04em;
 }
@@ -4292,7 +4292,7 @@ body.is-note-marquee-selecting {
 
 .limiter-pill {
   font-family: var(--font-mono);
-  font-size: 5.5px;
+  font-size: 8px;
   letter-spacing: 0.05em;
   color: var(--faint);
   display: inline-flex;
@@ -4319,7 +4319,7 @@ body.is-note-marquee-selecting {
   align-items: center;
   gap: 2px;
   font-family: var(--font-mono);
-  font-size: 5.3px;
+  font-size: 8px;
 }
 
 .master-fx b {
@@ -4342,7 +4342,7 @@ body.is-note-marquee-selecting {
   background: transparent;
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 5.5px;
+  font-size: 8px;
   letter-spacing: 0.05em;
   padding: 2px;
 }
@@ -4382,7 +4382,7 @@ body.is-note-marquee-selecting {
 
 .library-heading strong {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 9.1px;
   font-weight: 400;
   color: var(--text-dim);
 }
@@ -4405,7 +4405,7 @@ body.is-note-marquee-selecting {
   border-radius: 5px;
   background: transparent;
   color: var(--faint);
-  font-size: 9px;
+  font-size: 9.8px;
   transition: color 0.12s ease, background 0.12s ease;
 }
 
@@ -4447,7 +4447,7 @@ body.is-note-marquee-selecting {
   border: none;
   outline: none;
   color: var(--text-dim);
-  font-size: 10px;
+  font-size: 10.5px;
 }
 
 .library-search input::placeholder {
@@ -4457,7 +4457,7 @@ body.is-note-marquee-selecting {
 .library-search kbd {
   min-width: 15px;
   height: 15px;
-  font-size: 7px;
+  font-size: 8.4px;
   color: var(--faint);
   border-color: var(--line);
   background: transparent;
@@ -4468,7 +4468,7 @@ body.is-note-marquee-selecting {
   align-items: center;
   gap: 5px;
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   color: var(--faint);
   flex: none;
 }
@@ -4523,7 +4523,7 @@ body.is-note-marquee-selecting {
 
 .loop-category {
   font-family: var(--font-mono);
-  font-size: 6px;
+  font-size: 8px;
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--loop-color) 46%, var(--muted) 54%);
@@ -4578,7 +4578,7 @@ body.is-note-marquee-selecting {
 
 .loop-instrument {
   font-family: var(--font-mono);
-  font-size: 5.5px;
+  font-size: 8px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--faint);
@@ -4590,7 +4590,7 @@ body.is-note-marquee-selecting {
 
 .loop-card-main p {
   margin: 2px 0 0;
-  font-size: 9px;
+  font-size: 9.8px;
   line-height: 1.35;
   color: var(--muted);
   display: -webkit-box;
@@ -4638,7 +4638,7 @@ body.is-note-marquee-selecting {
 
 .loop-tags span {
   font-family: var(--font-mono);
-  font-size: 6px;
+  font-size: 8px;
   color: var(--faint);
   white-space: nowrap;
 }
@@ -4659,7 +4659,7 @@ body.is-note-marquee-selecting {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  font-size: 8px;
+  font-size: 9.1px;
   flex: none;
   transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
 }
@@ -4689,7 +4689,7 @@ body.is-note-marquee-selecting {
 
 .library-empty p {
   margin: 0 0 8px;
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--faint);
 }
 
@@ -4765,11 +4765,11 @@ body.is-note-marquee-selecting {
 }
 
 .sound-panel-head .eyebrow {
-  font-size: 6px;
+  font-size: 8px;
 }
 
 .sound-panel-head strong {
-  font-size: 10.5px;
+  font-size: 10.8px;
   font-weight: 560;
   color: var(--text-dim);
   white-space: nowrap;
@@ -4777,7 +4777,7 @@ body.is-note-marquee-selecting {
 
 .sound-panel-target {
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   color: #948677;
   padding: 2px 5px;
   border: 1px solid var(--line);
@@ -4816,7 +4816,7 @@ body.is-note-marquee-selecting {
   border: none;
   outline: none;
   color: var(--text-dim);
-  font-size: 9.5px;
+  font-size: 10.1px;
 }
 
 .sound-search input::placeholder {
@@ -4855,7 +4855,7 @@ body.is-note-marquee-selecting {
   z-index: 3;
   background: #13100d;
   font-family: var(--font-mono);
-  font-size: 6px;
+  font-size: 8px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #8d7f71;
@@ -4926,7 +4926,7 @@ body.is-note-marquee-selecting {
 }
 
 .sound-row-copy strong {
-  font-size: 9.5px;
+  font-size: 10.1px;
   font-weight: 550;
   color: #c3b7a8;
   white-space: nowrap;
@@ -4942,7 +4942,7 @@ body.is-note-marquee-selecting {
 .sound-row-copy em {
   font-style: normal;
   font-family: var(--font-mono);
-  font-size: 5.8px;
+  font-size: 8px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #7f7264;
@@ -5010,7 +5010,7 @@ body.is-note-marquee-selecting {
 
 .sound-no-results p {
   margin: 4px 0 0;
-  font-size: 8.5px;
+  font-size: 9.5px;
   color: var(--faint);
 }
 
@@ -5028,7 +5028,7 @@ body.is-note-marquee-selecting {
 
 .sound-panel-footer > span {
   font-family: var(--font-mono);
-  font-size: 6.2px;
+  font-size: 8px;
   color: #827567;
   white-space: nowrap;
   overflow: hidden;
@@ -5052,7 +5052,7 @@ body.is-note-marquee-selecting {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  font-size: 7.5px;
+  font-size: 8.8px;
 }
 
 .sound-panel-footer > button:hover {
@@ -5121,7 +5121,7 @@ body.is-note-marquee-selecting {
   background: rgba(255, 255, 255, 0.02);
   color: #8d8072;
   font-family: var(--font-mono);
-  font-size: 5.9px;
+  font-size: 8px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -5186,7 +5186,7 @@ body.is-note-marquee-selecting {
   align-items: center;
   gap: 7px;
   min-width: 0;
-  font-size: 9px;
+  font-size: 9.8px;
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
@@ -5220,7 +5220,7 @@ body.is-note-marquee-selecting {
 }
 
 .octave-control .eyebrow {
-  font-size: 5.5px;
+  font-size: 8px;
   margin-right: 1px;
 }
 
@@ -5248,7 +5248,7 @@ body.is-note-marquee-selecting {
 
 .octave-control strong {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 9.1px;
   font-weight: 500;
   color: var(--text-dim);
   min-width: 8px;
@@ -5259,7 +5259,7 @@ body.is-note-marquee-selecting {
   display: flex;
   align-items: center;
   gap: 3px;
-  font-size: 8.5px;
+  font-size: 9.5px;
   color: var(--faint);
   flex: none;
 }
@@ -5272,7 +5272,7 @@ body.is-note-marquee-selecting {
   min-width: 14px;
   height: 15px;
   padding: 0 3px;
-  font-size: 7px;
+  font-size: 8.4px;
 }
 
 .hint-sep {
@@ -5291,7 +5291,7 @@ body.is-note-marquee-selecting {
   background: rgba(221, 130, 109, 0.09);
   color: #eaa18d;
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   letter-spacing: 0.08em;
   flex: none;
 }
@@ -5376,7 +5376,7 @@ body.is-note-marquee-selecting {
 .white-key-label em {
   font-style: normal;
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   color: rgba(80, 61, 46, 0.55);
 }
 
@@ -5386,7 +5386,7 @@ body.is-note-marquee-selecting {
   border-color: rgba(77, 58, 42, 0.2);
   background: rgba(255, 255, 255, 0.22);
   color: rgba(77, 58, 42, 0.6);
-  font-size: 6.5px;
+  font-size: 8.1px;
   box-shadow: none;
 }
 
@@ -5426,7 +5426,7 @@ body.is-note-marquee-selecting {
   bottom: 7px;
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   pointer-events: none;
 }
 
@@ -5477,7 +5477,7 @@ body.is-note-marquee-selecting {
 
 .pad-shortcut {
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   color: var(--faint);
   border: 1px solid var(--line);
   border-radius: 3px;
@@ -5538,7 +5538,7 @@ body.is-note-marquee-selecting {
   background: #0c0a08;
   border-top: 1px solid var(--line);
   font-family: var(--font-mono);
-  font-size: 7.5px;
+  font-size: 8.8px;
   color: var(--faint);
   letter-spacing: 0.015em;
   position: relative;
@@ -5646,7 +5646,7 @@ body.is-note-marquee-selecting {
 .status-bar kbd {
   height: 13px;
   min-width: 24px;
-  font-size: 6px;
+  font-size: 8px;
   border-radius: 2px;
   background: rgba(255, 255, 255, 0.02);
   color: #7d7164;
@@ -5677,7 +5677,7 @@ body.is-note-marquee-selecting {
 .popover-heading {
   padding: 5px 8px 6px;
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--faint);
@@ -5705,7 +5705,7 @@ body.is-note-marquee-selecting {
   border-radius: 6px;
   background: transparent;
   color: var(--text-dim);
-  font-size: 10.5px;
+  font-size: 10.8px;
   text-align: left;
   transition: background 0.1s ease, color 0.1s ease;
 }
@@ -5740,7 +5740,7 @@ body.is-note-marquee-selecting {
 .menu-shortcut {
   margin-left: auto;
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   color: var(--faint);
 }
 
@@ -5768,7 +5768,7 @@ body.is-note-marquee-selecting {
 .field-label {
   display: block;
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   letter-spacing: 0.12em;
   color: var(--faint);
   text-transform: uppercase;
@@ -5791,7 +5791,7 @@ body.is-note-marquee-selecting {
 
 .tempo-display em {
   font-style: normal;
-  font-size: 7px;
+  font-size: 8.4px;
   letter-spacing: 0.08em;
   color: var(--faint);
 }
@@ -5826,7 +5826,7 @@ body.is-note-marquee-selecting {
   background: rgba(0, 0, 0, 0.2);
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--text);
   outline: none;
 }
@@ -5852,7 +5852,7 @@ body.is-note-marquee-selecting {
   background: transparent;
   color: var(--faint);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 9.1px;
 }
 
 .key-choice:hover {
@@ -5904,7 +5904,7 @@ body.is-note-marquee-selecting {
   border-radius: 4px;
   background: transparent;
   color: var(--faint);
-  font-size: 8.5px;
+  font-size: 9.5px;
   white-space: nowrap;
   padding: 0 7px;
 }
@@ -5923,7 +5923,7 @@ body.is-note-marquee-selecting {
   margin: 10px 0 2px;
   padding-top: 8px;
   border-top: 1px solid var(--line-soft);
-  font-size: 8px;
+  font-size: 9.1px;
   line-height: 1.5;
   color: var(--faint);
 }
@@ -5948,7 +5948,7 @@ body.is-note-marquee-selecting {
 .swing-state {
   display: block;
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 9.1px;
   color: var(--faint);
   transition: color 0.13s ease;
 }
@@ -6077,7 +6077,7 @@ body.is-note-marquee-selecting {
   min-width: 36px;
   text-align: right;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 400;
   color: var(--text-dim);
 }
@@ -6097,14 +6097,14 @@ body.is-note-marquee-selecting {
 
 .swing-division-row > span {
   font-family: var(--font-mono);
-  font-size: 7.1px;
+  font-size: 8.5px;
   color: #978879;
   white-space: nowrap;
 }
 
 .swing-note {
   margin: 8px 0 0;
-  font-size: 8px;
+  font-size: 9.1px;
   line-height: 1.45;
   color: var(--faint);
 }
@@ -6140,7 +6140,7 @@ body.is-note-marquee-selecting {
 
 .track-menu .menu-item {
   min-height: 27px;
-  font-size: 10px;
+  font-size: 10.5px;
 }
 
 .eraser-glyph {
@@ -6317,7 +6317,7 @@ body.is-note-marquee-selecting {
 
 .idea-style-top em {
   font-family: var(--font-mono);
-  font-size: 6px;
+  font-size: 8px;
   font-style: normal;
   letter-spacing: 0.04em;
   color: color-mix(in srgb, var(--idea-color) 60%, var(--faint));
@@ -6325,7 +6325,7 @@ body.is-note-marquee-selecting {
 }
 
 .idea-style strong {
-  font-size: 8.5px;
+  font-size: 9.5px;
   font-weight: 400;
   line-height: 1.4;
   color: #a99b8c;
@@ -6334,7 +6334,7 @@ body.is-note-marquee-selecting {
 .idea-style-tags {
   margin-top: auto;
   font-family: var(--font-mono);
-  font-size: 5.8px;
+  font-size: 8px;
   letter-spacing: 0.025em;
   color: var(--faint);
   white-space: nowrap;
@@ -6365,7 +6365,7 @@ body.is-note-marquee-selecting {
 .idea-option-group .segmented button {
   height: 23px;
   padding: 0 8px;
-  font-size: 8px;
+  font-size: 9.1px;
 }
 
 .idea-readout {
@@ -6383,7 +6383,7 @@ body.is-note-marquee-selecting {
 
 .idea-readout em {
   font-family: var(--font-mono);
-  font-size: 6px;
+  font-size: 8px;
   font-style: normal;
   letter-spacing: 0.1em;
   color: var(--faint);
@@ -6391,7 +6391,7 @@ body.is-note-marquee-selecting {
 
 .idea-readout strong {
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: 9.5px;
   font-weight: 400;
   color: var(--text-dim);
   white-space: nowrap;
@@ -6415,7 +6415,7 @@ body.is-note-marquee-selecting {
 
 .idea-tip p {
   margin: 0;
-  font-size: 8.5px;
+  font-size: 9.5px;
   line-height: 1.4;
   color: #918374;
 }
@@ -6431,7 +6431,7 @@ body.is-note-marquee-selecting {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 8px;
+  font-size: 9.1px;
   white-space: nowrap;
   flex: none;
 }
@@ -6459,7 +6459,7 @@ body.is-note-marquee-selecting {
   }
 
   .idea-tip p {
-    font-size: 8px;
+    font-size: 9.1px;
   }
 }
 
@@ -6536,7 +6536,7 @@ body.is-note-marquee-selecting {
   outline: none;
   background: transparent;
   color: var(--text-dim);
-  font-size: 9.5px;
+  font-size: 10.1px;
 }
 
 .sound-library-search input::placeholder {
@@ -6545,7 +6545,7 @@ body.is-note-marquee-selecting {
 
 .sound-library-search > span {
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   color: var(--faint);
 }
 
@@ -6629,7 +6629,7 @@ body.is-note-marquee-selecting {
 
 .library-sound-category {
   font-family: var(--font-mono);
-  font-size: 5.7px;
+  font-size: 8px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #87796a;
@@ -6641,7 +6641,7 @@ body.is-note-marquee-selecting {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 10.5px;
+  font-size: 10.8px;
   font-weight: 560;
   line-height: 1.35;
   color: #d8cbbb;
@@ -6658,7 +6658,7 @@ body.is-note-marquee-selecting {
   overflow: hidden;
   margin-top: 2px;
   font-style: normal;
-  font-size: 8px;
+  font-size: 9.1px;
   line-height: 1.35;
   color: #8c7e6f;
 }
@@ -6731,7 +6731,7 @@ body.is-note-marquee-selecting {
 
 .sound-library-empty p {
   margin: 5px 0 14px;
-  font-size: 9.5px;
+  font-size: 10.1px;
   color: var(--faint);
 }
 
@@ -6748,7 +6748,7 @@ body.is-note-marquee-selecting {
 
 .modal-footer-note {
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   letter-spacing: 0.03em;
   color: var(--faint);
 }
@@ -6835,7 +6835,7 @@ body.is-note-marquee-selecting {
 
 .step-number {
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   color: var(--accent);
   padding-top: 2px;
   flex: none;
@@ -6844,7 +6844,7 @@ body.is-note-marquee-selecting {
 
 .help-steps p {
   margin: 0;
-  font-size: 10px;
+  font-size: 10.5px;
   line-height: 1.5;
   color: var(--muted);
 }
@@ -6868,7 +6868,7 @@ body.is-note-marquee-selecting {
   padding-bottom: 7px;
   border-bottom: 1px solid var(--line);
   color: var(--text-dim);
-  font-size: 9.5px;
+  font-size: 10.1px;
   font-weight: 550;
 }
 
@@ -6890,7 +6890,7 @@ body.is-note-marquee-selecting {
   justify-content: space-between;
   gap: 6px;
   border-bottom: 1px solid var(--line-soft);
-  font-size: 8.5px;
+  font-size: 9.5px;
   color: var(--muted);
 }
 
@@ -6910,11 +6910,11 @@ body.is-note-marquee-selecting {
 .shortcut-keys kbd {
   min-width: 15px;
   height: 15px;
-  font-size: 6.5px;
+  font-size: 8.1px;
 }
 
 .shortcut-keys > span {
-  font-size: 7px;
+  font-size: 8.4px;
   color: var(--faint);
 }
 
@@ -6947,7 +6947,7 @@ body.is-note-marquee-selecting {
 
 .help-tip p {
   margin: 0;
-  font-size: 8px;
+  font-size: 9.1px;
   line-height: 1.5;
   color: var(--muted);
 }
@@ -6958,7 +6958,7 @@ body.is-note-marquee-selecting {
   gap: 7px;
   padding-top: 13px;
   font-family: var(--font-mono);
-  font-size: 6px;
+  font-size: 8px;
   letter-spacing: 0.1em;
   color: var(--faint);
 }
@@ -7120,7 +7120,7 @@ body.is-note-marquee-selecting {
 
 .session-copy p {
   margin: 0;
-  font-size: 9.5px;
+  font-size: 10.1px;
   line-height: 1.5;
   color: var(--muted);
 }
@@ -7131,7 +7131,7 @@ body.is-note-marquee-selecting {
   align-items: center;
   gap: 5px;
   color: var(--accent);
-  font-size: 9px;
+  font-size: 9.8px;
 }
 
 /* Export modal */
@@ -7216,7 +7216,7 @@ body.is-note-marquee-selecting {
 
 .export-disc-label {
   font-family: var(--font-mono);
-  font-size: 6px;
+  font-size: 8px;
   letter-spacing: 0.2em;
   color: rgba(255, 239, 223, 0.5);
   margin-top: -20px;
@@ -7279,14 +7279,14 @@ body.is-note-marquee-selecting {
 
 .export-meta-grid span {
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--faint);
 }
 
 .export-meta-grid strong {
-  font-size: 9.5px;
+  font-size: 10.1px;
   font-weight: 500;
   color: var(--text-dim);
   white-space: nowrap;
@@ -7314,7 +7314,7 @@ body.is-note-marquee-selecting {
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   letter-spacing: 0.07em;
   flex: none;
 }
@@ -7327,14 +7327,14 @@ body.is-note-marquee-selecting {
 }
 
 .export-format-row strong {
-  font-size: 9px;
+  font-size: 9.8px;
   font-weight: 500;
   color: var(--text-dim);
 }
 
 .export-format-row span {
   font-family: var(--font-mono);
-  font-size: 6.5px;
+  font-size: 8.1px;
   color: var(--faint);
 }
 
@@ -7346,7 +7346,7 @@ body.is-note-marquee-selecting {
 
 .export-note {
   margin: 8px 1px 0;
-  font-size: 7.5px;
+  font-size: 8.8px;
   line-height: 1.45;
   color: #847667;
 }
@@ -7376,7 +7376,7 @@ body.is-note-marquee-selecting {
 }
 
 .export-progress span {
-  font-size: 8px;
+  font-size: 9.1px;
   color: var(--muted);
 }
 
@@ -7452,7 +7452,7 @@ body.is-note-marquee-selecting {
 }
 
 .instrument-choice-copy strong {
-  font-size: 10.5px;
+  font-size: 10.8px;
   font-weight: 560;
   color: var(--text-dim);
 }
@@ -7463,7 +7463,7 @@ body.is-note-marquee-selecting {
 
 .instrument-choice-copy em {
   font-style: normal;
-  font-size: 8px;
+  font-size: 9.1px;
   line-height: 1.25;
   color: var(--faint);
   white-space: nowrap;
@@ -7477,7 +7477,7 @@ body.is-note-marquee-selecting {
   right: 9px;
   top: 8px;
   font-family: var(--font-mono);
-  font-size: 5.5px;
+  font-size: 8px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--faint);
@@ -7520,7 +7520,7 @@ body.is-note-marquee-selecting {
   background: rgba(0, 0, 0, 0.16);
   padding: 0 9px;
   color: var(--text);
-  font-size: 10.5px;
+  font-size: 10.8px;
   outline: none;
 }
 
@@ -7586,7 +7586,7 @@ body.is-note-marquee-selecting {
 }
 
 .toggle-field strong {
-  font-size: 9px;
+  font-size: 9.8px;
   font-weight: 500;
   color: var(--text-dim);
   white-space: nowrap;
@@ -7594,7 +7594,7 @@ body.is-note-marquee-selecting {
 
 .toggle-field em {
   font-style: normal;
-  font-size: 7.5px;
+  font-size: 8.8px;
   color: var(--faint);
   white-space: nowrap;
 }
@@ -7637,7 +7637,7 @@ body.is-note-marquee-selecting {
 
 .midi-button-label {
   font-family: var(--font-mono);
-  font-size: 7px;
+  font-size: 8.4px;
   letter-spacing: 0.06em;
 }
 
@@ -7714,7 +7714,7 @@ body.is-note-marquee-selecting {
 .midi-message p,
 .midi-empty p {
   margin: 0;
-  font-size: 10.2px;
+  font-size: 10.6px;
   line-height: 1.55;
   color: #aa9d8e;
 }
@@ -7728,7 +7728,7 @@ body.is-note-marquee-selecting {
 .midi-file-note {
   margin: 0 0 8px;
   padding: 0 2px;
-  font-size: 8.5px;
+  font-size: 9.5px;
   line-height: 1.45;
   color: #8b7d6e;
 }
@@ -7822,7 +7822,7 @@ body.is-note-marquee-selecting {
 }
 
 .midi-device-copy strong {
-  font-size: 10.5px;
+  font-size: 10.8px;
   font-weight: 560;
   color: var(--text-dim);
   white-space: nowrap;
@@ -7833,7 +7833,7 @@ body.is-note-marquee-selecting {
 .midi-device-copy em {
   font-style: normal;
   font-family: var(--font-mono);
-  font-size: 7.2px;
+  font-size: 8.6px;
   color: #897b6d;
   white-space: nowrap;
   overflow: hidden;
@@ -7842,7 +7842,7 @@ body.is-note-marquee-selecting {
 
 .midi-device-live {
   font-family: var(--font-mono);
-  font-size: 5.5px;
+  font-size: 8px;
   letter-spacing: 0.05em;
   color: #7f9a85;
   display: flex;
@@ -7887,7 +7887,7 @@ body.is-note-marquee-selecting {
 
 .midi-live-notes span {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 9.1px;
   color: var(--accent);
   border: 1px solid rgba(242, 166, 121, 0.23);
   border-radius: 4px;
@@ -7897,7 +7897,7 @@ body.is-note-marquee-selecting {
 
 .midi-live-notes em {
   font-style: normal;
-  font-size: 9px;
+  font-size: 9.8px;
   color: #897b6d;
 }
 
@@ -7917,7 +7917,7 @@ body.is-note-marquee-selecting {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 8.8px;
+  font-size: 9.7px;
   padding: 3px;
 }
 
@@ -7931,7 +7931,7 @@ body.is-note-marquee-selecting {
 
 .midi-tip {
   margin: 7px 0 0;
-  font-size: 8.8px;
+  font-size: 9.7px;
   line-height: 1.5;
   color: #897b6d;
 }
@@ -7946,7 +7946,7 @@ body.is-note-marquee-selecting {
   border-radius: 4px;
   color: #8eae96;
   font-family: var(--font-mono);
-  font-size: 6px;
+  font-size: 8px;
   letter-spacing: 0.05em;
   flex: none;
 }
@@ -8017,7 +8017,7 @@ body.is-note-marquee-selecting {
 
 .toast strong {
   display: block;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 550;
   color: var(--text);
   line-height: 1.3;
@@ -8025,7 +8025,7 @@ body.is-note-marquee-selecting {
 
 .toast p {
   margin: 2px 0 0;
-  font-size: 8.5px;
+  font-size: 9.5px;
   line-height: 1.4;
   color: var(--muted);
 }
@@ -8108,7 +8108,7 @@ body.is-note-marquee-selecting {
 }
 
 .readout-time {
-  font-size: 8.5px;
+  font-size: 9.5px;
   color: #8f8172;
 }
 
@@ -8117,7 +8117,7 @@ body.is-note-marquee-selecting {
 }
 
 .readout-meter {
-  font-size: 7px;
+  font-size: 8.4px;
   color: #9b8b7b;
   background: rgba(255, 255, 255, 0.025);
   padding: 0 4px;
@@ -8133,7 +8133,7 @@ body.is-note-marquee-selecting {
 }
 
 .section-seek {
-  font-size: 7.5px;
+  font-size: 8.8px;
   letter-spacing: 0.09em;
   opacity: 0.94;
 }
@@ -8143,13 +8143,13 @@ body.is-note-marquee-selecting {
 }
 
 .bar-mark span {
-  font-size: 8.5px;
+  font-size: 9.5px;
   color: #8d8072;
   font-weight: 500;
 }
 
 .loop-label {
-  font-size: 7px;
+  font-size: 8.4px;
   color: rgba(242, 166, 121, 0.82);
   background: rgba(16, 12, 9, 0.82);
   border: 1px solid rgba(242, 166, 121, 0.12);
@@ -8182,12 +8182,12 @@ body.is-note-marquee-selecting {
 }
 
 .clip-name {
-  font-size: 10px;
+  font-size: 10.5px;
   color: rgba(255, 250, 242, 0.98);
 }
 
 .clip-instrument {
-  font-size: 6.8px;
+  font-size: 8.3px;
   color: rgba(255, 248, 236, 0.54);
 }
 
@@ -8245,16 +8245,16 @@ body.is-note-marquee-selecting {
 }
 
 .channel-number {
-  font-size: 7.5px;
+  font-size: 8.8px;
   color: #7d7062;
 }
 
 .channel-name {
-  font-size: 10.5px;
+  font-size: 10.8px;
 }
 
 .channel-instrument {
-  font-size: 6.8px;
+  font-size: 8.3px;
   color: #7c6f61;
 }
 
@@ -8279,12 +8279,12 @@ body.is-note-marquee-selecting {
 }
 
 .knob-label {
-  font-size: 6px;
+  font-size: 8px;
   color: #8b7d6e;
 }
 
 .knob-value {
-  font-size: 7px;
+  font-size: 8.4px;
   color: #a49686;
 }
 
@@ -8303,7 +8303,7 @@ body.is-note-marquee-selecting {
 }
 
 .fader-readout {
-  font-size: 7.5px;
+  font-size: 8.8px;
   color: #958777;
 }
 
@@ -8316,7 +8316,7 @@ body.is-note-marquee-selecting {
 }
 
 .channel-type {
-  font-size: 6px;
+  font-size: 8px;
   color: #776b5e;
 }
 
@@ -8334,7 +8334,7 @@ body.is-note-marquee-selecting {
 }
 
 .master-head em {
-  font-size: 6.5px;
+  font-size: 8.1px;
   color: #837565;
 }
 
@@ -8353,7 +8353,7 @@ body.is-note-marquee-selecting {
 
 .limiter-pill,
 .master-reset {
-  font-size: 6px;
+  font-size: 8px;
 }
 
 .mixer-add-track {
@@ -8384,7 +8384,7 @@ body.is-note-marquee-selecting {
 }
 
 .loop-card-main p {
-  font-size: 9.2px;
+  font-size: 9.9px;
   line-height: 1.35;
   margin-top: 2px;
 }
@@ -8399,7 +8399,7 @@ body.is-note-marquee-selecting {
 }
 
 .loop-category {
-  font-size: 6.8px;
+  font-size: 8.3px;
   color: color-mix(in srgb, var(--loop-color) 55%, #b7a998 45%);
 }
 
@@ -8413,12 +8413,12 @@ body.is-note-marquee-selecting {
 }
 
 .loop-instrument {
-  font-size: 6px;
+  font-size: 8px;
   color: #8e8173;
 }
 
 .loop-card-main p {
-  font-size: 9.5px;
+  font-size: 10.1px;
   line-height: 1.4;
   color: #a99c8d;
   margin-top: 3px;
@@ -8430,18 +8430,18 @@ body.is-note-marquee-selecting {
 }
 
 .loop-tags span {
-  font-size: 6.5px;
+  font-size: 8.1px;
   color: #8b7e70;
 }
 
 .loop-add {
-  font-size: 8.5px;
+  font-size: 9.5px;
   height: 21px;
   color: #a89a8b;
 }
 
 .library-search input {
-  font-size: 10.5px;
+  font-size: 10.8px;
 }
 
 .library-search {
@@ -8449,11 +8449,11 @@ body.is-note-marquee-selecting {
 }
 
 .library-count {
-  font-size: 7.5px;
+  font-size: 8.8px;
 }
 
 .filter-chip {
-  font-size: 9.5px;
+  font-size: 10.1px;
 }
 
 /* Modal readability */
@@ -8464,7 +8464,7 @@ body.is-note-marquee-selecting {
 }
 
 .help-steps p {
-  font-size: 10.8px;
+  font-size: 11px;
   line-height: 1.55;
   color: #a89b8c;
 }
@@ -8474,11 +8474,11 @@ body.is-note-marquee-selecting {
 }
 
 .step-number {
-  font-size: 7.5px;
+  font-size: 8.8px;
 }
 
 .help-section-title {
-  font-size: 10.5px;
+  font-size: 10.8px;
 }
 
 .shortcut-grid {
@@ -8487,18 +8487,18 @@ body.is-note-marquee-selecting {
 
 .shortcut-row {
   height: 28px;
-  font-size: 9.5px;
+  font-size: 10.1px;
   color: #a19485;
 }
 
 .shortcut-keys kbd {
   min-width: 16px;
   height: 16px;
-  font-size: 7px;
+  font-size: 8.4px;
 }
 
 .help-tip p {
-  font-size: 9.2px;
+  font-size: 9.9px;
   line-height: 1.5;
   color: #a19485;
 }
@@ -8508,17 +8508,17 @@ body.is-note-marquee-selecting {
 }
 
 .session-copy p {
-  font-size: 10.2px;
+  font-size: 10.6px;
   line-height: 1.5;
   color: #a19485;
 }
 
 .session-link {
-  font-size: 9.5px;
+  font-size: 10.1px;
 }
 
 .modal-footer-note {
-  font-size: 7.3px;
+  font-size: 8.6px;
   color: #7e7164;
   letter-spacing: 0.02em;
 }
@@ -8533,18 +8533,18 @@ body.is-note-marquee-selecting {
 }
 
 .instrument-choice-copy em {
-  font-size: 8.5px;
+  font-size: 9.5px;
   color: #938576;
   padding-right: 28px;
 }
 
 .instrument-choice-category {
-  font-size: 6px;
+  font-size: 8px;
   color: #75695c;
 }
 
 .field-label {
-  font-size: 7px;
+  font-size: 8.4px;
   color: #897b6c;
 }
 
@@ -8553,37 +8553,37 @@ body.is-note-marquee-selecting {
 }
 
 .toggle-field strong {
-  font-size: 9.5px;
+  font-size: 10.1px;
 }
 
 .toggle-field em {
-  font-size: 8px;
+  font-size: 9.1px;
   color: #887a6b;
 }
 
 .export-meta-grid span {
-  font-size: 7px;
+  font-size: 8.4px;
 }
 
 .export-meta-grid strong {
-  font-size: 10px;
+  font-size: 10.5px;
 }
 
 .export-format-row strong {
-  font-size: 9.5px;
+  font-size: 10.1px;
 }
 
 .export-format-row span {
-  font-size: 7px;
+  font-size: 8.4px;
 }
 
 .export-progress span {
-  font-size: 8.5px;
+  font-size: 9.5px;
   color: #9b8d7e;
 }
 
 .export-progress-note {
-  font-size: 7.5px !important;
+  font-size: 8.8px !important;
   color: #7f7265 !important;
 }
 
@@ -8598,30 +8598,30 @@ body.is-note-marquee-selecting {
 }
 
 .inspector-title > span {
-  font-size: 7.5px;
+  font-size: 8.8px;
   color: #807365;
 }
 
 .editor-tool {
-  font-size: 9.5px;
+  font-size: 10.1px;
   color: #9a8c7d;
 }
 
 .editor-select > span {
-  font-size: 6.5px;
+  font-size: 8.1px;
 }
 
 .editor-select select {
-  font-size: 8.5px;
+  font-size: 9.5px;
 }
 
 .piano-status {
-  font-size: 8px;
+  font-size: 9.1px;
   color: #8d7f70;
 }
 
 .pr-label {
-  font-size: 8px;
+  font-size: 9.1px;
   color: #988a7b;
 }
 
@@ -8634,21 +8634,21 @@ body.is-note-marquee-selecting {
 }
 
 .pr-bar-mark span {
-  font-size: 7.5px;
+  font-size: 8.8px;
   color: #8d8072;
 }
 
 .pr-note {
-  font-size: 7.5px;
+  font-size: 8.8px;
 }
 
 .velocity-label span {
-  font-size: 6px;
+  font-size: 8px;
   color: #827566;
 }
 
 .velocity-label strong {
-  font-size: 8.5px;
+  font-size: 9.5px;
   color: #b4a695;
 }
 
@@ -8668,7 +8668,7 @@ body.is-note-marquee-selecting {
 /* Keyboard detail */
 
 .keyboard-track-meta {
-  font-size: 9.5px;
+  font-size: 10.1px;
   color: #9d9081;
 }
 
@@ -8696,7 +8696,7 @@ body.is-note-marquee-selecting {
 /* Status bar */
 
 .status-bar {
-  font-size: 8px;
+  font-size: 9.1px;
   color: #7d7164;
 }
 
@@ -8707,15 +8707,15 @@ body.is-note-marquee-selecting {
 /* Top bar finishing touches */
 
 .save-state {
-  font-size: 8.5px;
+  font-size: 9.5px;
 }
 
 .meta-pill-label {
-  font-size: 6.5px;
+  font-size: 8.1px;
 }
 
 .meta-pill-value {
-  font-size: 10.5px;
+  font-size: 10.8px;
   color: #c0b3a4;
 }
 
@@ -8840,12 +8840,12 @@ body.is-note-marquee-selecting {
   }
 
   .song-settings .meta-pill-value {
-    font-size: 9px;
+    font-size: 9.8px;
   }
 
   .song-settings .meta-pill:first-child .meta-pill-value::after {
     content: ' BPM';
-    font-size: 6px;
+    font-size: 8px;
     letter-spacing: 0.04em;
     color: #827466;
   }
@@ -9202,7 +9202,7 @@ body.is-note-marquee-selecting {
   }
 
   .pad-name {
-    font-size: 9px;
+    font-size: 9.8px;
   }
 
   .mixer-add-track {
@@ -9312,7 +9312,7 @@ body.is-note-marquee-selecting {
 
   .filter-chip {
     padding: 0 6px;
-    font-size: 8.5px;
+    font-size: 9.5px;
   }
 
   .library-search {

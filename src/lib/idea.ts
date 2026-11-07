@@ -238,12 +238,12 @@ const fitPitch = (pitch: number, min: number, max: number) => {
 
 const roleHasInstrument = (role: Role, instrument: InstrumentId) => {
   if (role === 'drums') return isDrumInstrument(instrument)
-  if (role === 'bass') return ['bass', 'sub', 'fretless', 'eightoheight', 'reese'].includes(instrument)
+  if (role === 'bass') return ['bass', 'sub', 'fretless', 'eightoheight', 'reese', 'acid', 'upright', 'pulsebass'].includes(instrument)
   if (role === 'chords') {
-    return ['piano', 'electric', 'wurlitzer', 'organ', 'harpsichord', 'celesta', 'vibraphone', 'marimba'].includes(instrument)
+    return ['piano', 'grand', 'electric', 'wurlitzer', 'organ', 'pipe', 'clav', 'harpsichord', 'celesta', 'vibraphone', 'marimba', 'steelpan'].includes(instrument)
   }
-  if (role === 'texture') return ['pad', 'strings', 'aurora', 'choir', 'halo'].includes(instrument)
-  return ['pluck', 'neon', 'kalimba', 'bell', 'flute', 'brass', 'supersaw', 'cello', 'nylon', 'harp', 'musicbox', 'toy'].includes(instrument)
+  if (role === 'texture') return ['pad', 'strings', 'aurora', 'choir', 'halo', 'velour', 'crystal', 'tapestrings'].includes(instrument)
+  return ['pluck', 'neon', 'kalimba', 'bell', 'flute', 'brass', 'supersaw', 'cello', 'nylon', 'harp', 'musicbox', 'toy', 'steelguitar', 'trumpet', 'ocarina', 'chip'].includes(instrument)
 }
 
 interface VoiceBuilder {

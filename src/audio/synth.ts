@@ -1,159 +1,19 @@
 import type { InstrumentId } from '../types'
+import {
+  applyEnvelope,
+  connectPanned,
+  createOutput,
+  finalize,
+  makeNoiseBuffer,
+  makeVoice,
+  midiToHz,
+  type Ctx,
+  type VoiceHandle,
+} from './voiceKit'
 
-type Ctx = BaseAudioContext
+import { triggerModernVoice } from './voices'
 
-export interface VoiceHandle {
-  id: string
-  instrument: InstrumentId
-  gain: GainNode
-  startedAt: number
-  endsAt: number
-  stop: (at?: number) => void
-  setDestination?: (node: AudioNode) => void
-}
-
-const noiseCache = new WeakMap<Ctx, AudioBuffer>()
-
-const NOTE_VOICE_COUNTER = { value: 0 }
-
-const midiToHz = (midi: number) => 440 * Math.pow(2, (midi - 69) / 12)
-
-const makeNoiseBuffer = (ctx: Ctx) => {
-  const cached = noiseCache.get(ctx)
-  if (cached) return cached
-  const length = Math.floor(ctx.sampleRate * 2)
-  const buffer = ctx.createBuffer(1, length, ctx.sampleRate)
-  const data = buffer.getChannelData(0)
-  let last = 0
-  for (let i = 0; i < length; i++) {
-    const white = Math.random() * 2 - 1
-    last = last * 0.22 + white * 0.78
-    data[i] = last
-  }
-  noiseCache.set(ctx, buffer)
-  return buffer
-}
-
-const holdParam = (param: AudioParam, time: number) => {
-  const candidate = param as AudioParam & { cancelAndHoldAtTime?: (time: number) => void }
-  if (typeof candidate.cancelAndHoldAtTime === 'function') {
-    candidate.cancelAndHoldAtTime(time)
-  } else {
-    param.cancelScheduledValues(time)
-  }
-}
-
-const safeStop = (source: AudioScheduledSourceNode, time: number) => {
-  try {
-    source.stop(Math.max(0, time))
-  } catch {
-    /* already stopped */
-  }
-}
-
-interface EnvelopeOptions {
-  attack: number
-  decay: number
-  sustain: number
-  release: number
-  peak: number
-}
-
-const applyEnvelope = (
-  gain: GainNode,
-  when: number,
-  duration: number,
-  opts: EnvelopeOptions,
-) => {
-  const t = when
-  const end = t + duration
-  const attack = Math.min(opts.attack, duration * 0.35)
-  const decay = Math.min(opts.decay, Math.max(0.01, duration * 0.9))
-  gain.gain.setValueAtTime(0.0001, t)
-  gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, opts.peak), t + attack)
-  gain.gain.exponentialRampToValueAtTime(
-    Math.max(0.0001, opts.peak * opts.sustain),
-    t + attack + decay,
-  )
-  holdParam(gain.gain, end)
-  gain.gain.exponentialRampToValueAtTime(0.0001, end + opts.release)
-  return end + opts.release + 0.03
-}
-
-const connectPanned = (ctx: Ctx, node: AudioNode, pan: number, destination: AudioNode) => {
-  if (Math.abs(pan) < 0.01) {
-    node.connect(destination)
-    return
-  }
-  const panner = ctx.createStereoPanner()
-  panner.pan.value = pan
-  node.connect(panner)
-  panner.connect(destination)
-}
-
-const createOutput = (ctx: Ctx) => {
-  const gain = ctx.createGain()
-  gain.gain.value = 0
-  return gain
-}
-
-const makeVoice = (
-  ctx: Ctx,
-  instrument: InstrumentId,
-  gain: GainNode,
-  sources: AudioScheduledSourceNode[],
-  endsAt: number,
-  extras: AudioNode[] = [],
-): VoiceHandle => {
-  const start = ctx.currentTime
-  let stopped = false
-  const stop = (at = ctx.currentTime) => {
-    if (stopped) return
-    stopped = true
-    const releaseAt = Math.max(at, start)
-    gain.gain.cancelScheduledValues(releaseAt)
-    holdParam(gain.gain, releaseAt)
-    gain.gain.setTargetAtTime(0.0001, releaseAt, 0.012)
-    for (const source of sources) safeStop(source, releaseAt + 0.07)
-    window.setTimeout(() => {
-      try {
-        gain.disconnect()
-        for (const extra of extras) extra.disconnect()
-      } catch {
-        /* noop */
-      }
-    }, Math.max(0, (releaseAt - start + 0.2) * 1000))
-  }
-  return {
-    id: `voice_${NOTE_VOICE_COUNTER.value++}`,
-    instrument,
-    gain,
-    startedAt: start,
-    endsAt,
-    stop,
-  }
-}
-
-const finalize = (
-  out: GainNode,
-  ctx: Ctx,
-  _sources: AudioScheduledSourceNode[],
-  endTime: number,
-) => {
-  window.setTimeout(
-    () => {
-      try {
-        out.disconnect()
-      } catch {
-        /* noop */
-      }
-    },
-    Math.max(0, (endTime - ctx.currentTime + 0.25) * 1000),
-  )
-  return { out, endTime }
-}
-
-// ── Pitched instruments ────────────────────────────────────────────────
+export type { VoiceHandle } from './voiceKit'
 
 const playPiano = (
   ctx: Ctx,
@@ -2664,6 +2524,8 @@ export const triggerNote = (
   velocity: number,
 ): VoiceHandle => {
   const safeVelocity = Math.min(1, Math.max(0.05, velocity))
+  const modern = triggerModernVoice(ctx, destination, instrument, pitch, when, duration, safeVelocity)
+  if (modern) return modern
   if (instrument === 'drums' || instrument === 'lofi') {
     return playDrum(
       ctx,
@@ -2746,16 +2608,44 @@ export const triggerNote = (
   }
 }
 
+/**
+ * A synthetic room: a short pre-delay, a cluster of discrete early
+ * reflections, then a decorrelated stereo tail that builds up, decays
+ * exponentially and grows darker as it fades — the way air and walls
+ * swallow high frequencies first.
+ */
 export const createReverbImpulse = (ctx: BaseAudioContext, seconds = 2.8) => {
-  const length = Math.floor(ctx.sampleRate * seconds)
-  const impulse = ctx.createBuffer(2, length, ctx.sampleRate)
+  const rate = ctx.sampleRate
+  const length = Math.floor(rate * seconds)
+  const impulse = ctx.createBuffer(2, length, rate)
+  const predelay = Math.floor(rate * 0.011)
+  const rt60 = seconds * 0.6
+  const decayPerSample = Math.pow(10, -3 / (rt60 * rate))
+  const buildUp = rate * 0.035
+  const fadeStart = Math.floor(length * 0.92)
   for (let channel = 0; channel < 2; channel++) {
     const data = impulse.getChannelData(channel)
-    for (let i = 0; i < length; i++) {
-      const t = i / length
-      const decay = Math.pow(1 - t, 2.4)
-      const early = i < ctx.sampleRate * 0.04 ? 0.6 : 1
-      data[i] = (Math.random() * 2 - 1) * decay * early
+    // Early reflections: sparse, signed taps that thin out over ~80 ms.
+    for (let tap = 0; tap < 14; tap++) {
+      const at = predelay + Math.floor(rate * (0.003 + Math.pow(Math.random(), 1.4) * 0.075))
+      if (at >= length) continue
+      const amp = (0.55 - tap * 0.03) * (Math.random() > 0.5 ? 1 : -1)
+      data[at] += amp
+    }
+    let envelope = 1
+    let low = 0
+    let lower = 0
+    for (let i = predelay; i < length; i++) {
+      const progress = (i - predelay) / (length - predelay)
+      envelope *= decayPerSample
+      const swell = Math.min(1, (i - predelay) / buildUp)
+      // Damping rises over time; a two-pole smoother darkens the tail smoothly.
+      const damping = 0.08 + progress * 0.72
+      const white = Math.random() * 2 - 1
+      low += (white - low) * (1 - damping)
+      lower += (low - lower) * (1 - damping * 0.6)
+      const fade = i > fadeStart ? 1 - (i - fadeStart) / (length - fadeStart) : 1
+      data[i] += lower * envelope * swell * fade * (1 + progress * 1.4)
     }
   }
   return impulse

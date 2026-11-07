@@ -22,7 +22,7 @@ function formatPan(value: number) {
   return `${value < 0 ? 'L' : 'R'}${Math.abs(Math.round(value * 100))}`
 }
 
-function Knob({
+export function Knob({
   value,
   min = 0,
   max = 1,

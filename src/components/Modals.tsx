@@ -510,7 +510,7 @@ function AddTrackModal({ onClose }: { onClose: () => void }) {
   )
 }
 
-const SOUND_CATEGORIES = ['All', 'Keys', 'Bass', 'Pads', 'Leads', 'Drums'] as const
+const SOUND_CATEGORIES = ['All', 'New', 'Keys', 'Bass', 'Pads', 'Leads', 'Drums'] as const
 
 function SoundLibraryModal({ onClose }: { onClose: () => void }) {
   const project = useProjectStore((state) => state.project)
@@ -529,7 +529,8 @@ function SoundLibraryModal({ onClose }: { onClose: () => void }) {
   const current = INSTRUMENT_MAP[track.instrument]
   const query = search.trim().toLowerCase()
   const sounds = INSTRUMENTS.filter((instrument) => {
-    if (category !== 'All' && instrument.category !== category) return false
+    if (category === 'New' && !instrument.isNew) return false
+    if (category !== 'All' && category !== 'New' && instrument.category !== category) return false
     if (!query) return true
     return `${instrument.name} ${instrument.category} ${instrument.description}`
       .toLowerCase()
@@ -619,6 +620,7 @@ function SoundLibraryModal({ onClose }: { onClose: () => void }) {
             <div
               key={instrument.id}
               className={`library-sound-card ${selected ? 'is-selected' : ''} ${playing ? 'is-previewing' : ''}`}
+              style={{ '--instrument-color': instrument.color } as CSSProperties}
             >
               <button className="library-sound-main" onClick={() => apply(instrument.id)} aria-pressed={selected}>
                 <span
@@ -628,7 +630,10 @@ function SoundLibraryModal({ onClose }: { onClose: () => void }) {
                   <TrackIcon instrument={instrument.id} size={16} />
                 </span>
                 <span className="library-sound-copy">
-                  <span className="library-sound-category">{instrument.category}</span>
+                  <span className="library-sound-category">
+                    {instrument.category}
+                    {instrument.isNew && <span className="library-sound-new">NEW</span>}
+                  </span>
                   <strong>{instrument.name}</strong>
                   <em>{instrument.description}</em>
                 </span>

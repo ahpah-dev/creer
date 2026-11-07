@@ -27,6 +27,7 @@ export interface TrackBus {
   setPan: (pan: number) => void
   setSends: (reverb: number, delay: number) => void
   setEffects: (effects: EffectInstance[]) => void
+  setTone: (tone: number) => void
 }
 
 const volumeCurve = (value: number) => Math.pow(Math.max(0, Math.min(1, value)), 1.35)
@@ -134,6 +135,26 @@ export const createTrackBus = (
   track: Track,
 ): TrackBus => {
   const input = ctx.createGain()
+  // Voice "Tone" tilt: a gentle see-saw between lows and highs.
+  const lowTilt = ctx.createBiquadFilter()
+  lowTilt.type = 'lowshelf'
+  lowTilt.frequency.value = 240
+  const highTilt = ctx.createBiquadFilter()
+  highTilt.type = 'highshelf'
+  highTilt.frequency.value = 2800
+  const applyTone = (tone: number, at?: number) => {
+    const value = Math.max(-1, Math.min(1, tone))
+    const low = -value * 4.5
+    const high = value * (value > 0 ? 8 : 11)
+    if (at === undefined) {
+      lowTilt.gain.value = low
+      highTilt.gain.value = high
+    } else {
+      lowTilt.gain.setTargetAtTime(low, at, 0.03)
+      highTilt.gain.setTargetAtTime(high, at, 0.03)
+    }
+  }
+  applyTone(track.voice?.tone ?? 0)
   const effectChain = createEffectChain(ctx)
   const fader = ctx.createGain()
   fader.gain.value = volumeCurve(track.volume)
@@ -148,7 +169,9 @@ export const createTrackBus = (
   const delaySend = ctx.createGain()
   delaySend.gain.value = track.delaySend
 
-  input.connect(effectChain.input)
+  input.connect(lowTilt)
+  lowTilt.connect(highTilt)
+  highTilt.connect(effectChain.input)
   effectChain.output.connect(fader)
   fader.connect(panner)
   panner.connect(analyser)
@@ -178,6 +201,7 @@ export const createTrackBus = (
       delaySend.gain.setTargetAtTime(delay, ctx.currentTime, 0.03)
     },
     setEffects: (effects) => effectChain.setEffects(effects),
+    setTone: (tone) => applyTone(tone, ctx.currentTime),
   }
 }
 

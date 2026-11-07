@@ -1,0 +1,519 @@
+/*
+ * Creer 2.0 — studio design layer.
+ *
+ * Loaded after styles.css. It refines the palette, gives clips a tinted body
+ * with a coloured header strip, adds alternating bar shading, sharpens the
+ * dock and the sound library, and styles the new Voice controls.
+ */
+
+:root {
+  --text: #f5ede2;
+  --text-dim: #cfc3b4;
+  --muted: #a89a8a;
+  --faint: #7f7366;
+  --line: rgba(243, 235, 223, 0.085);
+  --line-strong: rgba(243, 235, 223, 0.15);
+  --ink: #1b130d;
+  --ink-soft: rgba(27, 19, 13, 0.62);
+  --surface-raised: linear-gradient(180deg, rgba(40, 33, 27, 0.96), rgba(27, 23, 19, 0.97));
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.32), 0 6px 18px rgba(0, 0, 0, 0.22);
+  --ring: 0 0 0 1px rgba(255, 246, 234, 0.9), 0 0 0 4px rgba(242, 166, 121, 0.22);
+}
+
+.app {
+  background:
+    radial-gradient(ellipse 60% 40% at 50% -12%, rgba(242, 166, 121, 0.075), transparent 70%),
+    radial-gradient(ellipse 50% 60% at 100% 100%, rgba(160, 155, 219, 0.035), transparent 70%),
+    var(--bg);
+}
+
+/* ── Top bar & transport ─────────────────────────────────────────────── */
+
+.topbar {
+  background:
+    linear-gradient(180deg, rgba(35, 29, 24, 0.97), rgba(22, 18, 15, 0.985)),
+    var(--panel);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.03),
+    0 12px 36px rgba(0, 0, 0, 0.26);
+}
+
+.transport {
+  border-color: rgba(243, 235, 223, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(0, 0, 0, 0.08)),
+    #15110e;
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 -1px rgba(0, 0, 0, 0.35),
+    0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+/* ── Arrangement ─────────────────────────────────────────────────────── */
+
+.lane-grid {
+  background-image:
+    linear-gradient(to right, rgba(243, 235, 223, 0.075) 1px, transparent 1px),
+    linear-gradient(to right, rgba(243, 235, 223, 0.035) 1px, transparent 1px),
+    linear-gradient(to right, rgba(243, 235, 223, 0.016) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.014) 50%, transparent 50%);
+  background-size: var(--bar-w) 100%, var(--beat-w) 100%, var(--eighth-w) 100%, calc(var(--bar-w) * 2) 100%;
+}
+
+.show-sixteenths .lane-grid {
+  background-image:
+    linear-gradient(to right, rgba(243, 235, 223, 0.075) 1px, transparent 1px),
+    linear-gradient(to right, rgba(243, 235, 223, 0.035) 1px, transparent 1px),
+    linear-gradient(to right, rgba(243, 235, 223, 0.02) 1px, transparent 1px),
+    linear-gradient(to right, rgba(243, 235, 223, 0.01) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.014) 50%, transparent 50%);
+  background-size:
+    var(--bar-w) 100%,
+    var(--beat-w) 100%,
+    var(--eighth-w) 100%,
+    var(--sixteenth-w) 100%,
+    calc(var(--bar-w) * 2) 100%;
+}
+
+.track-lane.is-selected {
+  background: linear-gradient(180deg, rgba(242, 166, 121, 0.022), rgba(242, 166, 121, 0.01));
+}
+
+/* Clips: a dark, tinted body that lets the notes glow, under a solid strip. */
+.clip {
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--clip-color) 62%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--clip-color) 30%, #16120e), color-mix(in srgb, var(--clip-color) 19%, #110e0b));
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.3),
+    inset 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.clip::before {
+  inset: 0 0 auto 0;
+  height: 20px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--clip-color) 90%, #fff 10%), color-mix(in srgb, var(--clip-color) 84%, #000 16%));
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.22);
+}
+
+.clip:hover {
+  filter: brightness(1.07);
+  border-color: color-mix(in srgb, var(--clip-color) 85%, #fff 15%);
+}
+
+.clip.is-selected {
+  border-color: rgba(255, 247, 236, 0.95);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--clip-color) 38%, #16120e), color-mix(in srgb, var(--clip-color) 25%, #110e0b));
+  box-shadow:
+    0 0 0 1px rgba(255, 247, 236, 0.22),
+    0 6px 22px rgba(0, 0, 0, 0.38),
+    0 0 26px color-mix(in srgb, var(--clip-color) 28%, transparent);
+}
+
+.clip-name {
+  color: var(--ink);
+  font-weight: 650;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.clip-instrument {
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.clip-grip {
+  opacity: 0.7;
+}
+
+.clip-grip i {
+  background: rgba(27, 19, 13, 0.42);
+}
+
+.clip-notes rect {
+  fill: color-mix(in srgb, var(--clip-color) 72%, #fff 28%);
+}
+
+.clip.is-selected .clip-notes rect {
+  fill: color-mix(in srgb, var(--clip-color) 50%, #fff 50%);
+}
+
+.clip-sheen {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 40%, rgba(0, 0, 0, 0.14));
+}
+
+.clip-resize-handle::after {
+  background: rgba(255, 248, 238, 0);
+}
+
+.clip:hover .clip-resize-handle::after,
+.clip.is-selected .clip-resize-handle::after {
+  background: color-mix(in srgb, var(--clip-color) 60%, #fff 40%);
+}
+
+/* Track headers */
+.track-color-rail {
+  width: 3px;
+  opacity: 0.55;
+}
+
+.track-head.is-selected {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--track-color) 11%, transparent), transparent 75%),
+    rgba(255, 255, 255, 0.02);
+}
+
+.track-head.is-selected .track-color-rail {
+  box-shadow: 0 0 14px color-mix(in srgb, var(--track-color) 45%, transparent);
+}
+
+/* ── Dock ────────────────────────────────────────────────────────────── */
+
+.dock-tabs {
+  background: linear-gradient(180deg, #1e1915, #171310);
+}
+
+.dock-tab {
+  margin: 6px 1px;
+  height: auto;
+  padding: 0 13px;
+  border-radius: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.dock-tab:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.dock-tab.is-active {
+  color: var(--text);
+  background:
+    linear-gradient(180deg, rgba(242, 166, 121, 0.14), rgba(242, 166, 121, 0.06));
+  box-shadow:
+    inset 0 0 0 1px rgba(242, 166, 121, 0.22),
+    inset 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.dock-tab.is-active::after {
+  left: 14px;
+  right: 14px;
+  bottom: -7px;
+}
+
+/* ── Piano roll ──────────────────────────────────────────────────────── */
+
+.pr-note {
+  border-radius: 4px;
+  border-color: rgba(20, 13, 8, 0.35);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.3),
+    inset 0 -1px rgba(0, 0, 0, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Knobs ───────────────────────────────────────────────────────────── */
+
+.knob {
+  background:
+    radial-gradient(circle at 36% 26%, #4a4036 0%, #241e19 52%, #110e0b 100%);
+  border-color: rgba(243, 235, 223, 0.14);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.1),
+    0 0 0 2px rgba(0, 0, 0, 0.25),
+    0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.knob::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from -132deg,
+    color-mix(in srgb, var(--knob-color) 85%, transparent) 0deg,
+    color-mix(in srgb, var(--knob-color) 85%, transparent) calc(var(--knob-angle) + 132deg),
+    rgba(255, 255, 255, 0.06) calc(var(--knob-angle) + 132deg),
+    rgba(255, 255, 255, 0.06) 264deg,
+    transparent 264deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent calc(50% - 2px), #000 calc(50% - 1.5px));
+  mask: radial-gradient(circle, transparent calc(50% - 2px), #000 calc(50% - 1.5px));
+  pointer-events: none;
+}
+
+.knob-label,
+.knob-value {
+  white-space: nowrap;
+}
+
+/* ── Voice controls (Sounds & Keys) ─────────────────────────────────── */
+
+.voice-controls {
+  width: 150px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 11px 12px 10px;
+  border-right: 1px solid var(--line);
+  background:
+    radial-gradient(ellipse 120% 60% at 0% 0%, color-mix(in srgb, var(--track-color) 9%, transparent), transparent 70%),
+    linear-gradient(180deg, #17130f, #120f0c);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.voice-controls-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 16px;
+}
+
+.voice-controls-head .eyebrow {
+  color: var(--muted);
+}
+
+.voice-reset {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-reset:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--line-strong);
+}
+
+.voice-reset:disabled {
+  opacity: 0.3;
+}
+
+.voice-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 4px;
+  justify-items: center;
+  align-items: start;
+}
+
+.voice-controls .knob-control {
+  width: 60px;
+  gap: 3px;
+}
+
+.voice-controls .knob {
+  width: 32px;
+  height: 32px;
+  margin: 4px 0 3px;
+}
+
+.voice-controls .knob-marker {
+  top: 4px;
+  height: 8px;
+  transform-origin: 50% 12px;
+}
+
+.voice-controls .knob-label {
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+}
+
+.voice-controls .knob-value {
+  font-size: 9px;
+  color: var(--text-dim);
+}
+
+.voice-octave {
+  width: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.voice-octave-value {
+  width: 40px;
+  height: 22px;
+  margin-top: 4px;
+  border-radius: 6px;
+  border: 1px solid var(--line-strong);
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: color-mix(in srgb, var(--track-color) 70%, #fff 30%);
+}
+
+.voice-octave-buttons {
+  display: flex;
+  gap: 3px;
+}
+
+.voice-octave-buttons button {
+  width: 19px;
+  height: 17px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-octave-buttons button:hover:not(:disabled) {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.voice-octave-buttons button:disabled {
+  opacity: 0.3;
+}
+
+.voice-octave .knob-label {
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+  margin-top: 2px;
+}
+
+/* ── Sound library ───────────────────────────────────────────────────── */
+
+.sound-library-grid {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.library-sound-card {
+  min-height: 86px;
+  border-radius: 11px;
+  border-color: rgba(243, 235, 223, 0.08);
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--instrument-color, #c9a77f) 10%, transparent), transparent 55%),
+    linear-gradient(180deg, #1b1612, #15110e);
+  box-shadow: var(--shadow-soft);
+}
+
+.library-sound-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--instrument-color, var(--accent)), transparent 80%);
+  opacity: 0.55;
+}
+
+.library-sound-card:hover {
+  border-color: color-mix(in srgb, var(--instrument-color, #fff) 35%, transparent);
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--instrument-color, #c9a77f) 15%, transparent), transparent 60%),
+    linear-gradient(180deg, #1e1914, #16120f);
+  transform: translateY(-2px);
+}
+
+.library-sound-card.is-selected {
+  border-color: color-mix(in srgb, var(--instrument-color, var(--accent)) 60%, transparent);
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--instrument-color, #c9a77f) 20%, transparent), transparent 65%),
+    linear-gradient(180deg, #1f1914, #17120e);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--instrument-color, var(--accent)) 25%, transparent),
+    0 8px 26px rgba(0, 0, 0, 0.32);
+}
+
+.library-sound-card.is-selected::before {
+  opacity: 1;
+}
+
+.library-sound-main {
+  min-height: 84px;
+  padding: 11px 11px 10px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 0 10px;
+}
+
+.library-sound-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--instrument-color) 30%, transparent), color-mix(in srgb, var(--instrument-color) 10%, transparent));
+  border-color: color-mix(in srgb, var(--instrument-color) 32%, transparent);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.08), 0 4px 12px color-mix(in srgb, var(--instrument-color) 14%, transparent);
+  color: color-mix(in srgb, var(--instrument-color) 70%, #fff 30%);
+}
+
+.library-sound-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 8px;
+  color: color-mix(in srgb, var(--instrument-color, #a89a8a) 55%, #9a8c7d);
+}
+
+.library-sound-new {
+  padding: 1px 5px 0;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  color: var(--accent-strong);
+  font-size: 7.5px;
+  letter-spacing: 0.12em;
+  line-height: 1.35;
+}
+
+.library-sound-copy strong {
+  font-size: 12px;
+  color: #e6dacb;
+}
+
+.library-sound-copy em {
+  font-size: 9.5px;
+  line-height: 1.4;
+  color: #9a8c7d;
+}
+
+.library-sound-preview {
+  width: 26px;
+  height: 26px;
+  right: 9px;
+  bottom: 9px;
+}
+
+.library-sound-preview.is-playing {
+  background: var(--instrument-color, var(--accent));
+  border-color: var(--instrument-color, var(--accent));
+}
+
+/* ── Small screens ───────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .voice-controls {
+    width: 124px;
+    padding: 9px 8px;
+  }
+
+  .voice-controls .knob-control,
+  .voice-octave {
+    width: 52px;
+  }
+}

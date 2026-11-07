@@ -43,6 +43,23 @@ const defaults: Record<InstrumentId, { volume: number; reverb: number; delay: nu
   vintage: { volume: 0.82, reverb: 0.1, delay: 0.03 },
   kit808: { volume: 0.82, reverb: 0.06, delay: 0.03 },
   brush: { volume: 0.68, reverb: 0.18, delay: 0.04 },
+  grand: { volume: 0.7, reverb: 0.26, delay: 0.06 },
+  clav: { volume: 0.62, reverb: 0.1, delay: 0.08 },
+  steelpan: { volume: 0.58, reverb: 0.24, delay: 0.1 },
+  pipe: { volume: 0.56, reverb: 0.5, delay: 0.03 },
+  acid: { volume: 0.66, reverb: 0.06, delay: 0.16 },
+  upright: { volume: 0.78, reverb: 0.08, delay: 0.02 },
+  pulsebass: { volume: 0.74, reverb: 0.04, delay: 0.02 },
+  velour: { volume: 0.5, reverb: 0.4, delay: 0.08 },
+  crystal: { volume: 0.46, reverb: 0.46, delay: 0.1 },
+  tapestrings: { volume: 0.54, reverb: 0.34, delay: 0.05 },
+  steelguitar: { volume: 0.64, reverb: 0.2, delay: 0.1 },
+  chip: { volume: 0.5, reverb: 0.12, delay: 0.18 },
+  trumpet: { volume: 0.6, reverb: 0.26, delay: 0.1 },
+  ocarina: { volume: 0.56, reverb: 0.32, delay: 0.12 },
+  trap: { volume: 0.82, reverb: 0.05, delay: 0.03 },
+  house: { volume: 0.82, reverb: 0.08, delay: 0.03 },
+  breaks: { volume: 0.82, reverb: 0.1, delay: 0.03 },
 }
 
 export const createTrack = (
@@ -67,7 +84,7 @@ export const createTrack = (
     color: options.color ?? (isDrumInstrument(instrument) ? '#dd876f' : palette.value),
     volume: settings.volume,
     pan:
-      instrument === 'pad' || instrument === 'aurora' || instrument === 'choir'
+      instrument === 'pad' || instrument === 'aurora' || instrument === 'choir' || instrument === 'velour'
         ? 0.12
         : instrument === 'pluck' || instrument === 'neon'
           ? -0.16

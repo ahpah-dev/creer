@@ -9,6 +9,7 @@ import { useMidiStore } from '../store/midi'
 import { captureNoteEnd, captureNoteStart } from '../lib/recording'
 import { clamp, isBlackKey, isTypingTarget, midiToName } from '../lib/utils'
 import { TrackIcon } from './TrackIcon'
+import { VoiceControls } from './VoiceControls'
 
 const COMPUTER_KEYS: Record<string, number> = {
   KeyA: 0,
@@ -299,6 +300,7 @@ export function KeyboardPanel() {
       </div>
 
       <div className="keyboard-body">
+        <VoiceControls track={track} />
 
         <div className="keyboard-performance">
           {isDrums ? (

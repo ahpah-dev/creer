@@ -1,4 +1,4 @@
-import type { InstrumentId, Note, Project, Track } from '../types'
+import type { InstrumentId, Note, Project, Track, VoiceSettings } from '../types'
 import { clamp, projectEnd } from '../lib/utils'
 import {
   createMasterBus,
@@ -8,6 +8,7 @@ import {
   type TrackBus,
 } from './graph'
 import { triggerNote, type VoiceHandle } from './synth'
+import { triggerShapedNote } from './voiceShaping'
 import { swingOffset } from '../lib/swing'
 
 interface NoteEvent {
@@ -17,6 +18,7 @@ interface NoteEvent {
   velocity: number
   trackId: string
   instrument: InstrumentId
+  voice?: VoiceSettings
 }
 
 const LOOKAHEAD = 0.16
@@ -275,10 +277,11 @@ export class AudioEngine {
       if (!bus) continue
       const when = startTime + Math.max(0, event.beat - fromBeat) * secondsPerBeat
       const duration = Math.max(0.03, event.durationBeats * secondsPerBeat)
-      const voice = triggerNote(
+      const voice = triggerShapedNote(
         this.ctx,
         bus.input,
         event.instrument,
+        event.voice,
         event.pitch,
         when,
         duration,
@@ -366,6 +369,7 @@ export class AudioEngine {
             velocity: note.velocity,
             trackId: track.id,
             instrument: track.instrument,
+            voice: track.voice,
           })
         }
       }
@@ -404,6 +408,7 @@ export class AudioEngine {
       bus.setPan(track.pan)
       bus.setSends(track.reverbSend, track.delaySend)
       bus.setEffects(track.effects)
+      bus.setTone(track.voice?.tone ?? 0)
     }
   }
 
@@ -425,7 +430,9 @@ export class AudioEngine {
     const destination = bus?.input ?? this.liveGain
     if (!destination) return null
     const when = ctx.currentTime + 0.015
-    const voice = triggerNote(ctx, destination, instrument, pitch, when, 30, velocity)
+    const track = this.project?.tracks.find((item) => item.id === trackId)
+    const voiceSettings = track && track.instrument === instrument ? track.voice : undefined
+    const voice = triggerShapedNote(ctx, destination, instrument, voiceSettings, pitch, when, 30, velocity)
     const key = `live_${this.tempVoiceCounter++}`
     this.liveVoices.set(key, { handle: voice, sourceTrack: trackId })
     return key
@@ -435,7 +442,8 @@ export class AudioEngine {
     if (!key) return
     const entry = this.liveVoices.get(key)
     if (entry) {
-      entry.handle.stop()
+      if (entry.handle.release) entry.handle.release()
+      else entry.handle.stop()
       this.liveVoices.delete(key)
     }
   }
