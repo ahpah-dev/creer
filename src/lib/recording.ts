@@ -3,6 +3,7 @@ import { useProjectStore } from '../store/project'
 import { useSessionStore } from '../store/session'
 import type { Note } from '../types'
 import { getCurrentBeat, syncEngineProject } from './transport'
+import { resolveUseMobile } from './device'
 import { uid } from './utils'
 
 interface ActiveCapture {
@@ -83,11 +84,12 @@ export const startRecording = async () => {
   }
   session.setPlaying(true)
   session.setPausedBeat(recordStart)
+  const stopHint = resolveUseMobile() ? 'Tap record again to stop.' : 'Space or the record button stops the take.'
   session.toast(
     'Recording',
     restoreLoop
-      ? 'Loop paused for the take. Play the pads or keys; Space stops.'
-      : 'Play the pads or keys. Space or the record button stops the take.',
+      ? `Loop paused for the take. Play the pads or keys. ${stopHint}`
+      : `Play the pads or keys. ${stopHint}`,
     'default',
   )
 }

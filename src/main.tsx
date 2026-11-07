@@ -5,8 +5,9 @@ import '@fontsource/ibm-plex-mono/400.css'
 import '@fontsource/ibm-plex-mono/500.css'
 import './styles.css'
 import './studio.css'
+import './mobile/mobile.css'
 import { createRoot } from 'react-dom/client'
-import App from './App'
+import Root from './Root'
 import { exposeDebugApi } from './lib/debug'
 
 if (
@@ -17,4 +18,4 @@ if (
 ) {
   exposeDebugApi()
 }
-createRoot(document.getElementById('root')!).render(<App />)
+createRoot(document.getElementById('root')!).render(<Root />)

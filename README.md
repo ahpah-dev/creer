@@ -37,6 +37,21 @@ npm run build:standalone
 
 That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub Pages copy at `docs/index.html`.
 
+## Creer Mobile
+
+Open Creer on a phone and it switches to **Creer Mobile**, a touch-first layout in the spirit of BandLab and GarageBand. It is the same engine, sounds and project file, rebuilt around thumbs:
+
+- **Tracks** – a scrollable timeline with sticky track headers, pinch-to-zoom, tap-the-ruler seeking, loop and click toggles. Tap a region to select it, drag to move it (even between tracks), pull the grip to resize, and use the action bar to edit, duplicate, split, loop or delete. Double-tap a lane to add a region.
+- **Play** – a multi-touch piano with glissando and scale hints, a one-tap **Chords** strip built from your project's key, and velocity-sensitive drum pads. Hit record and your performance is captured into a region.
+- **Edit** – a finger-sized piano roll: tap to add notes, drag to move, pull the end to resize, with grid, velocity, quantize, octave shift and drum-name rows.
+- **Mixer** – full-height faders with live meters, pan, mute/solo and a master strip.
+- **Library** – Spark an idea, browse and drop in loops, or audition all 54 sounds.
+- **Project menu** – tempo, key, swing, WAV export, save/open `.creer.json`, new project and the demo song.
+
+Portrait and landscape both work, safe areas and the iOS silent switch are handled, and projects autosave on the device and are shared with the desktop version.
+
+Phones are detected automatically (user agent, or a small touch screen). To force a layout, add `?mobile` or `?desktop` to the address; the choice is remembered, and **Use the desktop version** in the project menu does the same. Add `?ui=auto` to go back to automatic.
+
 ## What is inside
 
 - **Six-track demo song, “Golden Hour”** — play it immediately, solo parts, or pull it apart to learn how it was built.

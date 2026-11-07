@@ -1,10 +1,11 @@
 import { useEffect } from 'react'
 import { engine } from './audio/engine'
-import { useProjectStore, getSelectedClip, saveProjectToStorage } from './store/project'
+import { useProjectStore, getSelectedClip } from './store/project'
 import { useSessionStore } from './store/session'
 import { seekTo, toggleLoop, toggleMute, togglePlayback, toggleSolo } from './lib/transport'
 import { deleteSelectedClip, duplicateSelectedClip } from './lib/clips'
 import { stopRecording, toggleRecording } from './lib/recording'
+import { useStudioRuntime } from './lib/runtime'
 import {
   copySelectedClips,
   copySelectedNotes,
@@ -21,57 +22,10 @@ import { StatusBar } from './components/StatusBar'
 import { ModalRoot, ToastStack } from './components/Modals'
 
 export default function App() {
-  const project = useProjectStore((state) => state.project)
-  const setSaveStatus = useSessionStore((state) => state.setSaveStatus)
   const isPlaying = useSessionStore((state) => state.isPlaying)
   const toast = useSessionStore((state) => state.toast)
 
-  // Keep the audio engine pointed at the latest project.
-  useEffect(() => {
-    engine.attach(project)
-    document.title = `${project.name} — Creer`
-  }, [project])
-
-  // Transport callbacks + first-run audio warmup.
-  useEffect(() => {
-    engine.onEnd = () => {
-      const session = useSessionStore.getState()
-      session.setPlaying(false)
-      session.setPausedBeat(engine.getPosition())
-      if (session.isRecording) {
-        stopRecording()
-      }
-    }
-    engine.setMetronome(useSessionStore.getState().metronome)
-    const warm = () => {
-      void engine.ensureContext()
-    }
-    window.addEventListener('pointerdown', warm, { once: true })
-    return () => {
-      engine.onEnd = null
-      window.removeEventListener('pointerdown', warm)
-    }
-  }, [])
-
-  // Debounced local autosave.
-  useEffect(() => {
-    let timer = 0
-    const save = (state = useProjectStore.getState()) => {
-      const ok = saveProjectToStorage(state.project)
-      setSaveStatus(ok ? 'saved' : 'error')
-    }
-    timer = window.setTimeout(() => save(), 500)
-    const unsubscribe = useProjectStore.subscribe((state, previous) => {
-      if (state.project === previous.project) return
-      setSaveStatus('saving')
-      window.clearTimeout(timer)
-      timer = window.setTimeout(() => save(state), 420)
-    })
-    return () => {
-      window.clearTimeout(timer)
-      unsubscribe()
-    }
-  }, [setSaveStatus])
+  useStudioRuntime()
 
   // A quiet welcome that only appears once per browser.
   useEffect(() => {
@@ -279,17 +233,6 @@ export default function App() {
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [])
-
-  // Keep the document title in sync and clean up any stray transport state on unload.
-  useEffect(() => {
-    const onVisibility = () => {
-      if (document.visibilityState === 'hidden') {
-        saveProjectToStorage(useProjectStore.getState().project)
-      }
-    }
-    document.addEventListener('visibilitychange', onVisibility)
-    return () => document.removeEventListener('visibilitychange', onVisibility)
   }, [])
 
   return (
