@@ -14,6 +14,7 @@ import {
   pasteClipboard,
 } from './lib/clipboard'
 import { isTypingTarget } from './lib/utils'
+import { editSelection, toggleFocusMode } from './lib/commands'
 import { TopBar } from './components/TopBar'
 import { Toolbar } from './components/Toolbar'
 import { Arrangement } from './components/Arrangement'
@@ -24,6 +25,7 @@ import { ModalRoot, ToastStack } from './components/Modals'
 export default function App() {
   const isPlaying = useSessionStore((state) => state.isPlaying)
   const toast = useSessionStore((state) => state.toast)
+  const dockMaximized = useSessionStore((state) => state.dockMaximized)
 
   useStudioRuntime()
 
@@ -48,6 +50,14 @@ export default function App() {
   // Global shortcuts. Musical typing owns the letter keys when Sounds & Keys is open.
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      // The command palette works everywhere, even while typing in a field.
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        const current = useSessionStore.getState()
+        if (current.modal === 'palette') current.setModal(null)
+        else if (!current.modal) current.setModal('palette')
+        return
+      }
       if (isTypingTarget(event.target)) return
       const session = useSessionStore.getState()
       const projectStore = useProjectStore.getState()
@@ -65,6 +75,15 @@ export default function App() {
       }
       if (key === 'Escape') {
         if (session.selectedNoteIds.length) session.setSelectedNoteIds([])
+        else if (session.dockMaximized) session.setDockMaximized(false)
+        return
+      }
+      if (key === 'Enter' && !event.repeat && !mod && !event.altKey && !event.shiftKey) {
+        const focused = document.activeElement
+        // Let focused buttons and links keep their own Enter behaviour.
+        if (focused instanceof HTMLElement && focused.closest('button, a, [role="tab"], [role="slider"], summary')) return
+        event.preventDefault()
+        editSelection()
         return
       }
       if (mod && lower === 'z') {
@@ -203,6 +222,10 @@ export default function App() {
         toggleLoop()
         return
       }
+      if (lower === 'f') {
+        toggleFocusMode()
+        return
+      }
       if (lower === 'r') {
         void toggleRecording()
         return
@@ -239,7 +262,7 @@ export default function App() {
     <div className="app">
       <TopBar />
       <Toolbar />
-      <main className="workspace">
+      <main className={`workspace ${dockMaximized ? 'is-focus' : ''}`}>
         <Arrangement />
         <EditorDock />
       </main>

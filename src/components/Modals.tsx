@@ -42,6 +42,7 @@ import {
 } from '../lib/idea'
 import { ALT_LABEL, contentEnd, formatDuration, MOD_LABEL, SHIFT_LABEL } from '../lib/utils'
 import { TrackIcon } from './TrackIcon'
+import { CommandPalette } from './CommandPalette'
 
 function ModalShell({
   eyebrow,
@@ -330,6 +331,7 @@ function ExportModal({ onClose }: { onClose: () => void }) {
     try {
       const { blob, duration: renderedDuration } = await renderProjectToWav(project)
       downloadBlob(blob, `${safeFilename(project.name)}.wav`)
+      useSessionStore.getState().markProgress('exported')
       toast('Your mix is ready', `${safeFilename(project.name)}.wav · ${formatDuration(renderedDuration)} · 44.1 kHz`, 'success')
       setWorking(false)
       onClose()
@@ -834,6 +836,7 @@ export function ModalRoot() {
   if (modal === 'addTrack') return <AddTrackModal onClose={close} />
   if (modal === 'sounds') return <SoundLibraryModal onClose={close} />
   if (modal === 'idea') return <IdeaModal onClose={close} />
+  if (modal === 'palette') return <CommandPalette onClose={close} />
   return null
 }
 

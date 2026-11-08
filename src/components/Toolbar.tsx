@@ -4,6 +4,7 @@ import {
   Copy,
   CopyPlus,
   Minus,
+  PencilLine,
   Plus,
   Scissors,
   Sparkles,
@@ -16,6 +17,7 @@ import { useSessionStore } from '../store/session'
 import { MOD_LABEL, SNAP_OPTIONS, projectEnd } from '../lib/utils'
 import { duplicateSelectedClip, splitSelectedClip } from '../lib/clips'
 import { copySelectedClips, pasteClipboard } from '../lib/clipboard'
+import { editSelection } from '../lib/commands'
 
 export function Toolbar() {
   const project = useProjectStore((state) => state.project)
@@ -69,65 +71,77 @@ export function Toolbar() {
         </label>
         <div className="toolbar-separator" />
         <div className="edit-tools">
+          {selected || selectedClipIds.length ? (
+            <div className="selection-group">
+              <span className="selection-chip" data-tip="Current selection">
+                <i style={{ background: selected?.track.color ?? 'var(--accent)' }} />
+                {selectedClipIds.length > 1 ? `${selectedClipIds.length} clips` : (selected?.clip.name ?? 'Clip')}
+              </span>
+              <button
+                className="text-button is-primary"
+                onClick={editSelection}
+                disabled={selectedClipIds.length > 1}
+                data-tip="Open in the piano roll  Enter"
+                aria-label="Edit notes"
+              >
+                <PencilLine size={14} />
+                <span>Edit notes</span>
+              </button>
+              <button
+                className="text-button"
+                onClick={splitSelectedClip}
+                disabled={!selected || selectedClipIds.length > 1}
+                data-tip="Split selected clip at the playhead"
+                aria-label="Split selected clip at the playhead"
+              >
+                <Scissors size={14} />
+                <span>Split</span>
+              </button>
+              <button
+                className="text-button"
+                onClick={duplicateSelectedClip}
+                disabled={!selected || selectedClipIds.length > 1}
+                data-tip={`Duplicate selected clip  ${MOD_LABEL}+D`}
+                aria-label="Duplicate selected clip"
+              >
+                <CopyPlus size={14} />
+                <span>Duplicate</span>
+              </button>
+              <button
+                className="icon-button compact"
+                onClick={() => copySelectedClips()}
+                data-tip={`Copy selected clips  ${MOD_LABEL}+C`}
+                aria-label="Copy selected clips"
+              >
+                <Copy size={14} />
+              </button>
+              <button
+                className="icon-button compact"
+                onClick={() => {
+                  const ids = selectedClipIds.length ? selectedClipIds : selected ? [selected.clip.id] : []
+                  if (!ids.length) return
+                  deleteClips(ids)
+                  toast(
+                    `${ids.length} clip${ids.length === 1 ? '' : 's'} deleted`,
+                    `${MOD_LABEL}Z brings ${ids.length === 1 ? 'it' : 'them'} back.`,
+                  )
+                }}
+                aria-label="Delete selected clips"
+                data-tip="Delete selected clips  ⌫"
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+          ) : (
+            <span className="toolbar-hint">Click a clip to edit it · double-click a lane to make one</span>
+          )}
           <button
-            className="text-button"
-            onClick={splitSelectedClip}
-            disabled={!selected}
-            data-tip="Split selected clip at the playhead"
-            aria-label="Split selected clip at the playhead"
-          >
-            <Scissors size={14} />
-            <span>Split</span>
-          </button>
-          <button
-            className="text-button"
-            onClick={duplicateSelectedClip}
-            disabled={!selected}
-            data-tip={`Duplicate selected clip  ${MOD_LABEL}+D`}
-            aria-label="Duplicate selected clip"
-          >
-            <CopyPlus size={14} />
-            <span>Duplicate</span>
-          </button>
-          <button
-            className="text-button"
-            onClick={() => copySelectedClips()}
-            disabled={!selectedClipIds.length && !selected}
-            data-tip={`Copy selected clips  ${MOD_LABEL}+C`}
-            aria-label="Copy selected clips"
-          >
-            <Copy size={14} />
-            <span>Copy</span>
-          </button>
-          <button
-            className="text-button"
+            className="icon-button compact"
             onClick={() => pasteClipboard('clips')}
             data-tip={`Paste clips at the playhead  ${MOD_LABEL}+V`}
             aria-label="Paste clips at the playhead"
           >
             <ClipboardPaste size={14} />
-            <span>Paste</span>
-          </button>
-          <button
-            className="icon-button compact"
-            onClick={() => {
-              const ids = selectedClipIds.length
-                ? selectedClipIds
-                : selected
-                  ? [selected.clip.id]
-                  : []
-              if (!ids.length) return
-              deleteClips(ids)
-              toast(
-                `${ids.length} clip${ids.length === 1 ? '' : 's'} deleted`,
-                `${MOD_LABEL}Z brings ${ids.length === 1 ? 'it' : 'them'} back.`,
-              )
-            }}
-            disabled={!selectedClipIds.length && !selected}
-            aria-label="Delete selected clips"
-            data-tip="Delete selected clips  ⌫"
-          >
-            <Trash2 size={14} />
           </button>
         </div>
       </div>

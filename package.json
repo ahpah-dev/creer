@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "start": "vite --host 127.0.0.1 --port 5178 --open",
-    "build:standalone": "tsc -b && vite build --config vite.single.config.ts && node scripts/package-copy.mjs"
+    "build:standalone": "tsc -b && vite build --config vite.single.config.ts && node scripts/package-copy.mjs",
+    "build:site": "npm run build && node scripts/build-site.mjs"
   },
   "dependencies": {
     "@fontsource-variable/instrument-sans": "^5.2.8",

@@ -8,6 +8,8 @@ import {
   ChevronUp,
   Keyboard,
   Library,
+  Maximize2,
+  Minimize2,
   Piano,
   SlidersHorizontal,
   Wand2,
@@ -64,6 +66,8 @@ export function EditorDock() {
   const setDock = useSessionStore((state) => state.setDock)
   const collapsed = useSessionStore((state) => state.dockCollapsed)
   const setCollapsed = useSessionStore((state) => state.setDockCollapsed)
+  const maximized = useSessionStore((state) => state.dockMaximized)
+  const setMaximized = useSessionStore((state) => state.setDockMaximized)
   const project = useProjectStore((state) => state.project)
   const selectedClipId = useProjectStore((state) => state.selectedClipId)
   const selectedTrackId = useProjectStore((state) => state.selectedTrackId)
@@ -185,11 +189,11 @@ export function EditorDock() {
   return (
     <section
       ref={dockRef}
-      className={`editor-dock ${collapsed ? 'is-collapsed' : ''} ${resizing ? 'is-resizing' : ''}`}
+      className={`editor-dock ${collapsed ? 'is-collapsed' : ''} ${resizing ? 'is-resizing' : ''} ${maximized ? 'is-maximized' : ''}`}
       aria-label="Editor"
-      style={!collapsed && dockHeight !== null ? { height: `${dockHeight}px` } : undefined}
+      style={!collapsed && !maximized && dockHeight !== null ? { height: `${dockHeight}px` } : undefined}
     >
-      {!collapsed && (
+      {!collapsed && !maximized && (
         <div
           className="dock-resize-handle"
           role="separator"
@@ -222,7 +226,7 @@ export function EditorDock() {
       )}
       <div className="dock-tabs">
         <div className="dock-tab-list" role="tablist" aria-label="Studio editors">
-          {TABS.map((tab) => {
+          {TABS.map((tab, index) => {
             const Icon = tab.icon
             return (
               <button
@@ -237,6 +241,7 @@ export function EditorDock() {
               >
                 <Icon size={15} />
                 <span>{tab.label}</span>
+                <kbd className="dock-tab-key">{index + 1}</kbd>
               </button>
             )
           })}
@@ -249,6 +254,15 @@ export function EditorDock() {
             </span>
           )}
           <span className="dock-context-text">{context}</span>
+          <button
+            className={`icon-button mini dock-focus ${maximized ? 'is-active' : ''}`}
+            onClick={() => setMaximized(!maximized)}
+            aria-label={maximized ? 'Leave focus mode' : 'Focus the editor'}
+            aria-pressed={maximized}
+            data-tip={maximized ? 'Back to arrangement  F' : 'Focus the editor  F'}
+          >
+            {maximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+          </button>
           <button
             className="icon-button mini dock-collapse"
             onClick={() => setCollapsed(!collapsed)}

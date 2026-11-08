@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#12100e" />
+    <title>Creer — A warm, free music studio in your browser</title>
+    <meta
+      name="description"
+      content="Creer is a free digital audio workstation that runs in your browser. 53 sounds, a piano roll, a mixer, effects and WAV export — no install, no account, nothing uploaded."
+    />
+    <link rel="canonical" href="https://creerdaw.vercel.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Creer" />
+    <meta property="og:title" content="Creer — Make something beautiful" />
+    <meta
+      property="og:description"
+      content="A warm, fast music studio in your browser. 53 sounds, piano roll, mixer, effects and WAV export. Free, no account."
+    />
+    <meta property="og:url" content="https://creerdaw.vercel.app/" />
+    <meta property="og:image" content="https://creerdaw.vercel.app/shots/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Creer — Make something beautiful" />
+    <meta name="twitter:description" content="A warm, fast music studio in your browser. Free, no account." />
+    <meta name="twitter:image" content="https://creerdaw.vercel.app/shots/og.jpg" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./landing.css" />
+    <script type="module" src="./landing.ts"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="nav" id="nav">
+      <div class="wrap nav-inner">
+        <a class="brand" href="/" aria-label="Creer home">
+          <svg viewBox="0 0 44 44" aria-hidden="true">
+            <circle cx="22" cy="22" r="19.5" fill="none" stroke="currentColor" stroke-width="1.4" opacity="0.7" />
+            <path
+              d="M10 23.5c3.2 0 3.2-8.4 6.4-8.4s3.2 16 6.4 16 3.6-12 6.8-12 2.6 4.4 4.4 4.4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.1"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span>Creer</span>
+        </a>
+        <nav class="nav-links" aria-label="Primary">
+          <a href="#how">How it works</a>
+          <a href="#sound">Sound</a>
+          <a href="#fast">Workflow</a>
+          <a href="#everywhere">Everywhere</a>
+          <a href="https://github.com/ahpah-dev/creer" rel="noopener">GitHub</a>
+        </nav>
+        <a class="btn btn-small btn-primary" href="/app/">Open the studio</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- Hero -->
+      <section class="hero">
+        <div class="hero-glow" aria-hidden="true"></div>
+        <div class="wrap hero-copy">
+          <p class="eyebrow reveal">A studio that fits in a browser tab</p>
+          <h1 class="reveal">Make something <em>beautiful.</em></h1>
+          <p class="lead reveal">
+            Creer is a warm, fast music studio. Spark a groove, draw a melody, shape the sound and export the song —
+            without installing anything or creating an account.
+          </p>
+          <div class="cta-row reveal">
+            <a class="btn btn-primary btn-large" href="/app/">
+              Open the studio
+              <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </a>
+            <a class="btn btn-ghost btn-large" href="https://github.com/ahpah-dev/creer/releases/latest/download/Creer.html" rel="noopener">
+              Download Creer.html
+            </a>
+          </div>
+          <p class="fine reveal">Free forever · No sign-up · Your music never leaves your device</p>
+        </div>
+
+        <div class="wrap">
+          <figure class="hero-shot reveal" aria-label="The Creer studio showing a six-track song and its piano roll">
+            <div class="window">
+              <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>Golden Hour — Creer</span></div>
+              <img src="/shots/studio.webp" width="1440" height="900" alt="Creer studio: six colourful tracks in the arrangement with the piano roll open below" fetchpriority="high" />
+            </div>
+          </figure>
+        </div>
+      </section>
+
+      <!-- Facts strip -->
+      <section class="facts" aria-label="At a glance">
+        <div class="wrap facts-row">
+          <div><strong>53</strong><span>synthesized sounds</span></div>
+          <div><strong>9</strong><span>drum kits</span></div>
+          <div><strong>11</strong><span>studio effects</span></div>
+          <div><strong>MIDI</strong><span>in, with recording</span></div>
+          <div><strong>WAV</strong><span>export in one click</span></div>
+          <div><strong>0</strong><span>accounts or uploads</span></div>
+        </div>
+      </section>
+
+      <!-- How it works -->
+      <section class="section" id="how">
+        <div class="wrap">
+          <header class="section-head reveal">
+            <p class="eyebrow">How it works</p>
+            <h2>From blank page to a finished song in three moves.</h2>
+          </header>
+          <ol class="steps">
+            <li class="step reveal">
+              <span class="step-num">1</span>
+              <h3>Start with a spark</h3>
+              <p>Pick a style and Creer writes drums, bass, chords, texture and a melody for a whole section. Or choose one sound and begin from nothing.</p>
+            </li>
+            <li class="step reveal">
+              <span class="step-num">2</span>
+              <h3>Shape it your way</h3>
+              <p>Draw notes in the piano roll, drop in loops, play it live on your keyboard or a MIDI controller, then balance everything in the mixer.</p>
+            </li>
+            <li class="step reveal">
+              <span class="step-num">3</span>
+              <h3>Share the result</h3>
+              <p>Export a WAV file to send to anyone, or save the project and pick it up later. Everything stays on your device.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Feature rows -->
+      <section class="section section-tight" id="sound">
+        <div class="wrap feature-row">
+          <div class="feature-copy reveal">
+            <p class="eyebrow">Spark an idea</p>
+            <h2>Never stare at an empty timeline again.</h2>
+            <p>
+              Press <strong>Idea</strong> and choose a mood — lo-fi, house, ambient, cinematic, pop or jazz. Creer writes a whole
+              section in your key and tempo, adds it to matching tracks and names the section. Don't like it? Undo is one step.
+            </p>
+            <ul class="ticks">
+              <li>Six styles that write in your song's key</li>
+              <li>Lands on matching tracks, ready to edit</li>
+              <li>Start playing immediately, or place it at the playhead</li>
+            </ul>
+          </div>
+          <figure class="feature-shot reveal">
+            <div class="window"><img src="/shots/spark.webp" width="1440" height="900" loading="lazy" alt="A freshly sparked lo-fi section laid across the arrangement" /></div>
+          </figure>
+        </div>
+
+        <div class="wrap feature-row reverse">
+          <div class="feature-copy reveal">
+            <p class="eyebrow">Play it, don't just program it</p>
+            <h2>A keyboard that's always within reach.</h2>
+            <p>
+              Type on your computer keys, click the on-screen piano or plug in a MIDI keyboard. Arm a track, hit record and your
+              performance lands in the arrangement. Fifty-three synthesized sounds, each with its own voice controls.
+            </p>
+            <ul class="ticks">
+              <li>Musical typing and Web MIDI input with velocity and sustain</li>
+              <li>Octave, attack, tone and dynamics per track</li>
+              <li>Every sound auditions before you commit to it</li>
+            </ul>
+          </div>
+          <figure class="feature-shot reveal">
+            <div class="window"><img src="/shots/keys.webp" width="1440" height="900" loading="lazy" alt="The Sounds and Keys panel with an on-screen keyboard" /></div>
+          </figure>
+        </div>
+
+        <div class="wrap feature-row">
+          <div class="feature-copy reveal">
+            <p class="eyebrow">Mix with intent</p>
+            <h2>Levels, space and polish — all in the same window.</h2>
+            <p>
+              A full mixer with faders, pan and reverb and delay sends, plus an insert chain on every track and the master:
+              filter, drive, EQ, chorus, phaser, tremolo, auto-pan, delay, reverb, compressor and bitcrusher.
+            </p>
+            <ul class="ticks">
+              <li>Per-track and master insert effects</li>
+              <li>Swing from straight time to full triplet feel</li>
+              <li>Exports match what you hear, effects and all</li>
+            </ul>
+          </div>
+          <figure class="feature-shot reveal">
+            <div class="window"><img src="/shots/effects.webp" width="1440" height="900" loading="lazy" alt="An insert effects chain with low-pass filter, chorus and echo delay" /></div>
+          </figure>
+        </div>
+      </section>
+
+      <!-- Workflow / command palette -->
+      <section class="section fast" id="fast">
+        <div class="wrap fast-grid">
+          <div class="reveal">
+            <p class="eyebrow">Built for flow</p>
+            <h2>Everything is one keystroke away.</h2>
+            <p class="lead-sm">
+              Press <kbd>Ctrl</kbd> <kbd>K</kbd> (or <kbd>⌘</kbd> <kbd>K</kbd>) and search any action, sound or setting. Add a bass,
+              jump to bar 33, set the key to D minor or type a tempo like <em>124</em>. Right-click clips for the usual edits,
+              and press <kbd>F</kbd> to give the editor the whole screen.
+            </p>
+            <dl class="keys">
+              <div><dt><kbd>Space</kbd></dt><dd>Play / pause</dd></div>
+              <div><dt><kbd>Enter</kbd></dt><dd>Edit the selected clip</dd></div>
+              <div><dt><kbd>T</kbd></dt><dd>New track</dd></div>
+              <div><dt><kbd>R</kbd></dt><dd>Record</dd></div>
+              <div><dt><kbd>L</kbd></dt><dd>Loop</dd></div>
+              <div><dt><kbd>F</kbd></dt><dd>Focus the editor</dd></div>
+            </dl>
+          </div>
+
+          <div class="palette-mock reveal" role="img" aria-label="The Creer command palette searching for 'bass'">
+            <div class="pm-search">
+              <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="9" cy="9" r="5.5" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="m13.5 13.5 3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+              <span class="pm-typed">add bass</span><i class="pm-caret"></i>
+              <kbd>Esc</kbd>
+            </div>
+            <ul class="pm-list">
+              <li class="is-active"><b>+</b><span>Add Round Bass track</span><em>Create</em></li>
+              <li><b>+</b><span>Add Upright Bass track</span><em>Create</em></li>
+              <li><b>+</b><span>Add Reese track</span><em>Create</em></li>
+              <li><b>+</b><span>Add Deep End track</span><em>Create</em></li>
+              <li><b>+</b><span>Add Fretless track</span><em>Create</em></li>
+            </ul>
+            <div class="pm-foot"><span>↑ ↓ navigate</span><span>↵ run</span><span class="grow">Every action lives here.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Feature grid -->
+      <section class="section" id="everywhere">
+        <div class="wrap">
+          <header class="section-head reveal">
+            <p class="eyebrow">Everywhere you are</p>
+            <h2>Powerful where you want it, simple where you don't.</h2>
+          </header>
+          <div class="cards">
+            <article class="card reveal">
+              <h3>Creer Mobile</h3>
+              <p>Open it on a phone and it switches to a touch-first studio with a multi-touch piano, chord strip, drum pads and finger-sized editing.</p>
+            </article>
+            <article class="card reveal">
+              <h3>Private by design</h3>
+              <p>Projects autosave to your own device. There are no accounts, no servers storing your songs and nothing to upload.</p>
+            </article>
+            <article class="card reveal">
+              <h3>One-file portable</h3>
+              <p>Download <code>Creer.html</code> — the entire studio in a single file you can double-click, keep on a USB stick and run offline.</p>
+            </article>
+            <article class="card reveal">
+              <h3>Loop library</h3>
+              <p>Beats, basslines, chords, melodies and textures that drop onto the right track and transpose to your key automatically.</p>
+            </article>
+            <article class="card reveal">
+              <h3>Real piano roll</h3>
+              <p>Draw, drag, resize, quantize and nudge notes. Box-select, zoom up to 800% and hear every pitch as you move it.</p>
+            </article>
+            <article class="card reveal">
+              <h3>Open source</h3>
+              <p>Creer is released under the Unlicense — public domain. Read it, fork it, bend it into your own instrument.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Final CTA -->
+      <section class="cta">
+        <div class="cta-glow" aria-hidden="true"></div>
+        <div class="wrap cta-inner reveal">
+          <h2>Your next song is one click away.</h2>
+          <p>Open the studio, press Space to hear the demo, then make something of your own.</p>
+          <div class="cta-row center">
+            <a class="btn btn-primary btn-large" href="/app/">Open the studio</a>
+            <a class="btn btn-ghost btn-large" href="https://github.com/ahpah-dev/creer" rel="noopener">View on GitHub</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap footer-inner">
+        <a class="brand" href="/" aria-label="Creer home">
+          <svg viewBox="0 0 44 44" aria-hidden="true">
+            <circle cx="22" cy="22" r="19.5" fill="none" stroke="currentColor" stroke-width="1.4" opacity="0.7" />
+            <path d="M10 23.5c3.2 0 3.2-8.4 6.4-8.4s3.2 16 6.4 16 3.6-12 6.8-12 2.6 4.4 4.4 4.4" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" />
+          </svg>
+          <span>Creer</span>
+        </a>
+        <p>A warm, browser-native DAW. Released into the public domain.</p>
+        <nav aria-label="Footer">
+          <a href="/app/">Studio</a>
+          <a href="https://github.com/ahpah-dev/creer" rel="noopener">GitHub</a>
+          <a href="https://github.com/ahpah-dev/creer/releases/latest/download/Creer.html" rel="noopener">Download</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

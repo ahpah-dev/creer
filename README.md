@@ -2,7 +2,7 @@
 
 **A warm, fast digital audio workstation for the web.** Make a beat, hum a melody, borrow a loop and turn it into a song — all in the browser, with no account and no upload.
 
-**Play online:** [**ahpah-dev.github.io/creer**](https://ahpah-dev.github.io/creer/)
+**Website:** [**creerdaw.vercel.app**](https://creerdaw.vercel.app) · **Studio:** [creerdaw.vercel.app/app](https://creerdaw.vercel.app/app/) · also on [GitHub Pages](https://ahpah-dev.github.io/creer/)
 
 ![Creer studio](screenshots/studio.png)
 
@@ -10,7 +10,7 @@
 
 ### Play online
 
-Open **[ahpah-dev.github.io/creer](https://ahpah-dev.github.io/creer/)**. The site is served over HTTPS, so Web MIDI permissions are available directly in the browser.
+Open **[creerdaw.vercel.app/app](https://creerdaw.vercel.app/app/)** (or the [GitHub Pages copy](https://ahpah-dev.github.io/creer/)). Both are served over HTTPS, so Web MIDI permissions are available directly in the browser.
 
 ### The quick way
 
@@ -37,6 +37,19 @@ npm run build:standalone
 
 That writes `standalone/index.html`, the finished `Creer.html`, and the GitHub Pages copy at `docs/index.html`.
 
+## Faster to use
+
+The studio is organised around the things you do most, and everything else is one search away.
+
+- **Command palette** — press `Ctrl/⌘ + K` (or click **Search** in the top bar) to find any action, sound or setting: *add bass*, *export*, *key d minor*, *mixer*. Type a number like `124` to set the tempo, or jump to a bar.
+- **Quick-add sounds** — one-click Drums, Bass, Keys, Pad, Lead and Bells chips sit under the track list. Each adds a track with an empty clip and opens the piano roll.
+- **Start panel** — a blank session greets you with three ways in: spark an idea, pick a sound, or drop in a loop.
+- **Quick-start guide** — the **Guide** pill in the top bar tracks five steps from first sound to exported song and jumps to each one. Hide it whenever you like; **Show the quick-start guide** in the palette brings it back.
+- **Contextual toolbar** — select a clip and its actions (**Edit notes**, Split, Duplicate, Copy, Delete) appear beside the clip's name. With nothing selected the toolbar stays quiet.
+- **Right-click menus** — right-click a clip to edit, split, duplicate, copy, cut or delete it; right-click an empty lane to add a clip or paste.
+- **Focus mode** — press `F` (or the expand button on the editor tabs) to give the piano roll or mixer the whole window, and `F` or `Esc` to return.
+- **Numbered editor tabs and live hints** — tabs show their `1`–`5` shortcut, and the status bar explains what the selection can do.
+
 ## Creer Mobile
 
 Open Creer on a phone and it switches to **Creer Mobile**, a touch-first layout in the spirit of BandLab and GarageBand. It is the same engine, sounds and project file, rebuilt around thumbs:
@@ -45,7 +58,7 @@ Open Creer on a phone and it switches to **Creer Mobile**, a touch-first layout 
 - **Play** – a multi-touch piano with glissando and scale hints, a one-tap **Chords** strip built from your project's key, and velocity-sensitive drum pads. Hit record and your performance is captured into a region.
 - **Edit** – a finger-sized piano roll: tap to add notes, drag to move, pull the end to resize, with grid, velocity, quantize, octave shift and drum-name rows.
 - **Mixer** – full-height faders with live meters, pan, mute/solo and a master strip.
-- **Library** – Spark an idea, browse and drop in loops, or audition all 54 sounds.
+- **Library** – Spark an idea, browse and drop in loops, or audition all 53 sounds.
 - **Project menu** – tempo, key, swing, WAV export, save/open `.creer.json`, new project and the demo song.
 
 Portrait and landscape both work, safe areas and the iOS silent switch are handled, and projects autosave on the device and are shared with the desktop version.
@@ -57,7 +70,7 @@ Phones are detected automatically (user agent, or a small touch screen). To forc
 - **Six-track demo song, “Golden Hour”** — play it immediately, solo parts, or pull it apart to learn how it was built.
 - **Piano-roll editor** — draw, drag, resize and nudge notes, change velocity, quantize, transpose, split clips, and edit drum patterns by drum name. Drag a note up or down and you hear each new pitch as it moves; drag any selected note and the whole selection moves together. Zoom in from 100% to 800% with the − / + controls, or hold Ctrl/⌘ and scroll to zoom around the pointer. Drag the grip above the editor tabs to make the piano roll as tall as you like; double-click the grip to reset its height.
 - **Spark an idea** — press **Idea** to generate a whole section in one click. Six styles write drums, bass, chords, texture and a melody into matching tracks, add a named section, and can start playing immediately. Undo is one step.
-- **Instrument library** — 54 synthesized sounds across Keys, Bass, Pads, Leads and Drums, including nine drum kits. Filter by **New** to find the 2.0 additions. Search or filter the collection, audition any sound, load it onto the current track with one click, or grow a new track from it.
+- **Instrument library** — 53 synthesized sounds across Keys, Bass, Pads, Leads and Drums, including nine drum kits. Filter by **New** to find the 2.0 additions. Search or filter the collection, audition any sound, load it onto the current track with one click, or grow a new track from it.
 - **New in the 2.0 sound update** — Concert Grand (stretched, inharmonic partials with twin-string beating, hammer felt and damper release), Funk Clav, Steel Pan, Cathedral Organ, Acid Line, Upright Bass, Rubber Pulse, Velour Poly, Crystal Pad, Tape Strings, Steel Strings, Harmon Trumpet, Clay Ocarina and Chip Lead, plus Trap, House and Dusty Breaks kits with metallic six-oscillator cymbals.
 - **Voice controls** — every track now has Octave, Attack, Tone and Dynamics controls in **Sounds & Keys**. They shape live playing, playback and WAV export, and are saved with the project.
 - **Natural releases** — live notes now ring out with each instrument's own release instead of cutting off, and the shared reverb uses a new room impulse with early reflections and a tail that darkens as it fades.
@@ -147,7 +160,10 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 
 | Shortcut | Action |
 | --- | --- |
+| `Ctrl/⌘ + K` | Open the command palette |
 | `Space` | Play / pause |
+| `Enter` | Open the selected clip in the piano roll |
+| `F` | Focus the editor (full-window piano roll, mixer…) |
 | `Ctrl/⌘ + Z` | Undo |
 | `Ctrl/⌘ + Shift + Z` | Redo |
 | `Ctrl/⌘ + D` | Duplicate selected clip |
@@ -164,7 +180,18 @@ The audio is synthesised live with Web Audio. There are no samples or external a
 | `A` – `K` | Musical typing (when Sounds & Keys is open) |
 | `Z` / `X` | Octave down / up (keyboard) |
 | `Alt + drag` | Move without snapping |
+| Right-click | Clip and lane menus |
 | `?` | Open help |
+
+## Website and deployment
+
+The repository holds two pages: the studio (`index.html`) and a marketing landing page (`landing/`). `npm run build:site` builds both and arranges them for static hosting — the landing page at `/` and the studio at `/app/` — which is exactly what `vercel.json` runs:
+
+```bash
+npm run build:site
+```
+
+The landing page lives in `landing/` and uses the same fonts and palette as the studio. During development it is available at `/landing/` on the dev server.
 
 ## Under the hood
 

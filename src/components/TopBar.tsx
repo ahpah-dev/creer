@@ -13,6 +13,7 @@ import {
   Play,
   Redo2,
   Repeat2,
+  Search,
   SkipBack,
   Square,
   Undo2,
@@ -30,9 +31,10 @@ import {
   stopTransport,
 } from '../lib/transport'
 import { formatBeatPosition, formatTime, MOD_LABEL, SHIFT_LABEL } from '../lib/utils'
-import { safeFilename, downloadBlob } from '../audio/export'
-import { stopRecording, toggleRecording } from '../lib/recording'
+import { importProjectFile, saveProjectCopy } from '../lib/projectFile'
+import { toggleRecording } from '../lib/recording'
 import { MidiControl } from './MidiControl'
+import { GuideButton } from './QuickStart'
 
 const SONG_KEYS = ['C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭', 'A', 'B♭', 'B']
 
@@ -106,34 +108,7 @@ function TransportReadout() {
 function ProjectMenu() {
   const { open, setOpen, ref } = usePopover()
   const fileRef = useRef<HTMLInputElement>(null)
-  const project = useProjectStore((state) => state.project)
   const setModal = useSessionStore((state) => state.setModal)
-  const toast = useSessionStore((state) => state.toast)
-  const replaceProject = useProjectStore((state) => state.replaceProject)
-
-  const importProject = async (file: File) => {
-    try {
-      const text = await file.text()
-      const data = JSON.parse(text)
-      if (useSessionStore.getState().isRecording) stopRecording()
-      engine.stop()
-      const session = useSessionStore.getState()
-      session.setPlaying(false)
-      session.setPausedBeat(0)
-      session.setSelectedNoteIds([])
-      replaceProject(data, { clearHistory: true })
-      toast('Project imported', `"${data.name ?? file.name}" is ready to play.`, 'success')
-    } catch {
-      toast('Could not open that file', 'Choose a Creer project (.json) to import.', 'warn')
-    }
-    if (fileRef.current) fileRef.current.value = ''
-  }
-
-  const saveCopy = () => {
-    const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' })
-    downloadBlob(blob, `${safeFilename(project.name)}.creer.json`)
-    toast('Project saved to your computer', 'A .creer.json copy has been downloaded.', 'success')
-  }
 
   return (
     <div className="project-menu-wrap" ref={ref}>
@@ -144,7 +119,8 @@ function ProjectMenu() {
         hidden
         onChange={(event) => {
           const file = event.target.files?.[0]
-          if (file) void importProject(file)
+          if (file) void importProjectFile(file)
+          event.target.value = ''
         }}
       />
       <button
@@ -181,7 +157,7 @@ function ProjectMenu() {
             className="menu-item"
             onClick={() => {
               setOpen(false)
-              saveCopy()
+              saveProjectCopy()
             }}
           >
             <Download size={15} /> Save a copy
@@ -566,6 +542,17 @@ export function TopBar() {
           <span>{saveStatus === 'saving' ? 'Saving' : saveStatus === 'error' ? 'Not saved' : 'Saved'}</span>
         </div>
         <div className="topbar-action-divider" />
+        <GuideButton />
+        <button
+          className="palette-trigger"
+          onClick={() => setModal('palette')}
+          aria-label="Search actions"
+          data-tip={`Search every action  ${MOD_LABEL}K`}
+        >
+          <Search size={14} />
+          <span className="palette-trigger-label">Search</span>
+          <kbd>{MOD_LABEL}K</kbd>
+        </button>
         <MidiControl />
         <button className="icon-button help-button" onClick={() => setModal('help')} aria-label="Help" data-tip="Help  ?">
           <HelpCircle size={17} />

@@ -1,18 +1,31 @@
 import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from 'react'
-import { Pencil, Plus } from 'lucide-react'
+import {
+  ClipboardPaste,
+  Copy,
+  CopyPlus,
+  Pencil,
+  PencilLine,
+  Plus,
+  Scissors,
+  Trash2,
+} from 'lucide-react'
 import type { Clip, DragState, LoopSettings, Track } from '../types'
 import { useProjectStore } from '../store/project'
 import { useSessionStore } from '../store/session'
 import { engine } from '../audio/engine'
 import { getCurrentBeat, seekTo } from '../lib/transport'
-import { addClipOnTrack } from '../lib/clips'
+import { addClipOnTrack, deleteSelectedClip, duplicateSelectedClip, splitSelectedClip } from '../lib/clips'
+import { copySelectedClips, cutSelectedClips, pasteClipboard } from '../lib/clipboard'
+import { editSelection } from '../lib/commands'
 import { moveClipBetweenTracks } from '../lib/tracks'
-import { clamp, projectEnd, snapBeat, uid } from '../lib/utils'
+import { MOD_LABEL, clamp, projectEnd, snapBeat, uid } from '../lib/utils'
 import { SECTION_COLORS, nextSectionName, sectionColor } from '../data/sections'
 import { ClipView } from './ClipView'
 import { TrackHeader } from './TrackHeader'
 import { SectionEditor } from './SectionEditor'
+import { ContextMenu, type ContextMenuEntry } from './ContextMenu'
+import { QuickAddTracks, StartPanel } from './QuickStart'
 
 const TRACK_HEIGHT = 68
 const RULER_HEIGHT = 44
@@ -69,6 +82,13 @@ export function Arrangement() {
     y1: number
     x2: number
     y2: number
+  } | null>(null)
+  const [contextMenu, setContextMenu] = useState<{
+    x: number
+    y: number
+    trackId: string
+    clipId: string | null
+    beat: number
   } | null>(null)
   const [sectionEditor, setSectionEditor] = useState<{
     sectionId: string
@@ -369,6 +389,60 @@ export function Arrangement() {
     toast('Empty clip added', 'Draw notes below, or add a loop from the library.', 'success')
   }
 
+  const handleLaneContextMenu = (event: ReactMouseEvent<HTMLDivElement>, track: Track) => {
+    event.preventDefault()
+    const clipEl = (event.target as HTMLElement).closest<HTMLElement>('[data-clip-id]')
+    const clipId = clipEl?.dataset.clipId ?? null
+    const beat = beatFromClientX(event.clientX, false)
+    const store = useProjectStore.getState()
+    if (clipId) {
+      // Keep a multi-selection intact when right-clicking inside it.
+      if (!store.selectedClipIds.includes(clipId)) store.selectClip(track.id, clipId)
+    } else {
+      store.selectTrack(track.id, store.selectedClipId)
+    }
+    setSelectedNoteIds([])
+    setContextMenu({ x: event.clientX, y: event.clientY, trackId: track.id, clipId, beat })
+  }
+
+  const contextItems = (): ContextMenuEntry[] => {
+    if (!contextMenu) return []
+    const track = project.tracks.find((item) => item.id === contextMenu.trackId)
+    if (!track) return []
+    const count = useProjectStore.getState().selectedClipIds.length
+    if (contextMenu.clipId) {
+      const plural = count > 1
+      return [
+        { label: 'Edit notes', icon: <PencilLine size={15} />, hint: 'Enter', onClick: editSelection, disabled: plural },
+        'divider',
+        { label: 'Split at playhead', icon: <Scissors size={15} />, onClick: splitSelectedClip, disabled: plural },
+        { label: plural ? `Duplicate ${count} clips` : 'Duplicate', icon: <CopyPlus size={15} />, hint: `${MOD_LABEL}D`, onClick: duplicateSelectedClip, disabled: plural },
+        { label: plural ? `Copy ${count} clips` : 'Copy', icon: <Copy size={15} />, hint: `${MOD_LABEL}C`, onClick: () => copySelectedClips() },
+        { label: plural ? `Cut ${count} clips` : 'Cut', icon: <Scissors size={15} />, hint: `${MOD_LABEL}X`, onClick: () => cutSelectedClips() },
+        'divider',
+        { label: plural ? `Delete ${count} clips` : 'Delete', icon: <Trash2 size={15} />, hint: '⌫', danger: true, onClick: deleteSelectedClip },
+      ]
+    }
+    const at = Math.floor(contextMenu.beat / project.timeSig) * project.timeSig
+    return [
+      {
+        label: 'New clip here',
+        icon: <Plus size={15} />,
+        onClick: () => {
+          addClipOnTrack(track.id, at)
+        },
+      },
+      {
+        label: 'Paste at playhead',
+        icon: <ClipboardPaste size={15} />,
+        hint: `${MOD_LABEL}V`,
+        onClick: () => pasteClipboard(),
+      },
+      'divider',
+      { label: 'Add another track…', icon: <Plus size={15} />, hint: 'T', onClick: () => setModal('addTrack') },
+    ]
+  }
+
   const beginClipDrag = (
     event: ReactPointerEvent<HTMLDivElement>,
     track: Track,
@@ -544,6 +618,7 @@ export function Arrangement() {
               />
             ))}
             <div className="add-track-footer">
+              <QuickAddTracks />
               <button className="ghost-add-track" onClick={() => setModal('addTrack')}>
                 <Plus size={15} />
                 <span>Add another track</span>
@@ -700,6 +775,7 @@ export function Arrangement() {
                 data-track-lane={track.id}
                 onPointerDown={(event) => handleLaneDown(event, track)}
                 onDoubleClick={(event) => handleLaneDoubleClick(event, track)}
+                onContextMenu={(event) => handleLaneContextMenu(event, track)}
               >
                 <div className="lane-grid" aria-hidden="true" />
                 {!track.clips.length && (
@@ -715,6 +791,7 @@ export function Arrangement() {
                     <div
                       key={clip.id}
                       className="clip-slot"
+                      data-clip-id={clip.id}
                       style={{ left: clip.start * zoom, top: TRACK_GAP / 2, width, height: TRACK_HEIGHT - TRACK_GAP }}
                     >
                       <ClipView
@@ -778,6 +855,17 @@ export function Arrangement() {
           <div className="timeline-corner-shade" aria-hidden="true" />
         </div>
       </div>
+
+      {project.tracks.every((track) => track.clips.length === 0) && <StartPanel />}
+
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          items={contextItems()}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
 
       {sectionEditor && (
         <SectionEditor

@@ -2,13 +2,21 @@ import { create } from 'zustand'
 import type { DockTab, Toast } from '../types'
 import { clamp, uid } from '../lib/utils'
 
-export type ModalType = 'help' | 'new' | 'export' | 'addTrack' | 'sounds' | 'idea' | null
+export type ModalType = 'help' | 'new' | 'export' | 'addTrack' | 'sounds' | 'idea' | 'palette' | null
 
 interface SessionState {
   dock: DockTab
   setDock: (dock: DockTab) => void
   dockCollapsed: boolean
   setDockCollapsed: (collapsed: boolean) => void
+  /** Focus mode: the editor takes the whole workspace. */
+  dockMaximized: boolean
+  setDockMaximized: (maximized: boolean) => void
+  /** Progress markers for the quick-start guide. */
+  progress: { played: boolean; exported: boolean; shaped: boolean }
+  markProgress: (key: 'played' | 'exported' | 'shaped') => void
+  guideDismissed: boolean
+  setGuideDismissed: (dismissed: boolean) => void
   zoom: number
   setZoom: (zoom: number) => void
   pianoZoom: number
@@ -47,6 +55,23 @@ interface SessionState {
   setPreviewingLoop: (id: string | null) => void
 }
 
+const readFlag = (key: string) => {
+  try {
+    return localStorage.getItem(key) === '1'
+  } catch {
+    return false
+  }
+}
+
+const writeFlag = (key: string, value: boolean) => {
+  try {
+    if (value) localStorage.setItem(key, '1')
+    else localStorage.removeItem(key)
+  } catch {
+    /* storage can be unavailable in private or embedded contexts */
+  }
+}
+
 const readZoom = () => {
   try {
     const raw = Number(localStorage.getItem('creer.zoom'))
@@ -83,14 +108,29 @@ const writePianoZoom = (value: number) => {
 
 export const useSessionStore = create<SessionState>((set, get) => ({
   dock: 'editor',
-  setDock: (dock) =>
+  setDock: (dock) => {
+    if (dock === 'mixer' || dock === 'effects' || dock === 'keys') get().markProgress('shaped')
     set({
       dock,
       dockCollapsed: false,
       ...(dock !== 'editor' ? { selectedNoteIds: [] } : {}),
-    }),
+    })
+  },
   dockCollapsed: false,
-  setDockCollapsed: (dockCollapsed) => set({ dockCollapsed }),
+  setDockCollapsed: (dockCollapsed) => set({ dockCollapsed, ...(dockCollapsed ? { dockMaximized: false } : {}) }),
+  dockMaximized: false,
+  setDockMaximized: (dockMaximized) => set({ dockMaximized, ...(dockMaximized ? { dockCollapsed: false } : {}) }),
+  progress: { played: false, exported: false, shaped: false },
+  markProgress: (key) => {
+    const current = get().progress
+    if (current[key]) return
+    set({ progress: { ...current, [key]: true } })
+  },
+  guideDismissed: readFlag('creer.guideDismissed'),
+  setGuideDismissed: (guideDismissed) => {
+    writeFlag('creer.guideDismissed', guideDismissed)
+    set({ guideDismissed })
+  },
   zoom: readZoom(),
   setZoom: (zoom) => {
     const next = clamp(zoom, 8, 56)
@@ -108,7 +148,10 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   noteLength: 1,
   setNoteLength: (noteLength) => set({ noteLength }),
   isPlaying: false,
-  setPlaying: (isPlaying) => set({ isPlaying }),
+  setPlaying: (isPlaying) => {
+    if (isPlaying) get().markProgress('played')
+    set({ isPlaying })
+  },
   isRecording: false,
   setRecording: (isRecording) => set({ isRecording }),
   metronome: false,
